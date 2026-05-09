@@ -48,6 +48,7 @@
         <if test="empId != null and empId != ''">
             AND t2.EMPID LIKE '%' || #{empId} || '%'
         </if>
+        
         <if test="localName != null and localName != ''">
             AND t2.LOCAL_NAME LIKE '%' || #{localName} || '%'
         </if>
