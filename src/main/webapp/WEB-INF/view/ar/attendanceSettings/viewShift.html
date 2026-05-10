@@ -2,15 +2,15 @@
     <div class="row h-100">
         <!-- Left Pane: Shift Parent Tree (AR_SHIFT010) -->
         <div class="col-md-2 border-end p-3 bg-white mb-3">
-            <h5 class="mb-3">Danh sách Ca làm việc (Shift)</h5>
+            <h5 class="mb-3" th:text="#{ar.viewshift.title.shiftlist}">Danh sách Ca làm việc (Shift)</h5>
             <div class="d-flex mb-2">
-                <input type="text" class="form-control me-2" id="arShift_searchTreeInput" placeholder="Tìm kiếm ca...">
+                <input type="text" class="form-control me-2" id="arShift_searchTreeInput" th:placeholder="#{ar.viewshift.placeholder.search}" placeholder="Tìm kiếm ca...">
                 <div class="btn-group">
-                    <button class="btn btn-sm btn-success" onclick="arShiftOpenModal()" title="Thêm mới ca làm việc"><i
+                    <button class="btn btn-sm btn-success" onclick="arShiftOpenModal()" th:title="#{ar.viewshift.title.addshift}" title="Thêm mới ca làm việc"><i
                             class="bx bx-plus"></i></button>
-                    <button class="btn btn-sm btn-warning" onclick="arShiftEditSelected()" title="Sửa ca đăng chọn"><i
+                    <button class="btn btn-sm btn-warning" onclick="arShiftEditSelected()" th:title="#{ar.viewshift.title.editshift}" title="Sửa ca đăng chọn"><i
                             class="bx bx-edit"></i></button>
-                    <button class="btn btn-sm btn-danger" onclick="arShiftDeleteSelected()" title="Xóa ca đang chọn"><i
+                    <button class="btn btn-sm btn-danger" onclick="arShiftDeleteSelected()" th:title="#{ar.viewshift.title.deleteshift}" title="Xóa ca đang chọn"><i
                             class="bx bx-trash"></i></button>
                 </div>
             </div>
@@ -24,10 +24,10 @@
         <div class="col-md-10 p-3 bg-white mb-3">
             <div class="card h-100 border-0">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <span class="fw-bold" id="arShiftDetail_selectedParentLabel">Tham số ca làm việc</span>
+                    <span class="fw-bold" id="arShiftDetail_selectedParentLabel" th:text="#{ar.viewshift.title.bancicanshu}">Tham số ca làm việc</span>
                     <div>
                         <button class="btn btn-sm btn-success" onclick="arShiftDetailOpenModal()"><i
-                                class="bx bx-plus"></i> Thêm chi tiết</button>
+                                class="bx bx-plus"></i> <span th:text="#{ar.viewshift.title.adddetail}">Thêm chi tiết</span></button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -36,16 +36,16 @@
                             class="table table-striped table-bordered table-hover w-100 display nowrap">
                             <thead class="table-light">
                                 <tr>
-                                    <th>STT</th>
+                                    <th th:text="#{common.stt}">STT</th>
                                     <th>PK No</th>
-                                    <th>Hạng mục (Item)</th>
-                                    <th>Độ lệch ngày b/đầu</th>
-                                    <th>Giờ bắt đầu</th>
-                                    <th>Độ lệch ngày k/thúc</th>
-                                    <th>Giờ kết thúc</th>
-                                    <th>Sắp xếp</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
+                                    <th th:text="#{ar.viewshift.title.hangmuc}">Hạng mục (Item)</th>
+                                    <th th:text="#{ar.viewshift.title.beginoffset}">Độ lệch ngày b/đầu</th>
+                                    <th th:text="#{ar.viewshift.title.start}">Giờ bắt đầu</th>
+                                    <th th:text="#{ar.viewshift.title.endoffset}">Độ lệch ngày k/thúc</th>
+                                    <th th:text="#{ar.viewshift.title.end}">Giờ kết thúc</th>
+                                    <th th:text="#{common.orderno}">Sắp xếp</th>
+                                    <th th:text="#{common.activity}">Trạng thái</th>
+                                    <th th:text="#{common.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -63,7 +63,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="arShiftModalTitle">Thiết lập Ca làm việc (Shift)</h5>
+                    <h5 class="modal-title" id="arShiftModalTitle" th:text="#{ar.viewshift.title.setupshift}">Thiết lập Ca làm việc (Shift)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -72,70 +72,70 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Mã nhóm (Shift ID)</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.banciID}">Mã nhóm (Shift ID)</label>
                                 <input type="text" class="form-control" id="shiftShiftId" name="shiftId">
                             </div>
 
-                            <div class="col-md-6"><label class="form-label">Tên Tiếng Việt <span
+                            <div class="col-md-6"><label class="form-label" th:text="#{common.nameVi}">Tên Tiếng Việt <span
                                         class="text-danger">*</span></label><input type="text" class="form-control"
                                     id="shiftNameVi" required></div>
-                            <div class="col-md-6"><label class="form-label">Tên Tiếng Anh <span
+                            <div class="col-md-6"><label class="form-label" th:text="#{common.nameEn}">Tên Tiếng Anh <span
                                         class="text-danger">*</span></label><input type="text" class="form-control"
                                     id="shiftNameEn" required></div>
-                            <div class="col-md-6"><label class="form-label">Tên Tiếng Trung <span
+                            <div class="col-md-6"><label class="form-label" th:text="#{common.nameZh}">Tên Tiếng Trung <span
                                         class="text-danger">*</span></label><input type="text" class="form-control"
                                     id="shiftNameZh" required></div>
-                            <div class="col-md-6"><label class="form-label">Tên Tiếng Hàn <span
+                            <div class="col-md-6"><label class="form-label" th:text="#{common.nameKo}">Tên Tiếng Hàn <span
                                         class="text-danger">*</span></label><input type="text" class="form-control"
                                     id="shiftNameKo" required></div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Tên rút gọn (Shortname)</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.shortname}">Tên rút gọn (Shortname)</label>
                                 <input type="text" class="form-control" id="shiftShiftShortname">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Kiểu dữ liệu (Datatype)</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.datatype}">Kiểu dữ liệu (Datatype)</label>
                                 <input type="number" class="form-control" id="shiftDatatype">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Phân chia phòng ban</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.deptdistinguish}">Phân chia phòng ban</label>
                                 <input type="text" class="form-control" id="shiftDeptDistinguishNo">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Thời gian khấu trừ</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.kouchushijian}">Thời gian khấu trừ</label>
                                 <input type="number" step="any" class="form-control" id="shiftDeductTime">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Giờ bắt đầu OT</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.ottimestart}">Giờ bắt đầu OT</label>
                                 <input type="text" class="form-control" id="shiftOtTimeStart" placeholder="HH:mm">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Phụ cấp OT</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.otallowance}">Phụ cấp OT</label>
                                 <input type="number" step="any" class="form-control" id="shiftOtAllowance">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Độ dài ca (Shift length)</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.shiftlength}">Độ dài ca (Shift length)</label>
                                 <input type="number" step="any" class="form-control" id="shiftShiftLength">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Sắp xếp</label>
+                                <label class="form-label" th:text="#{common.orderno}">Sắp xếp</label>
                                 <input type="number" class="form-control" id="shiftOrderno" value="0">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Trạng thái (Activity)</label>
+                                <label class="form-label" th:text="#{common.activity}">Trạng thái (Activity)</label>
                                 <select class="form-select" id="shiftActivity">
-                                    <option value="1">Hoạt động</option>
-                                    <option value="0">Ngừng</option>
+                                    <option value="1" th:text="#{common.active}">Hoạt động</option>
+                                    <option value="0" th:text="#{common.inactive}">Ngừng</option>
                                 </select>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" onclick="arShiftSaveData()">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="arShiftSaveData()" th:text="#{common.save}">Lưu</button>
                 </div>
             </div>
         </div>
@@ -146,7 +146,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="arShiftDetailModalTitle">Chi tiết tham số ca làm việc</h5>
+                    <h5 class="modal-title" id="arShiftDetailModalTitle" th:text="#{ar.viewshift.title.shiftdetailtitle}">Chi tiết tham số ca làm việc</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -156,47 +156,47 @@
 
                         <div class="row g-3">
                             <div class="col-md-12">
-                                <label class="form-label">Hạng mục (Item) <span class="text-danger">*</span></label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.hangmuc}">Hạng mục (Item) <span class="text-danger">*</span></label>
                                 <select class="form-select" id="detailItemNo" required>
-                                    <option value="">-- Chọn hạng mục --</option>
+                                    <option value="" th:text="#{ar.viewshift.title.selecthangmuc}">-- Chọn hạng mục --</option>
                                 </select>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Độ lệch ngày bắt đầu</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.beginoffset}">Độ lệch ngày bắt đầu</label>
                                 <input type="number" class="form-control" id="detailBeginDayOffset" value="0">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Giờ bắt đầu</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.start}">Giờ bắt đầu</label>
                                 <input type="time" class="form-control" id="detailFromTimeStr">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Độ lệch ngày kết thúc</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.endoffset}">Độ lệch ngày kết thúc</label>
                                 <input type="number" class="form-control" id="detailEndDayOffset" value="0">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Giờ kết thúc</label>
+                                <label class="form-label" th:text="#{ar.viewshift.title.end}">Giờ kết thúc</label>
                                 <input type="time" class="form-control" id="detailToTimeStr">
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Sắp xếp</label>
+                                <label class="form-label" th:text="#{common.orderno}">Sắp xếp</label>
                                 <input type="number" class="form-control" id="detailOrderno" value="0">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Trạng thái (Activity)</label>
+                                <label class="form-label" th:text="#{common.activity}">Trạng thái (Activity)</label>
                                 <select class="form-select" id="detailActivity">
-                                    <option value="1">Hoạt động</option>
-                                    <option value="0">Ngừng</option>
+                                    <option value="1" th:text="#{common.active}">Hoạt động</option>
+                                    <option value="0" th:text="#{common.inactive}">Ngừng</option>
                                 </select>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" onclick="arShiftDetailSaveData()">Lưu chi
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="arShiftDetailSaveData()" th:text="#{ar.viewshift.title.savedetail}">Lưu chi
                         tiết</button>
                 </div>
             </div>

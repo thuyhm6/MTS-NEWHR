@@ -6,28 +6,28 @@
                     <!-- Search Form -->
                     <form id="searchForm" class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label for="searchEmpId" class="form-label">Mã nhân viên</label>
-                            <input type="text" class="form-control" id="searchEmpId" placeholder="Nhập mã nhân viên">
+                            <label for="searchEmpId" class="form-label" th:text="#{hrm.addressSearch.title.empId}">Mã nhân viên</label>
+                            <input type="text" class="form-control" id="searchEmpId" th:placeholder="#{hrm.addressSearch.title.empIdPlaceholder}" placeholder="Nhập mã nhân viên">
                         </div>
                         <div class="col-md-3">
-                            <label for="searchLocalName" class="form-label">Tên nhân viên</label>
+                            <label for="searchLocalName" class="form-label" th:text="#{hrm.addressSearch.title.localName}">Tên nhân viên</label>
                             <input type="text" class="form-control" id="searchLocalName"
-                                placeholder="Nhập tên nhân viên">
+                                th:placeholder="#{hrm.addressSearch.title.localNamePlaceholder}" placeholder="Nhập tên nhân viên">
                         </div>
                         <div class="col-md-3">
-                            <label for="searchAddressContent" class="form-label">Nội dung địa chỉ</label>
+                            <label for="searchAddressContent" class="form-label" th:text="#{hrm.addressSearch.title.addressContent}">Nội dung địa chỉ</label>
                             <input type="text" class="form-control" id="searchAddressContent"
-                                placeholder="Nhập nội dung địa chỉ">
+                                th:placeholder="#{hrm.addressSearch.title.addressContentPlaceholder}" placeholder="Nhập nội dung địa chỉ">
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary me-2" onclick="searchData()">
-                                <i class="bx bx-search"></i> Tìm kiếm
+                                <i class="bx bx-search"></i> <span th:text="#{hrm.addressSearch.title.search}">Tìm kiếm</span>
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="clearSearch()">
-                                <i class="bx bx-x"></i> Xóa lọc
+                                <i class="bx bx-x"></i> <span th:text="#{hrm.addressSearch.title.clearFilter}">Xóa lọc</span>
                             </button>
                             <button type="button" class="btn btn-success ms-2" onclick="openModal()">
-                                <i class="bx bx-plus"></i> Thêm mới
+                                <i class="bx bx-plus"></i> <span th:text="#{hrm.addressSearch.title.addNew}">Thêm mới</span>
                             </button>
                         </div>
                     </form>
@@ -38,14 +38,14 @@
                             style="width:100%">
                             <thead class="table-light">
                                 <tr>
-                                    <th>STT</th>
-                                    <th>Mã NV</th>
-                                    <th>Họ tên</th>
-                                    <th>Loại địa chỉ</th>
-                                    <th>Ngày hiệu lực</th>
-                                    <th>Nội dung địa chỉ</th>
-                                    <th>Quốc gia</th>
-                                    <th class="text-center" style="width: 100px;">Thao tác</th>
+                                    <th th:text="#{hrm.addressSearch.title.stt}">STT</th>
+                                    <th th:text="#{hrm.addressSearch.title.empCode}">Mã NV</th>
+                                    <th th:text="#{hrm.addressSearch.title.fullName}">Họ tên</th>
+                                    <th th:text="#{hrm.addressSearch.title.addressType}">Loại địa chỉ</th>
+                                    <th th:text="#{hrm.addressSearch.title.effectiveDate}">Ngày hiệu lực</th>
+                                    <th th:text="#{hrm.addressSearch.title.addressContent}">Nội dung địa chỉ</th>
+                                    <th th:text="#{hrm.addressSearch.title.nationality}">Quốc gia</th>
+                                    <th class="text-center" style="width: 100px;" th:text="#{hrm.addressSearch.title.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -64,7 +64,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Thông tin địa chỉ</h5>
+                <h5 class="modal-title" id="modalTitle" th:text="#{hrm.addressSearch.title.modalTitle}">Thông tin địa chỉ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -72,11 +72,11 @@
                     <input type="hidden" id="addressNo" name="addressNo">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="empNameDisplay" class="form-label">Nhân viên <span
+                            <label for="empNameDisplay" class="form-label" th:text="#{hrm.addressSearch.title.employee}">Nhân viên <span
                                     class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control" id="empNameDisplay"
-                                    placeholder="Chọn nhân viên..." readonly required>
+                                    th:placeholder="#{hrm.addressSearch.title.selectEmployee}" placeholder="Chọn nhân viên..." readonly required>
                                 <input type="hidden" id="personId" name="personId">
                                 <button class="btn btn-outline-primary" type="button"
                                     onclick="openEmployeeSearchPopup()">

@@ -6,20 +6,20 @@
                     <!-- Search Form -->
                     <form id="arItemSearchForm" class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label for="searchArItemNo" class="form-label">Hạng mục</label>
+                            <label for="searchArItemNo" class="form-label" th:text="#{ar.viewArItem.title.hangmuc}">Hạng mục</label>
                             <input type="text" class="form-control" id="searchArItemNo"
-                                placeholder="Nhập mã hạng mục / tên">
+                                th:placeholder="#{ar.viewArItem.placeholder.search}" placeholder="Nhập mã hạng mục / tên">
                         </div>
 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary me-2" onclick="arItemSearchData()">
-                                <i class="bx bx-search"></i> Tìm kiếm
+                                <i class="bx bx-search"></i> <span th:text="#{common.search}">Tìm kiếm</span>
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="arItemClearSearch()">
-                                <i class="bx bx-x"></i> Xóa lọc
+                                <i class="bx bx-x"></i> <span th:text="#{common.clearFilter}">Xóa lọc</span>
                             </button>
                             <button type="button" class="btn btn-success ms-2" onclick="arItemOpenModal()">
-                                <i class="bx bx-plus"></i> Thêm mới
+                                <i class="bx bx-plus"></i> <span th:text="#{common.addNew}">Thêm mới</span>
                             </button>
                         </div>
                     </form>
@@ -30,17 +30,17 @@
                             style="width:100%">
                             <thead class="table-light">
                                 <tr>
-                                    <th>STT</th>
-                                    <th>Mã hạng mục (No)</th>
+                                    <th th:text="#{common.stt}">STT</th>
+                                    <th th:text="#{ar.viewArItem.title.itemNo}">Mã hạng mục (No)</th>
                                     <th>ID</th>
-                                    <th>Tên viết tắt</th>
-                                    <th>Mô tả</th>
-                                    <th>Đơn vị</th>
-                                    <th>Mã nhóm</th>
-                                    <th>Tên</th>
-                                    <th>Sắp xếp</th>
-                                    <th>Trạng thái</th>
-                                    <th class="text-center" style="width: 100px;">Thao tác</th>
+                                    <th th:text="#{ar.viewArItem.title.shortName}">Tên viết tắt</th>
+                                    <th th:text="#{ar.viewArItem.title.description}">Mô tả</th>
+                                    <th th:text="#{ar.viewArItem.title.unit}">Đơn vị</th>
+                                    <th th:text="#{ar.viewArItem.title.groupCode}">Mã nhóm</th>
+                                    <th th:text="#{common.name}">Tên</th>
+                                    <th th:text="#{common.orderno}">Sắp xếp</th>
+                                    <th th:text="#{common.activity}">Trạng thái</th>
+                                    <th class="text-center" style="width: 100px;" th:text="#{common.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,72 +59,72 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="arItemModalTitle">Danh sách hạng mục</h5>
+                <h5 class="modal-title" id="arItemModalTitle" th:text="#{ar.viewArItem.title.itemlist}">Danh sách hạng mục</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="arItemForm">
                     <input type="hidden" id="arItemItemNo" name="itemNo">
 
-                    <h6 class="mb-3 text-primary border-bottom pb-2">Thông tin Đa Ngôn Ngữ</h6>
+                    <h6 class="mb-3 text-primary border-bottom pb-2" th:text="#{common.multiLangInfo}">Thông tin Đa Ngôn Ngữ</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label for="arItemNameVi" class="form-label">Tên Tiếng Việt <span
+                            <label for="arItemNameVi" class="form-label" th:text="#{common.nameVi}">Tên Tiếng Việt <span
                                     class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="arItemNameVi" name="nameVi" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemNameEn" class="form-label">Tên Tiếng Anh</label>
+                            <label for="arItemNameEn" class="form-label" th:text="#{common.nameEn}">Tên Tiếng Anh</label>
                             <input type="text" class="form-control" id="arItemNameEn" name="nameEn">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemNameZh" class="form-label">Tên Tiếng Trung</label>
+                            <label for="arItemNameZh" class="form-label" th:text="#{common.nameZh}">Tên Tiếng Trung</label>
                             <input type="text" class="form-control" id="arItemNameZh" name="nameZh">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemNameKo" class="form-label">Tên Tiếng Hàn</label>
+                            <label for="arItemNameKo" class="form-label" th:text="#{common.nameKo}">Tên Tiếng Hàn</label>
                             <input type="text" class="form-control" id="arItemNameKo" name="nameKo">
                         </div>
                     </div>
 
-                    <h6 class="mb-3 text-primary border-bottom pb-2">Thông tin Hạng Mục</h6>
+                    <h6 class="mb-3 text-primary border-bottom pb-2" th:text="#{ar.viewArItem.title.iteminfo}">Thông tin Hạng Mục</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="arItemItemId" class="form-label">ID hạng mục</label>
+                            <label for="arItemItemId" class="form-label" th:text="#{ar.viewArItem.title.itemId}">ID hạng mục</label>
                             <input type="text" class="form-control" id="arItemItemId" name="itemId">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemShortName" class="form-label">Tên rút gọn</label>
+                            <label for="arItemShortName" class="form-label" th:text="#{ar.viewArItem.title.shortName}">Tên rút gọn</label>
                             <input type="text" class="form-control" id="arItemShortName" name="shortName">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemDescription" class="form-label">Mô tả</label>
+                            <label for="arItemDescription" class="form-label" th:text="#{ar.viewArItem.title.description}">Mô tả</label>
                             <input type="text" class="form-control" id="arItemDescription" name="description">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemUnit" class="form-label">Đơn vị (ngày, giờ, phút)</label>
+                            <label for="arItemUnit" class="form-label" th:text="#{ar.viewArItem.title.unit}">Đơn vị (ngày, giờ, phút)</label>
                             <input type="text" class="form-control" id="arItemUnit" name="unit">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemItemGroupCode" class="form-label">Mã nhóm dự án (CODE)</label>
+                            <label for="arItemItemGroupCode" class="form-label" th:text="#{ar.viewArItem.title.groupCode}">Mã nhóm dự án (CODE)</label>
                             <select class="form-select" id="arItemItemGroupCode" name="itemGroupCode"
-                                data-parent-code="1429" data-default-text="-- Chọn mã nhóm --">
+                                data-parent-code="1429" th:attr="data-default-text=#{common.selectGroup}">
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemItemIdMapping" class="form-label">ID Mapping</label>
+                            <label for="arItemItemIdMapping" class="form-label" th:text="#{ar.viewArItem.title.idMapping}">ID Mapping</label>
                             <input type="text" class="form-control" id="arItemItemIdMapping" name="itemIdMapping">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemOrderno" class="form-label">Sắp xếp</label>
+                            <label for="arItemOrderno" class="form-label" th:text="#{common.orderno}">Sắp xếp</label>
                             <input type="number" class="form-control" id="arItemOrderno" name="orderno">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemOrdernoSst" class="form-label">Sắp xếp SST</label>
+                            <label for="arItemOrdernoSst" class="form-label" th:text="#{ar.viewArItem.title.ordernoSst}">Sắp xếp SST</label>
                             <input type="number" class="form-control" id="arItemOrdernoSst" name="ordernoSst">
                         </div>
                         <div class="col-md-6">
-                            <label for="arItemActivity" class="form-label">Trạng thái (1: Hoạt động, 0: Ngừng)</label>
+                            <label for="arItemActivity" class="form-label" th:text="#{common.activity}">Trạng thái (1: Hoạt động, 0: Ngừng)</label>
                             <input type="number" class="form-control" id="arItemActivity" name="activity" min="0"
                                 max="1" value="1">
                         </div>
@@ -132,8 +132,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="arItemSaveData()">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="arItemSaveData()" th:text="#{common.save}">Lưu</button>
             </div>
         </div>
     </div>

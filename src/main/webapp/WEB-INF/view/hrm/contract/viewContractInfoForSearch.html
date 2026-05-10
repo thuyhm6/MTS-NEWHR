@@ -12,102 +12,102 @@
                                     <form class="searchForm" id="contractSearchFormForSearch">
                                         <div class="row g-3">
                                             <div class="col-md-2">
-                                                <label for="searchContractNoForSearch" class="form-label">Số hợp
+                                                <label for="searchContractNoForSearch" class="form-label" th:text="#{hrm.viewContract.title.contractNo}">Số hợp
                                                     đồng</label>
                                                 <input type="text" class="form-control" id="searchContractNoForSearch"
-                                                    name="contractNo" placeholder="Nhập số hợp đồng">
+                                                    name="contractNo" th:placeholder="#{hrm.viewContract.title.contractNoPlaceholder}" placeholder="Nhập số hợp đồng">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchEmpIdForSearch" class="form-label">Mã nhân
+                                                <label for="searchEmpIdForSearch" class="form-label" th:text="#{hrm.viewContract.title.empId}">Mã nhân
                                                     viên</label>
                                                 <input type="text" class="form-control" id="searchEmpIdForSearch"
-                                                    name="empId" placeholder="Nhập mã nhân viên">
+                                                    name="empId" th:placeholder="#{hrm.viewContract.title.empIdPlaceholder}" placeholder="Nhập mã nhân viên">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchContractTypeForSearch" class="form-label">Loại hợp
+                                                <label for="searchContractTypeForSearch" class="form-label" th:text="#{hrm.viewContract.title.contractType}">Loại hợp
                                                     đồng</label>
                                                 <select class="form-select" id="searchContractTypeForSearch"
                                                     name="contractType">
-                                                    <option value="">Tất cả</option>
-                                                    <option value="FULL_TIME">Toàn thời gian</option>
-                                                    <option value="PART_TIME">Bán thời gian</option>
-                                                    <option value="INTERN">Thực tập</option>
-                                                    <option value="CONSULTANT">Tư vấn</option>
+                                                    <option value="" th:text="#{hrm.viewContract.title.all}">Tất cả</option>
+                                                    <option value="FULL_TIME" th:text="#{hrm.editContract.title.fullTime}">Toàn thời gian</option>
+                                                    <option value="PART_TIME" th:text="#{hrm.editContract.title.partTime}">Bán thời gian</option>
+                                                    <option value="INTERN" th:text="#{hrm.editContract.title.intern}">Thực tập</option>
+                                                    <option value="CONSULTANT" th:text="#{hrm.editContract.title.consultant}">Tư vấn</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchDepartmentForSearch" class="form-label">Phòng
+                                                <label for="searchDepartmentForSearch" class="form-label" th:text="#{hrm.viewContract.title.dept}">Phòng
                                                     ban</label>
                                                 <input type="text" class="form-control" id="searchDepartmentForSearch"
-                                                    name="department" placeholder="Nhập phòng ban">
+                                                    name="department" th:placeholder="#{hrm.viewContract.title.deptPlaceholder}" placeholder="Nhập phòng ban">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchStartDateFromForSearch" class="form-label">Ngày bắt
+                                                <label for="searchStartDateFromForSearch" class="form-label" th:text="#{hrm.viewContract.title.startDateFrom}">Ngày bắt
                                                     đầu
                                                     từ</label>
                                                 <input type="date" class="form-control"
                                                     id="searchStartDateFromForSearch" name="startDateFrom">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchStartDateToForSearch" class="form-label">Ngày bắt đầu
+                                                <label for="searchStartDateToForSearch" class="form-label" th:text="#{hrm.viewContract.title.startDateTo}">Ngày bắt đầu
                                                     đến</label>
                                                 <input type="date" class="form-control" id="searchStartDateToForSearch"
                                                     name="startDateTo">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchEndDateFromForSearch" class="form-label">Ngày kết thúc
+                                                <label for="searchEndDateFromForSearch" class="form-label" th:text="#{hrm.viewContract.title.endDateFrom}">Ngày kết thúc
                                                     từ</label>
                                                 <input type="date" class="form-control" id="searchEndDateFromForSearch"
                                                     name="endDateFrom">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchEndDateToForSearch" class="form-label">Ngày kết thúc
+                                                <label for="searchEndDateToForSearch" class="form-label" th:text="#{hrm.viewContract.title.endDateTo}">Ngày kết thúc
                                                     đến</label>
                                                 <input type="date" class="form-control" id="searchEndDateToForSearch"
                                                     name="endDateTo">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchActivityForSearch" class="form-label">Hoạt
+                                                <label for="searchActivityForSearch" class="form-label" th:text="#{hrm.viewContract.title.activity}">Hoạt
                                                     động</label>
                                                 <select class="form-select" id="searchActivityForSearch"
                                                     name="activity">
-                                                    <option value="">Tất cả</option>
-                                                    <option value="ACTIVE">Hoạt động</option>
-                                                    <option value="INACTIVE">Không hoạt động</option>
+                                                    <option value="" th:text="#{hrm.viewContract.title.all}">Tất cả</option>
+                                                    <option value="ACTIVE" th:text="#{hrm.editContract.title.active}">Hoạt động</option>
+                                                    <option value="INACTIVE" th:text="#{hrm.editContract.title.inactive}">Không hoạt động</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchWorkPositionForSearch" class="form-label">Vị trí làm
+                                                <label for="searchWorkPositionForSearch" class="form-label" th:text="#{hrm.viewContract.title.workPosition}">Vị trí làm
                                                     việc</label>
                                                 <input type="text" class="form-control" id="searchWorkPositionForSearch"
-                                                    name="workPosition" placeholder="Nhập vị trí làm việc">
+                                                    name="workPosition" th:placeholder="#{hrm.viewContract.title.workPositionPlaceholder}" placeholder="Nhập vị trí làm việc">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchSalaryFromForSearch" class="form-label">Lương
+                                                <label for="searchSalaryFromForSearch" class="form-label" th:text="#{hrm.viewContract.title.salaryFrom}">Lương
                                                     từ</label>
                                                 <input type="number" class="form-control" id="searchSalaryFromForSearch"
-                                                    name="salaryFrom" placeholder="Nhập lương tối thiểu">
+                                                    name="salaryFrom" th:placeholder="#{hrm.viewContract.title.salaryFromPlaceholder}" placeholder="Nhập lương tối thiểu">
                                             </div>
                                             <div class="col-md-2">
-                                                <label for="searchSalaryToForSearch" class="form-label">Lương
+                                                <label for="searchSalaryToForSearch" class="form-label" th:text="#{hrm.viewContract.title.salaryTo}">Lương
                                                     đến</label>
                                                 <input type="number" class="form-control" id="searchSalaryToForSearch"
-                                                    name="salaryTo" placeholder="Nhập lương tối đa">
+                                                    name="salaryTo" th:placeholder="#{hrm.viewContract.title.salaryToPlaceholder}" placeholder="Nhập lương tối đa">
                                             </div>
                                         </div>
                                         <div class="row mt-3">
                                             <div class="col-12">
                                                 <button type="button" class="btn btn-primary"
                                                     onclick="performSearchForSearch()">
-                                                    <i class="bx bx-search me-1"></i> Tìm kiếm
+                                                    <i class="bx bx-search me-1"></i> <span th:text="#{hrm.viewContract.title.search}">Tìm kiếm</span>
                                                 </button>
                                                 <button type="button" class="btn btn-secondary ms-2"
                                                     onclick="clearSearchForSearch()">
-                                                    <i class="bx bx-x me-1"></i> Xóa bộ lọc
+                                                    <i class="bx bx-x me-1"></i> <span th:text="#{hrm.viewContract.title.clearFilter}">Xóa bộ lọc</span>
                                                 </button>
                                                 <button type="button" class="btn btn-outline-info ms-2"
                                                     onclick="exportSearchResultsForSearch()">
-                                                    <i class="bx bx-download me-1"></i> Xuất kết quả
+                                                    <i class="bx bx-download me-1"></i> <span th:text="#{hrm.viewContract.title.exportResult}">Xuất kết quả</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -130,19 +130,19 @@
                         <table id="contractsTableForSearch" class="table table-striped table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>STT</th>
-                                    <th>Số hợp đồng</th>
-                                    <th>Mã nhân viên</th>
-                                    <th>Tên hợp đồng</th>
-                                    <th>Loại hợp đồng</th>
-                                    <th>Ngày bắt đầu</th>
-                                    <th>Ngày kết thúc</th>
-                                    <th>Phòng ban</th>
-                                    <th>Vị trí</th>
-                                    <th>Lương</th>
-                                    <th>Hoạt động</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Thao tác</th>
+                                    <th th:text="#{hrm.viewContract.title.stt}">STT</th>
+                                    <th th:text="#{hrm.viewContract.title.contractNo}">Số hợp đồng</th>
+                                    <th th:text="#{hrm.viewContract.title.empId}">Mã nhân viên</th>
+                                    <th th:text="#{hrm.viewContract.title.contractName}">Tên hợp đồng</th>
+                                    <th th:text="#{hrm.viewContract.title.contractType}">Loại hợp đồng</th>
+                                    <th th:text="#{hrm.viewContract.title.startDate}">Ngày bắt đầu</th>
+                                    <th th:text="#{hrm.viewContract.title.endDate}">Ngày kết thúc</th>
+                                    <th th:text="#{hrm.viewContract.title.dept}">Phòng ban</th>
+                                    <th th:text="#{hrm.viewContract.title.position}">Vị trí</th>
+                                    <th th:text="#{hrm.viewContract.title.salary}">Lương</th>
+                                    <th th:text="#{hrm.viewContract.title.activity}">Hoạt động</th>
+                                    <th th:text="#{hrm.viewContract.title.createDate}">Ngày tạo</th>
+                                    <th th:text="#{hrm.viewContract.title.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>

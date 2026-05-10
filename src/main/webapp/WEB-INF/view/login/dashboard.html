@@ -195,30 +195,30 @@
             <div class="col-lg-4">
                 <div class="card card-height-100">
                     <div class="card-header d-flex align-items-center justify-content-between gap-2">
-                        <h4 class="card-title flex-grow-1">Cảnh báo</h4>
+                        <h4 class="card-title flex-grow-1" th:text="#{dashboard.alerts.title}">Cảnh báo</h4>
 
-                        <a href="#" class="btn btn-sm btn-soft-primary">View All</a>
+                        <a href="#" class="btn btn-sm btn-soft-primary" th:text="#{common.viewAll}">View All</a>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover table-nowrap table-centered m-0">
                             <thead class="bg-light bg-opacity-50">
                                 <tr>
-                                    <th class="text-muted ps-3" style="width: 60%">Tên</th>
-                                    <th class="text-muted" style="width: 20%">Số lượng</th>
-                                    <th class="text-muted" style="width: 20%">Trạng thái</th>
+                                    <th class="text-muted ps-3" style="width: 60%" th:text="#{common.name}">Tên</th>
+                                    <th class="text-muted" style="width: 20%" th:text="#{dashboard.col.quantity}">Số lượng</th>
+                                    <th class="text-muted" style="width: 20%" th:text="#{common.status}">Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td class="ps-3"><a href="/hrm/contractInfo/viewExpiredContract" class="text-muted"
                                             data-tab="/hrm/contractInfo/viewExpiredContract"
-                                            data-title="Hợp đồng sắp hết hạn">Hợp đồng sắp hết hạn (7 ngày tới)</a></td>
+                                            th:attr="data-title=#{dashboard.contract.expiring}"
+                                            th:text="#{dashboard.contract.expiringDetail}">Hợp đồng sắp hết hạn (7 ngày tới)</a></td>
                                     <td th:text="${expiringContractsCount}">0</td>
                                     <td>
-                                        <span th:if="${expiringContractsCount > 0}" class="badge badge-soft-danger">Cần
-                                            xử lý</span>
+                                        <span th:if="${expiringContractsCount > 0}" class="badge badge-soft-danger" th:text="#{dashboard.status.needAction}">Cần xử lý</span>
                                         <span th:unless="${expiringContractsCount > 0}"
-                                            class="badge badge-soft-success">Ổn định</span>
+                                            class="badge badge-soft-success" th:text="#{dashboard.status.stable}">Ổn định</span>
                                     </td>
                                 </tr>
 

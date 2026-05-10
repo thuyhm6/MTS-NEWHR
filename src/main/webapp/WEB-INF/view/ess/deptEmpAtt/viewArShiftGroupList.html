@@ -6,21 +6,21 @@
                     <!-- Search Form -->
                     <form id="shg_searchForm" class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label for="shg_searchEmpId" class="form-label">Mã nhân viên</label>
+                            <label for="shg_searchEmpId" class="form-label" th:text="#{common.empId}">Mã nhân viên</label>
                             <input type="text" class="form-control" id="shg_searchEmpId"
-                                placeholder="Nhập mã nhân viên">
+                                th:placeholder="#{common.placeholder.empId}" placeholder="Nhập mã nhân viên">
                         </div>
                         <div class="col-md-3">
-                            <label for="shg_searchEmpName" class="form-label">Tên nhân viên</label>
+                            <label for="shg_searchEmpName" class="form-label" th:text="#{common.empName}">Tên nhân viên</label>
                             <input type="text" class="form-control" id="shg_searchEmpName"
-                                placeholder="Nhập tên nhân viên">
+                                th:placeholder="#{common.placeholder.empName}" placeholder="Nhập tên nhân viên">
                         </div>
                         <div class="col-md-4 d-flex align-items-end flex-wrap gap-1">
                             <button type="button" class="btn btn-primary" onclick="shgSearchData()">
-                                <i class="bx bx-search"></i> Tìm kiếm
+                                <i class="bx bx-search"></i> <span th:text="#{common.search}">Tìm kiếm</span>
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="shgClearSearch()">
-                                <i class="bx bx-x"></i> Xóa lọc
+                                <i class="bx bx-x"></i> <span th:text="#{common.clearFilter}">Xóa lọc</span>
                             </button>
                         </div>
                     </form>
@@ -31,14 +31,14 @@
                             style="width:100%">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 3%;">STT</th>
-                                    <th style="width: 10%;">Mã NV</th>
-                                    <th style="width: 15%;">Tên nhân viên</th>
-                                    <th style="width: 15%;">Ca trước thay đổi</th>
-                                    <th style="width: 18%;">Ca sau thay đổi</th>
-                                    <th style="width: 12%;">Ngày bắt đầu</th>
-                                    <th style="width: 17%;">Ghi chú</th>
-                                    <th class="text-center" style="width: 10%;">Thao tác</th>
+                                    <th style="width: 3%;" th:text="#{common.stt}">STT</th>
+                                    <th style="width: 10%;" th:text="#{common.empId}">Mã NV</th>
+                                    <th style="width: 15%;" th:text="#{common.empName}">Tên nhân viên</th>
+                                    <th style="width: 15%;" th:text="#{ess.shiftGroup.col.beforeShift}">Ca trước thay đổi</th>
+                                    <th style="width: 18%;" th:text="#{ess.shiftGroup.col.afterShift}">Ca sau thay đổi</th>
+                                    <th style="width: 12%;" th:text="#{common.startDate}">Ngày bắt đầu</th>
+                                    <th style="width: 17%;" th:text="#{common.note}">Ghi chú</th>
+                                    <th class="text-center" style="width: 10%;" th:text="#{common.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

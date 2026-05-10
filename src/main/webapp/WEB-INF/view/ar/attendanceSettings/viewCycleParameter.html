@@ -6,23 +6,23 @@
                     <!-- Search Form -->
                     <form id="cycleParamSearchForm" class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label for="searchCpnyId" class="form-label">Mã công ty</label>
-                            <input type="text" class="form-control" id="searchCpnyId" placeholder="Nhập mã công ty">
+                            <label for="searchCpnyId" class="form-label" th:text="#{ar.viewcycleparameter.title.gongsi}">Mã công ty</label>
+                            <input type="text" class="form-control" id="searchCpnyId" th:placeholder="#{ar.viewcycleparameter.placeholder.cpnyId}" placeholder="Nhập mã công ty">
                         </div>
                         <div class="col-md-3">
-                            <label for="searchStatNo" class="form-label">Khoảng mã</label>
-                            <input type="text" class="form-control" id="searchStatNo" placeholder="Nhập khoảng mã">
+                            <label for="searchStatNo" class="form-label" th:text="#{ar.viewcycleparameter.title.qujian}">Khoảng mã</label>
+                            <input type="text" class="form-control" id="searchStatNo" th:placeholder="#{ar.viewcycleparameter.placeholder.statNo}" placeholder="Nhập khoảng mã">
                         </div>
 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary me-2" onclick="cycleParamSearchData()">
-                                <i class="bx bx-search"></i> Tìm kiếm
+                                <i class="bx bx-search"></i> <span th:text="#{common.search}">Tìm kiếm</span>
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="cycleParamClearSearch()">
-                                <i class="bx bx-x"></i> Xóa lọc
+                                <i class="bx bx-x"></i> <span th:text="#{common.clearFilter}">Xóa lọc</span>
                             </button>
                             <button type="button" class="btn btn-success ms-2" onclick="cycleParamOpenModal()">
-                                <i class="bx bx-plus"></i> Thêm mới
+                                <i class="bx bx-plus"></i> <span th:text="#{common.addNew}">Thêm mới</span>
                             </button>
                         </div>
                     </form>
@@ -33,14 +33,14 @@
                             style="width:100%">
                             <thead class="table-light">
                                 <tr>
-                                    <th>STT</th>
-                                    <th>Mã công ty</th>
-                                    <th>Khoảng mã</th>
-                                    <th>Từ ngày</th>
-                                    <th>Đến ngày</th>
-                                    <th>Sắp xếp</th>
-                                    <th>Trạng thái</th>
-                                    <th class="text-center" style="width: 100px;">Thao tác</th>
+                                    <th th:text="#{common.stt}">STT</th>
+                                    <th th:text="#{ar.viewcycleparameter.title.gongsi}">Mã công ty</th>
+                                    <th th:text="#{ar.viewcycleparameter.title.qujian}">Khoảng mã</th>
+                                    <th th:text="#{ar.viewcycleparameter.title.kaishiriqi}">Từ ngày</th>
+                                    <th th:text="#{ar.viewcycleparameter.title.jieshuriqi}">Đến ngày</th>
+                                    <th th:text="#{common.orderno}">Sắp xếp</th>
+                                    <th th:text="#{common.activity}">Trạng thái</th>
+                                    <th class="text-center" style="width: 100px;" th:text="#{common.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,7 +59,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cycleParamModalTitle">Thông số chu kỳ</h5>
+                <h5 class="modal-title" id="cycleParamModalTitle" th:text="#{ar.viewcycleparameter.title.cycleParamInfo}">Thông số chu kỳ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -67,31 +67,31 @@
                     <input type="hidden" id="cycleParamParamNo" name="paramNo">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="cycleParamCpnyId" class="form-label">Mã công ty <span
+                            <label for="cycleParamCpnyId" class="form-label" th:text="#{ar.viewcycleparameter.title.gongsi}">Mã công ty <span
                                     class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="cycleParamCpnyId" name="cpnyId" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleParamStatNo" class="form-label">Khoảng mã <span
+                            <label for="cycleParamStatNo" class="form-label" th:text="#{ar.viewcycleparameter.title.qujian}">Khoảng mã <span
                                     class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="cycleParamStatNo" name="statNo" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleParamStartDate" class="form-label">Từ ngày</label>
+                            <label for="cycleParamStartDate" class="form-label" th:text="#{ar.viewcycleparameter.title.kaishiriqi}">Từ ngày</label>
                             <input type="text" class="form-control" id="cycleParamStartDate" name="startDate"
                                 placeholder="YYYY-MM-DD">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleParamEndDate" class="form-label">Đến ngày</label>
+                            <label for="cycleParamEndDate" class="form-label" th:text="#{ar.viewcycleparameter.title.jieshuriqi}">Đến ngày</label>
                             <input type="text" class="form-control" id="cycleParamEndDate" name="endDate"
                                 placeholder="YYYY-MM-DD">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleParamOrderno" class="form-label">Sắp xếp</label>
+                            <label for="cycleParamOrderno" class="form-label" th:text="#{common.orderno}">Sắp xếp</label>
                             <input type="number" class="form-control" id="cycleParamOrderno" name="orderno">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleParamActivity" class="form-label">Trạng thái (1: Hoạt động, 0:
+                            <label for="cycleParamActivity" class="form-label" th:text="#{common.activity}">Trạng thái (1: Hoạt động, 0:
                                 Ngừng)</label>
                             <input type="number" class="form-control" id="cycleParamActivity" name="activity" min="0"
                                 max="1" value="1">

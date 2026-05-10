@@ -6,25 +6,25 @@
                     <!-- Search Form -->
                     <form id="arItemParamSearchForm" class="row g-3 mb-2">
                         <div class="col-md-3">
-                            <label for="searchParamCpnyId" class="form-label">Pháp nhân (Công ty)</label>
+                            <label for="searchParamCpnyId" class="form-label" th:text="#{ar.viewArItemParam.title.company}">Pháp nhân (Công ty)</label>
                             <select class="form-select" id="searchParamCpnyId">
-                                <option value="">Tất cả</option>
+                                <option value="" th:text="#{common.all}">Tất cả</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="searchParamItemNo" class="form-label">Hạng mục (No / Tên)</label>
-                            <input type="text" class="form-control" id="searchParamItemNo" placeholder="Nhập hạng mục">
+                            <label for="searchParamItemNo" class="form-label" th:text="#{ar.viewArItemParam.title.hangmuc}">Hạng mục (No / Tên)</label>
+                            <input type="text" class="form-control" id="searchParamItemNo" th:placeholder="#{ar.viewArItemParam.placeholder.searchItem}" placeholder="Nhập hạng mục">
                         </div>
 
                         <div class="col-md-4 d-flex align-items-end">
                             <button type="button" class="btn btn-primary me-2" onclick="arItemParamSearchData()">
-                                <i class="bx bx-search"></i> Tìm kiếm
+                                <i class="bx bx-search"></i> <span th:text="#{common.search}">Tìm kiếm</span>
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="arItemParamClearSearch()">
-                                <i class="bx bx-x"></i> Xóa lọc
+                                <i class="bx bx-x"></i> <span th:text="#{common.clearFilter}">Xóa lọc</span>
                             </button>
                             <button type="button" class="btn btn-success ms-2" onclick="arItemParamOpenModal()">
-                                <i class="bx bx-plus"></i> Thêm mới
+                                <i class="bx bx-plus"></i> <span th:text="#{common.addNew}">Thêm mới</span>
                             </button>
                         </div>
                     </form>
@@ -35,28 +35,28 @@
                             class="table table-striped table-bordered table-hover w-100 display nowrap">
                             <thead class="table-light">
                                 <tr>
-                                    <th>STT</th>
-                                    <th>Mã tham số (No)</th>
-                                    <th>Công ty / Pháp nhân</th>
-                                    <th>Mã hạng mục</th>
-                                    <th>Tên hạng mục</th>
-                                    <th>Đơn vị tham số</th>
-                                    <th>Nhóm hiệu</th>
-                                    <th>Giới hạn tối thiểu</th>
-                                    <th>Giới hạn tối đa</th>
-                                    <th>Hạng mục phụ thuộc</th>
-                                    <th>Hạng mục thay thế</th>
-                                    <th>Tham chiếu quẹt thẻ</th>
-                                    <th>Cờ bắt đầu quẹt</th>
-                                    <th>Quẹt bắt đầu bù trừ</th>
-                                    <th>Chiều bù trừ bắt đầu</th>
-                                    <th>Cờ kết thúc quẹt</th>
-                                    <th>Quẹt kết thúc bù trừ</th>
-                                    <th>Chiều bù trừ kết thúc</th>
-                                    <th>Chính sách nhân sự</th>
-                                    <th>Sắp xếp</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
+                                    <th th:text="#{common.stt}">STT</th>
+                                    <th th:text="#{ar.viewArItemParam.title.paramNo}">Mã tham số (No)</th>
+                                    <th th:text="#{ar.viewArItemParam.title.company}">Công ty / Pháp nhân</th>
+                                    <th th:text="#{ar.viewArItemParam.title.itemNo}">Mã hạng mục</th>
+                                    <th th:text="#{ar.viewArItemParam.title.itemName}">Tên hạng mục</th>
+                                    <th th:text="#{ar.viewArItemParam.title.unit}">Đơn vị tham số</th>
+                                    <th th:text="#{ar.viewArItemParam.title.groupNo}">Nhóm hiệu</th>
+                                    <th th:text="#{ar.viewArItemParam.title.minValue}">Giới hạn tối thiểu</th>
+                                    <th th:text="#{ar.viewArItemParam.title.maxValue}">Giới hạn tối đa</th>
+                                    <th th:text="#{ar.viewArItemParam.title.dependItem}">Hạng mục phụ thuộc</th>
+                                    <th th:text="#{ar.viewArItemParam.title.replaceItem}">Hạng mục thay thế</th>
+                                    <th th:text="#{ar.viewitemparameter.title.cankaoshuaka}">Tham chiếu quẹt thẻ</th>
+                                    <th th:text="#{ar.viewitemparameter.title.dakakaishibiaozhi}">Cờ bắt đầu quẹt</th>
+                                    <th th:text="#{ar.viewitemparameter.title.dakakaishipianyi}">Quẹt bắt đầu bù trừ</th>
+                                    <th th:text="#{ar.viewitemparameter.title.dakakaishipianyifangxiang}">Chiều bù trừ bắt đầu</th>
+                                    <th th:text="#{ar.viewitemparameter.title.dakajieshubiaozhi}">Cờ kết thúc quẹt</th>
+                                    <th th:text="#{ar.viewitemparameter.title.dakajieshupianyi}">Quẹt kết thúc bù trừ</th>
+                                    <th th:text="#{ar.viewitemparameter.title.dakajieshupianyifangxiang}">Chiều bù trừ kết thúc</th>
+                                    <th th:text="#{ar.viewArItemParam.title.hrPolicy}">Chính sách nhân sự</th>
+                                    <th th:text="#{common.orderno}">Sắp xếp</th>
+                                    <th th:text="#{common.activity}">Trạng thái</th>
+                                    <th th:text="#{common.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,159 +75,159 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="arItemParamModalTitle">Thông số hạng mục</h5>
+                <h5 class="modal-title" id="arItemParamModalTitle" th:text="#{ar.viewArItemParam.title.paramInfo}">Thông số hạng mục</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="arItemParamForm">
                     <input type="hidden" id="paramArParamNo" name="arParamNo">
 
-                    <h6 class="mb-3 text-primary border-bottom pb-2">Thông tin Cơ Bản</h6>
+                    <h6 class="mb-3 text-primary border-bottom pb-2" th:text="#{common.basicInfo}">Thông tin Cơ Bản</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label for="paramCpnyId" class="form-label">Pháp nhân (Công ty) <span
+                            <label for="paramCpnyId" class="form-label" th:text="#{ar.viewArItemParam.title.company}">Pháp nhân (Công ty) <span
                                     class="text-danger">*</span></label>
                             <select class="form-select" id="paramCpnyId" name="cpnyId" required>
-                                <option value="">-- Chọn công ty --</option>
+                                <option value="" th:text="#{common.selectCompany}">-- Chọn công ty --</option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="paramItemNo" class="form-label">Thuộc hạng mục <span
+                            <label for="paramItemNo" class="form-label" th:text="#{ar.viewArItemParam.title.hangmuc}">Thuộc hạng mục <span
                                     class="text-danger">*</span></label>
                             <select class="form-select" id="paramItemNo" name="itemNo" required>
-                                <option value="">-- Chọn hạng mục --</option>
+                                <option value="" th:text="#{ar.viewArItemParam.placeholder.selectItem}">-- Chọn hạng mục --</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="paramGroupNo" class="form-label">Nhóm hiệu (Group No)</label>
+                            <label for="paramGroupNo" class="form-label" th:text="#{ar.viewArItemParam.title.groupNo}">Nhóm hiệu (Group No)</label>
                             <input type="text" class="form-control" id="paramGroupNo" name="groupNo">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramUnit" class="form-label">Đơn vị tham chiếu</label>
+                            <label for="paramUnit" class="form-label" th:text="#{ar.viewArItemParam.title.unitRef}">Đơn vị tham chiếu</label>
                             <input type="text" class="form-control" id="paramUnit" name="unit">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramUnitValue" class="form-label">Giá trị đơn vị</label>
+                            <label for="paramUnitValue" class="form-label" th:text="#{ar.viewArItemParam.title.unitValue}">Giá trị đơn vị</label>
                             <input type="number" class="form-control" id="paramUnitValue" name="unitValue">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramMinValue" class="form-label">Giá trị tối thiểu</label>
+                            <label for="paramMinValue" class="form-label" th:text="#{ar.viewitemparameter.title.zuixiaozhi}">Giá trị tối thiểu</label>
                             <input type="number" class="form-control" id="paramMinValue" name="minValue">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramMaxValue" class="form-label">Giá trị tối đa</label>
+                            <label for="paramMaxValue" class="form-label" th:text="#{ar.viewitemparameter.title.zuidazhi}">Giá trị tối đa</label>
                             <input type="number" class="form-control" id="paramMaxValue" name="maxValue">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramDependItem" class="form-label">Hạng mục phụ thuộc</label>
+                            <label for="paramDependItem" class="form-label" th:text="#{ar.viewArItemParam.title.dependItem}">Hạng mục phụ thuộc</label>
                             <input type="text" class="form-control" id="paramDependItem" name="dependItem">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramReplaceItem" class="form-label">Hạng mục thay thế</label>
+                            <label for="paramReplaceItem" class="form-label" th:text="#{ar.viewArItemParam.title.replaceItem}">Hạng mục thay thế</label>
                             <input type="text" class="form-control" id="paramReplaceItem" name="replaceItem">
                         </div>
                     </div>
 
-                    <h6 class="mb-3 text-primary border-bottom pb-2">Thông số Quẹt thẻ</h6>
+                    <h6 class="mb-3 text-primary border-bottom pb-2" th:text="#{ar.viewArItemParam.title.cardParam}">Thông số Quẹt thẻ</h6>
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label for="paramCardFlag" class="form-label">Tham chiếu quẹt thẻ (1/0)</label>
+                            <label for="paramCardFlag" class="form-label" th:text="#{ar.viewitemparameter.title.cankaoshuaka}">Tham chiếu quẹt thẻ (1/0)</label>
                             <select class="form-select" id="paramCardFlag" name="cardFlag">
-                                <option value="1">Có</option>
-                                <option value="0">Không</option>
+                                <option value="1" th:text="#{common.yes}">Có</option>
+                                <option value="0" th:text="#{common.no}">Không</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="paramCardFromFlag" class="form-label">Cờ bắt đầu quẹt (1/0)</label>
+                            <label for="paramCardFromFlag" class="form-label" th:text="#{ar.viewArItemParam.title.cardFromFlag}">Cờ bắt đầu quẹt (1/0)</label>
                             <select class="form-select" id="paramCardFromFlag" name="cardFromFlag">
-                                <option value="1">Có</option>
-                                <option value="0">Không</option>
+                                <option value="1" th:text="#{common.yes}">Có</option>
+                                <option value="0" th:text="#{common.no}">Không</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="paramCardToFlag" class="form-label">Cờ kết thúc quẹt (1/0)</label>
+                            <label for="paramCardToFlag" class="form-label" th:text="#{ar.viewArItemParam.title.cardToFlag}">Cờ kết thúc quẹt (1/0)</label>
                             <select class="form-select" id="paramCardToFlag" name="cardToFlag">
-                                <option value="1">Có</option>
-                                <option value="0">Không</option>
+                                <option value="1" th:text="#{common.yes}">Có</option>
+                                <option value="0" th:text="#{common.no}">Không</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="paramCardFromOffset" class="form-label">Độ lệch thời gian bắt đầu (phút)</label>
+                            <label for="paramCardFromOffset" class="form-label" th:text="#{ar.viewArItemParam.title.cardFromOffset}">Độ lệch thời gian bắt đầu (phút)</label>
                             <input type="number" class="form-control" id="paramCardFromOffset" name="cardFromOffset"
                                 value="0">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramCardFromRelation" class="form-label">Chiều độ lệch bắt đầu (
-                                < /> /
+                            <label for="paramCardFromRelation" class="form-label" th:text="#{ar.viewArItemParam.title.cardFromRelation}">Chiều độ lệch bắt đầu (
+                                &lt; / &gt; /
                                 =)
                             </label>
                             <input type="text" class="form-control" id="paramCardFromRelation" name="cardFromRelation">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramCardToOffset" class="form-label">Độ lệch thời gian kết thúc (phút)</label>
+                            <label for="paramCardToOffset" class="form-label" th:text="#{ar.viewArItemParam.title.cardToOffset}">Độ lệch thời gian kết thúc (phút)</label>
                             <input type="number" class="form-control" id="paramCardToOffset" name="cardToOffset"
                                 value="0">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramCardToRelation" class="form-label">Chiều độ lệch kết thúc (
-                                < /> /
+                            <label for="paramCardToRelation" class="form-label" th:text="#{ar.viewArItemParam.title.cardToRelation}">Chiều độ lệch kết thúc (
+                                &lt; / &gt; /
                                 =)
                             </label>
                             <input type="text" class="form-control" id="paramCardToRelation" name="cardToRelation">
                         </div>
                     </div>
 
-                    <h6 class="mb-3 text-primary border-bottom pb-2 mt-4">Thông số Form xin phép (Apply)</h6>
+                    <h6 class="mb-3 text-primary border-bottom pb-2 mt-4" th:text="#{ar.viewArItemParam.title.applyParam}">Thông số Form xin phép (Apply)</h6>
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label for="paramApplyFlag" class="form-label">Tham chiếu làm đơn xin phép (1/0)</label>
+                            <label for="paramApplyFlag" class="form-label" th:text="#{ar.viewitemparameter.title.shifoucankaoshenqing}">Tham chiếu làm đơn xin phép (1/0)</label>
                             <select class="form-select" id="paramApplyFlag" name="applyFlag">
-                                <option value="1">Có</option>
-                                <option value="0">Không</option>
+                                <option value="1" th:text="#{common.yes}">Có</option>
+                                <option value="0" th:text="#{common.no}">Không</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="paramApplyType" class="form-label">Loại đơn (CODE)</label>
+                            <label for="paramApplyType" class="form-label" th:text="#{ar.viewArItemParam.title.applyType}">Loại đơn (CODE)</label>
                             <input type="text" class="form-control" id="paramApplyType" name="applyType">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramApplyFulldayValue" class="form-label">Giá trị tương đương cả ngày</label>
+                            <label for="paramApplyFulldayValue" class="form-label" th:text="#{ar.viewArItemParam.title.applyFullday}">Giá trị tương đương cả ngày</label>
                             <input type="number" class="form-control" id="paramApplyFulldayValue"
                                 name="applyFulldayValue" step="any">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramApplyCardPriority" class="form-label">Ưu tiên thẻ quẹt hơn đơn
+                            <label for="paramApplyCardPriority" class="form-label" th:text="#{ar.viewArItemParam.title.applyCardPriority}">Ưu tiên thẻ quẹt hơn đơn
                                 (1/0)</label>
                             <select class="form-select" id="paramApplyCardPriority" name="applyCardPriority">
-                                <option value="1">Có</option>
-                                <option value="0">Không</option>
+                                <option value="1" th:text="#{common.yes}">Có</option>
+                                <option value="0" th:text="#{common.no}">Không</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="paramDateType" class="form-label">Loại ngày nghỉ áp dụng (CODE)</label>
+                            <label for="paramDateType" class="form-label" th:text="#{ar.viewArItemParam.title.dateType}">Loại ngày nghỉ áp dụng (CODE)</label>
                             <input type="text" class="form-control" id="paramDateType" name="dateType">
                         </div>
                         <div class="col-md-4">
-                            <label for="paramDetailContent" class="form-label">Ghi chú chính sách nhân sự</label>
+                            <label for="paramDetailContent" class="form-label" th:text="#{ar.viewArItemParam.title.hrPolicy}">Ghi chú chính sách nhân sự</label>
                             <input type="text" class="form-control" id="paramDetailContent" name="detailContent">
                         </div>
                         <div class="col-md-6">
-                            <label for="paramOrderno" class="form-label">Sắp xếp</label>
+                            <label for="paramOrderno" class="form-label" th:text="#{common.orderno}">Sắp xếp</label>
                             <input type="number" class="form-control" id="paramOrderno" name="orderno" value="0">
                         </div>
                         <div class="col-md-6">
-                            <label for="paramActivity" class="form-label">Trạng thái (1: Hoạt động, 0: Ngừng)</label>
+                            <label for="paramActivity" class="form-label" th:text="#{common.activity}">Trạng thái (1: Hoạt động, 0: Ngừng)</label>
                             <select class="form-select" id="paramActivity" name="activity">
-                                <option value="1">Hoạt động</option>
-                                <option value="0">Ngừng</option>
+                                <option value="1" th:text="#{common.active}">Hoạt động</option>
+                                <option value="0" th:text="#{common.inactive}">Ngừng</option>
                             </select>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="arItemParamSaveData()">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="arItemParamSaveData()" th:text="#{common.save}">Lưu</button>
             </div>
         </div>
     </div>

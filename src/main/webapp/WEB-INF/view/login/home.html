@@ -109,17 +109,17 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link active" th:href="@{/home}">
-                            <i class="fas fa-home me-1"></i>Trang chủ
+                            <i class="fas fa-home me-1"></i><span th:text="#{home.nav.home}">Trang chủ</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/employees}">
-                            <i class="fas fa-users me-1"></i>Nhân viên
+                            <i class="fas fa-users me-1"></i><span th:text="#{home.nav.employees}">Nhân viên</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/departments}">
-                            <i class="fas fa-building me-1"></i>Phòng ban
+                            <i class="fas fa-building me-1"></i><span th:text="#{home.nav.departments}">Phòng ban</span>
                         </a>
                     </li>
                 </ul>
@@ -132,18 +132,18 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a class="dropdown-item" th:href="@{/profile}">
-                                    <i class="fas fa-user-edit me-2"></i>Thông tin cá nhân
+                                    <i class="fas fa-user-edit me-2"></i><span th:text="#{home.nav.profile}">Thông tin cá nhân</span>
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" th:href="@{/change-password}">
-                                    <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                                    <i class="fas fa-key me-2"></i><span th:text="#{home.nav.changePassword}">Đổi mật khẩu</span>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" th:href="@{/logout}">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    <i class="fas fa-sign-out-alt me-2"></i><span th:text="#{home.nav.logout}">Đăng xuất</span>
                                 </a>
                             </li>
                         </ul>
@@ -183,17 +183,17 @@
                     </p>
                     <p class="mb-0">
                         <i class="fas fa-clock me-2"></i>
-                        Đăng nhập lần cuối: 
+                        <span th:text="#{home.lastLogin}">Đăng nhập lần cuối:</span>
                         <span th:text="${#temporals.format(currentUser.lastLoginAt, 'dd/MM/yyyy HH:mm')}">N/A</span>
                     </p>
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="btn-group-vertical">
                         <a th:href="@{/profile}" class="btn btn-light mb-2">
-                            <i class="fas fa-user-edit me-2"></i>Chỉnh sửa thông tin
+                            <i class="fas fa-user-edit me-2"></i><span th:text="#{home.editInfo}">Chỉnh sửa thông tin</span>
                         </a>
                         <a th:href="@{/change-password}" class="btn btn-outline-light">
-                            <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                            <i class="fas fa-key me-2"></i><span th:text="#{home.nav.changePassword}">Đổi mật khẩu</span>
                         </a>
                     </div>
                 </div>
@@ -208,7 +208,7 @@
                         <i class="fas fa-hand-wave me-2"></i>
                         <span th:text="${message}">Chào mừng đến với hệ thống HR!</span>
                     </h4>
-                    <p class="mb-0">
+                    <p class="mb-0" th:text="#{home.description}">
                         Hệ thống quản lý nhân sự giúp bạn quản lý thông tin nhân viên, phòng ban một cách hiệu quả và chuyên nghiệp.
                     </p>
                 </div>
@@ -222,9 +222,9 @@
                     <div class="stats-icon primary">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h5>Tổng nhân viên</h5>
+                    <h5 th:text="#{home.stats.totalEmployees}">Tổng nhân viên</h5>
                     <h3 class="text-primary">156</h3>
-                    <small class="text-muted">+12% so với tháng trước</small>
+                    <small class="text-muted" th:text="#{home.stats.vsLastMonth12}">+12% so với tháng trước</small>
                 </div>
             </div>
             <div class="col-md-3 mb-3">
@@ -232,9 +232,9 @@
                     <div class="stats-icon success">
                         <i class="fas fa-building"></i>
                     </div>
-                    <h5>Phòng ban</h5>
+                    <h5 th:text="#{home.nav.departments}">Phòng ban</h5>
                     <h3 class="text-success">8</h3>
-                    <small class="text-muted">Không thay đổi</small>
+                    <small class="text-muted" th:text="#{home.stats.noChange}">Không thay đổi</small>
                 </div>
             </div>
             <div class="col-md-3 mb-3">
@@ -242,9 +242,9 @@
                     <div class="stats-icon warning">
                         <i class="fas fa-user-plus"></i>
                     </div>
-                    <h5>Tuyển dụng mới</h5>
+                    <h5 th:text="#{home.stats.newRecruits}">Tuyển dụng mới</h5>
                     <h3 class="text-warning">23</h3>
-                    <small class="text-muted">+8% so với tháng trước</small>
+                    <small class="text-muted" th:text="#{home.stats.vsLastMonth8}">+8% so với tháng trước</small>
                 </div>
             </div>
             <div class="col-md-3 mb-3">
@@ -252,9 +252,9 @@
                     <div class="stats-icon info">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h5>Hiệu suất</h5>
+                    <h5 th:text="#{home.stats.performance}">Hiệu suất</h5>
                     <h3 class="text-info">94%</h3>
-                    <small class="text-muted">+2% so với tháng trước</small>
+                    <small class="text-muted" th:text="#{home.stats.vsLastMonth2}">+2% so với tháng trước</small>
                 </div>
             </div>
         </div>
@@ -263,39 +263,39 @@
         <div class="row">
             <div class="col-12">
                 <h4 class="mb-3">
-                    <i class="fas fa-bolt me-2"></i>Thao tác nhanh
+                    <i class="fas fa-bolt me-2"></i><span th:text="#{home.quickActions.title}">Thao tác nhanh</span>
                 </h4>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="quick-action">
                     <i class="fas fa-user-plus"></i>
-                    <h6>Thêm nhân viên</h6>
-                    <p class="text-muted small">Tạo hồ sơ nhân viên mới</p>
-                    <a href="#" class="btn btn-primary btn-sm">Thực hiện</a>
+                    <h6 th:text="#{home.quickActions.addEmployee}">Thêm nhân viên</h6>
+                    <p class="text-muted small" th:text="#{home.quickActions.addEmployeeDesc}">Tạo hồ sơ nhân viên mới</p>
+                    <a href="#" class="btn btn-primary btn-sm" th:text="#{home.quickActions.execute}">Thực hiện</a>
                 </div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="quick-action">
                     <i class="fas fa-building"></i>
-                    <h6>Quản lý phòng ban</h6>
-                    <p class="text-muted small">Xem và chỉnh sửa phòng ban</p>
-                    <a th:href="@{/departments}" class="btn btn-primary btn-sm">Thực hiện</a>
+                    <h6 th:text="#{home.quickActions.manageDept}">Quản lý phòng ban</h6>
+                    <p class="text-muted small" th:text="#{home.quickActions.manageDeptDesc}">Xem và chỉnh sửa phòng ban</p>
+                    <a th:href="@{/departments}" class="btn btn-primary btn-sm" th:text="#{home.quickActions.execute}">Thực hiện</a>
                 </div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="quick-action">
                     <i class="fas fa-file-alt"></i>
-                    <h6>Báo cáo</h6>
-                    <p class="text-muted small">Tạo báo cáo thống kê</p>
-                    <a href="#" class="btn btn-primary btn-sm">Thực hiện</a>
+                    <h6 th:text="#{home.quickActions.reports}">Báo cáo</h6>
+                    <p class="text-muted small" th:text="#{home.quickActions.reportsDesc}">Tạo báo cáo thống kê</p>
+                    <a href="#" class="btn btn-primary btn-sm" th:text="#{home.quickActions.execute}">Thực hiện</a>
                 </div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="quick-action">
                     <i class="fas fa-cog"></i>
-                    <h6>Cài đặt</h6>
-                    <p class="text-muted small">Cấu hình hệ thống</p>
-                    <a href="#" class="btn btn-primary btn-sm">Thực hiện</a>
+                    <h6 th:text="#{home.quickActions.settings}">Cài đặt</h6>
+                    <p class="text-muted small" th:text="#{home.quickActions.settingsDesc}">Cấu hình hệ thống</p>
+                    <a href="#" class="btn btn-primary btn-sm" th:text="#{home.quickActions.execute}">Thực hiện</a>
                 </div>
             </div>
         </div>
@@ -304,7 +304,7 @@
     <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
-            <p>&copy; 2025 HR System. Tất cả quyền được bảo lưu.</p>
+            <p>&copy; 2025 HR System. <span th:text="#{home.footer.copyright}">Tất cả quyền được bảo lưu.</span></p>
         </div>
     </footer>
 

@@ -6,20 +6,20 @@
                     <!-- Search Form -->
                     <form id="cycleSearchForm" class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label for="searchCycleStatNo" class="form-label">Chi nhánh</label>
+                            <label for="searchCycleStatNo" class="form-label" th:text="#{ar.viewcycle.title.chinhanh}">Chi nhánh</label>
                             <input type="text" class="form-control" id="searchCycleStatNo"
-                                placeholder="Nhập mã chi nhánh / khoảng mã / tên">
+                                th:placeholder="#{ar.viewcycle.placeholder.search}" placeholder="Nhập mã chi nhánh / khoảng mã / tên">
                         </div>
 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary me-2" onclick="cycleSearchData()">
-                                <i class="bx bx-search"></i> Tìm kiếm
+                                <i class="bx bx-search"></i> <span th:text="#{common.search}">Tìm kiếm</span>
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="cycleClearSearch()">
-                                <i class="bx bx-x"></i> Xóa lọc
+                                <i class="bx bx-x"></i> <span th:text="#{common.clearFilter}">Xóa lọc</span>
                             </button>
                             <button type="button" class="btn btn-success ms-2" onclick="cycleOpenModal()">
-                                <i class="bx bx-plus"></i> Thêm mới
+                                <i class="bx bx-plus"></i> <span th:text="#{common.addNew}">Thêm mới</span>
                             </button>
                         </div>
                     </form>
@@ -30,21 +30,21 @@
                             style="width:100%">
                             <thead class="table-light">
                                 <tr>
-                                    <th>STT</th>
-                                    <th>Chi nhánh (Mã)</th>
-                                    <th>Tên Việt</th>
-                                    <th>Tên Anh</th>
-                                    <th>Tên Trung</th>
-                                    <th>Tên Hàn</th>
-                                    <th>Ngày bắt đầu</th>
-                                    <th>Ngày kết thúc</th>
-                                    <th>Từ ngày</th>
-                                    <th>Đến ngày</th>
-                                    <th>Bắt đầu lệch tháng</th>
-                                    <th>Kết thúc lệch tháng</th>
-                                    <th>Sắp xếp</th>
-                                    <th>Trạng thái</th>
-                                    <th class="text-center" style="width: 100px;">Thao tác</th>
+                                    <th th:text="#{common.stt}">STT</th>
+                                    <th th:text="#{ar.viewcycle.title.chinhanh}">Chi nhánh (Mã)</th>
+                                    <th th:text="#{common.nameVi}">Tên Việt</th>
+                                    <th th:text="#{common.nameEn}">Tên Anh</th>
+                                    <th th:text="#{common.nameZh}">Tên Trung</th>
+                                    <th th:text="#{common.nameKo}">Tên Hàn</th>
+                                    <th th:text="#{ar.viewcycle.title.kaishiri}">Ngày bắt đầu</th>
+                                    <th th:text="#{ar.viewcycle.title.jieshuri}">Ngày kết thúc</th>
+                                    <th th:text="#{ar.viewcycle.title.tungay}">Từ ngày</th>
+                                    <th th:text="#{ar.viewcycle.title.denngay}">Đến ngày</th>
+                                    <th th:text="#{ar.viewcycle.title.beginMonthOffset}">Bắt đầu lệch tháng</th>
+                                    <th th:text="#{ar.viewcycle.title.endMonthOffset}">Kết thúc lệch tháng</th>
+                                    <th th:text="#{common.orderno}">Sắp xếp</th>
+                                    <th th:text="#{common.activity}">Trạng thái</th>
+                                    <th class="text-center" style="width: 100px;" th:text="#{common.action}">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -63,70 +63,70 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cycleModalTitle">Chi nhánh (Khoảng mã)</h5>
+                <h5 class="modal-title" id="cycleModalTitle" th:text="#{ar.viewcycle.title.chinhanh}">Chi nhánh (Khoảng mã)</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="cycleForm">
                     <input type="hidden" id="cycleStatNo" name="statNo">
 
-                    <h6 class="mb-3 text-primary border-bottom pb-2">Thông tin Đa Ngôn Ngữ</h6>
+                    <h6 class="mb-3 text-primary border-bottom pb-2" th:text="#{common.multiLangInfo}">Thông tin Đa Ngôn Ngữ</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label for="cycleNameVi" class="form-label">Tên Tiếng Việt <span
+                            <label for="cycleNameVi" class="form-label" th:text="#{common.nameVi}">Tên Tiếng Việt <span
                                     class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="cycleNameVi" name="nameVi" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleNameEn" class="form-label">Tên Tiếng Anh</label>
+                            <label for="cycleNameEn" class="form-label" th:text="#{common.nameEn}">Tên Tiếng Anh</label>
                             <input type="text" class="form-control" id="cycleNameEn" name="nameEn">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleNameZh" class="form-label">Tên Tiếng Trung</label>
+                            <label for="cycleNameZh" class="form-label" th:text="#{common.nameZh}">Tên Tiếng Trung</label>
                             <input type="text" class="form-control" id="cycleNameZh" name="nameZh">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleNameKo" class="form-label">Tên Tiếng Hàn</label>
+                            <label for="cycleNameKo" class="form-label" th:text="#{common.nameKo}">Tên Tiếng Hàn</label>
                             <input type="text" class="form-control" id="cycleNameKo" name="nameKo">
                         </div>
                     </div>
 
-                    <h6 class="mb-3 text-primary border-bottom pb-2">Thông số Khoảng Ngày</h6>
+                    <h6 class="mb-3 text-primary border-bottom pb-2" th:text="#{ar.viewcycle.title.dateRange}">Thông số Khoảng Ngày</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="cycleStartDay" class="form-label">Ngày bắt đầu</label>
+                            <label for="cycleStartDay" class="form-label" th:text="#{ar.viewcycle.title.kaishiri}">Ngày bắt đầu</label>
                             <input type="number" class="form-control" id="cycleStartDay" name="startDay">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleEndDay" class="form-label">Ngày kết thúc</label>
+                            <label for="cycleEndDay" class="form-label" th:text="#{ar.viewcycle.title.jieshuri}">Ngày kết thúc</label>
                             <input type="number" class="form-control" id="cycleEndDay" name="endDay">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleValidDateFrom" class="form-label">Từ ngày</label>
+                            <label for="cycleValidDateFrom" class="form-label" th:text="#{ar.viewcycle.title.tungay}">Từ ngày</label>
                             <input type="text" class="form-control" id="cycleValidDateFrom" name="validDateFrom"
                                 placeholder="YYYY-MM-DD">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleValidDateTo" class="form-label">Đến ngày</label>
+                            <label for="cycleValidDateTo" class="form-label" th:text="#{ar.viewcycle.title.denngay}">Đến ngày</label>
                             <input type="text" class="form-control" id="cycleValidDateTo" name="validDateTo"
                                 placeholder="YYYY-MM-DD">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleBeginMonthOffset" class="form-label">Bắt đầu chênh lệch tháng</label>
+                            <label for="cycleBeginMonthOffset" class="form-label" th:text="#{ar.viewcycle.title.beginMonthOffset}">Bắt đầu chênh lệch tháng</label>
                             <input type="number" class="form-control" id="cycleBeginMonthOffset" name="beginMonthOffset"
                                 value="0">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleEndMonthOffset" class="form-label">Kết thúc chênh lệch tháng</label>
+                            <label for="cycleEndMonthOffset" class="form-label" th:text="#{ar.viewcycle.title.endMonthOffset}">Kết thúc chênh lệch tháng</label>
                             <input type="number" class="form-control" id="cycleEndMonthOffset" name="endMonthOffset"
                                 value="0">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleOrderno" class="form-label">Sắp xếp</label>
+                            <label for="cycleOrderno" class="form-label" th:text="#{common.orderno}">Sắp xếp</label>
                             <input type="number" class="form-control" id="cycleOrderno" name="orderno">
                         </div>
                         <div class="col-md-6">
-                            <label for="cycleActivity" class="form-label">Trạng thái (1: Hoạt động, 0: Ngừng)</label>
+                            <label for="cycleActivity" class="form-label" th:text="#{common.activity}">Trạng thái (1: Hoạt động, 0: Ngừng)</label>
                             <input type="number" class="form-control" id="cycleActivity" name="activity" min="0" max="1"
                                 value="1">
                         </div>
@@ -134,8 +134,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="cycleSaveData()">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="cycleSaveData()" th:text="#{common.save}">Lưu</button>
             </div>
         </div>
     </div>
