@@ -16,4 +16,12 @@ public interface EssLeaveApplyService {
     Map<String, Object> calculateLeaveLength(String fromDateTime, String toDateTime, String leaveTypeCode);
     List<EssLeaveApplyDto> getMyLeaveApplyList(EssLeaveApplyDto dto);
     int cancelMyLeaveApplyList(List<String> applyNos);
+
+    Map<String, Object> getEmpDefaultInfo(String personId);
+
+    Map<String, Object> calcLeaveLengthForPerson(String personId, String fromTime, String toTime, String leaveTypeCode);
+
+    void cancelLeaveApplyByApplyNo(String applyNo);
+
+    void resubmitLeaveApply(Map<String, Object> params);
 }

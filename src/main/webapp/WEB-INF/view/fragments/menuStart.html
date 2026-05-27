@@ -55,7 +55,6 @@
                                                                       th:each="grandChild : ${child.children}"
                                                                       th:if="${grandChild.isActive()}">
                                                                       <a class="sub-nav-link"
-                                                                           th:href="${grandChild.menuUrl != null and !grandChild.menuUrl.empty} ? ${grandChild.menuUrl} : 'javascript:void(0);'"
                                                                            th:attr="data-tab=${grandChild.menuUrl != null and !grandChild.menuUrl.empty} ? ${grandChild.menuUrl} : 'javascript:void(0);', data-menu-no=${grandChild.menuNo}"
                                                                            th:text="${grandChild.menuName}">Grand Child
                                                                            Menu Name</a>
@@ -65,7 +64,6 @@
                                                   </th:block>
                                                   <th:block th:unless="${child.hasChildren()}">
                                                        <a class="sub-nav-link"
-                                                            th:href="${child.menuUrl != null and !child.menuUrl.empty} ? ${child.menuUrl} : 'javascript:void(0);'"
                                                             th:attr="data-tab=${child.menuUrl != null and !child.menuUrl.empty} ? ${child.menuUrl} : 'javascript:void(0);', data-menu-no=${child.menuNo}"
                                                             th:text="${child.menuName}">Child Menu Name</a>
                                                   </th:block>
@@ -75,7 +73,6 @@
                               </th:block>
                               <th:block th:unless="${menu.hasChildren()}">
                                    <a class="nav-link"
-                                        th:href="${menu.menuUrl != null and !menu.menuUrl.empty} ? ${menu.menuUrl} : 'javascript:void(0);'"
                                         th:attr="data-tab=${menu.menuUrl != null and !menu.menuUrl.empty} ? ${menu.menuUrl} : 'javascript:void(0);', data-menu-no=${menu.menuNo}">
                                         <span class="nav-icon" th:if="${menu.menuImg != null and !menu.menuImg.empty}">
                                              <img th:if="${#strings.contains(menu.menuImg, '.')}"

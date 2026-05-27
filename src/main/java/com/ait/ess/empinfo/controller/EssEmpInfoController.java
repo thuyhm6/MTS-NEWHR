@@ -237,10 +237,8 @@ public class EssEmpInfoController {
     @ResponseBody
     public ResponseEntity<EssPersonalInfoDto> getMyInfo(HttpSession session) {
         String personId = (String) session.getAttribute("adminID");
-        String lang = (String) session.getAttribute("language");
-        if (lang == null) lang = "vi";
-
-        EssPersonalInfoDto info = essPersonalInfoService.getMyInfo(personId, lang);
+       
+        EssPersonalInfoDto info = essPersonalInfoService.getMyInfo(personId);
         return ResponseEntity.ok(info);
     }
 

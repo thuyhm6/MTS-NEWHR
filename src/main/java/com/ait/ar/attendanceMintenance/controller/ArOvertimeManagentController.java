@@ -61,6 +61,19 @@ public class ArOvertimeManagentController {
         return ResponseEntity.ok(service.getDetail(applyNo, applyType));
     }
 
+    @GetMapping("/api/overtime/auto-fill-by-emp")
+    @ResponseBody
+    public ResponseEntity<ArOvertimeManagentDto> getAutoFillByEmp(
+            @RequestParam(name = "personId", required = false) String personId,
+            @RequestParam(name = "applyOtDate", required = false) String applyOtDate,
+            @RequestParam(name = "deductYn", required = false, defaultValue = "0") String deductYn) {
+        ArOvertimeManagentDto dto = new ArOvertimeManagentDto();
+        dto.setPersonId(personId);
+        dto.setApplyOtDate(applyOtDate);
+        dto.setDeductYn(deductYn);
+        return ResponseEntity.ok(service.getAutoFillOtInfo(dto));
+    }
+
     @GetMapping("/api/overtime/default-info")
     @ResponseBody
     public ResponseEntity<ArOvertimeManagentDto> getDefaultOtInfo(
@@ -116,6 +129,42 @@ public class ArOvertimeManagentController {
             response.put("success", false);
             response.put("error", e.getMessage() == null || e.getMessage().isBlank()
                     ? "Lỗi hệ thống khi lưu tăng ca."
+                    : e.getMessage());
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/overtime/resubmit")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> resubmit(@RequestBody ArOvertimeManagentDto dto) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            service.resubmitOvertimeApply(dto);
+            response.put("success", true);
+            response.put("message", "Đã lưu lại đơn tăng ca thành công");
+        } catch (Exception e) {
+            log.error("Failed to resubmit overtime apply", e);
+            response.put("success", false);
+            response.put("error", e.getMessage() == null || e.getMessage().isBlank()
+                    ? "Lỗi hệ thống khi lưu lại đơn tăng ca."
+                    : e.getMessage());
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/overtime/cancel")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> cancel(@RequestBody ArOvertimeManagentDto dto) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            service.cancelOvertimeApply(dto.getApplyNo());
+            response.put("success", true);
+            response.put("message", "Hủy đơn thành công");
+        } catch (Exception e) {
+            log.error("Failed to cancel overtime apply", e);
+            response.put("success", false);
+            response.put("error", e.getMessage() == null || e.getMessage().isBlank()
+                    ? "Lỗi hệ thống khi hủy đơn tăng ca."
                     : e.getMessage());
         }
         return ResponseEntity.ok(response);

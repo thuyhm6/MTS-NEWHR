@@ -120,6 +120,11 @@ public class EssInfoApplyAttendanceController {
         return "ess/infoApplyAttendance/viewApplyAttendanceInfoList";
     }
 
+    @GetMapping("/viewApplyAttenanceBatchInfoList")
+    public String viewApplyAttenanceBatchInfoList() {
+        return "ess/infoApplyAttendance/viewApplyAttenanceBatchInfoList";
+    }
+
     @GetMapping("/api/myLeaveApply/list")
     @ResponseBody
     public ResponseEntity<List<EssLeaveApplyDto>> getMyLeaveApplyList(

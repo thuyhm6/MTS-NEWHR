@@ -1349,4 +1349,543 @@ Giống như viewAffirmTarget1.html, hãy tạo cho tôi một file viewAffirmTa
 
  Ở đây hãy thể hiện tình hình chấm công và tăng ca theo từng ngày từ ngày 25 tháng trước đến 24 tháng này. Ở trên cũng có ô input để nhập giá trị ngày giống như vrl_standardDate của /evs/manage/viewResumeList.html. Dữ liệu chấm công lấy ra dựa vào viewAttendancePersonalInfoList, Dữ liệu tăng ca lấy ra dựa vào viewPersonOtApplyInfoList. hãy thể hiện bàng dạng biểu đồ cột hoặc một dạng nào đó để nhìn vào trực quan nhất.
 
- Ở trong bảng HR_EMPLOYEE có trường DATE_STARTED là ngày nhân viên vào công ty nhận việc, DATE_LEFT là ngày nhân viên nghỉ việc. dựa vòa đó hãy làm cho tôi một biểu đồ dạng cột kết hợp với biểu đồ dạng đường, thể hiện số lượng nhân viên làm việc trong từng tháng (tính đến ngày cuối tháng) của năm hiện tại
+ Ở trong bảng HR_EMPLOYEE có trường DATE_STARTED là ngày nhân viên vào công ty nhận việc, DATE_LEFT là ngày nhân viên nghỉ việc. dựa vòa đó hãy làm cho tôi một biểu đồ dạng cột kết hợp với biểu đồ dạng đường, thể hiện số lượng nhân viên làm việc trong từng tháng (tính đến ngày cuối tháng) của năm hiện tại.
+
+Giống như viewApplyAttenanceManagentInfoList_new.html, hãy tạo cho tôi một file viewApplyAttenanceBatchInfoList.html - Xin nghỉ phép nằm trong module /ess/infoApplyAttendance. 
+
+Khi chọn ra được nhân việc thì sẽ tự động điền luôn Phòng ban sau đó sử dụng person_id của nhân viên đó cùng với ngày hiện tại (dạng YYYY-MM-DD) để điền các thông tin của nhân viên đó vào các trường tương ứng như:
+Thời gian bắt đầu sử dụng function get_ar_shift_start_time(#{personId, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{interCpnyID, jdbcType=VARCHAR}) (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+Thời gian kết thúc sử dụng function get_ar_shift_end_time(#{personId, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{interCpnyID, jdbcType=VARCHAR}) (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+Phép năm còn lại sử dụng function GET_VAC_COUNT(#{personId, jdbcType=VARCHAR}, #{interCpnyID, jdbcType=VARCHAR}, TO_CHAR(Thời gian bắt đầu, 'YYYY-MM-DD'), TO_CHAR(Thời gian kết thúc, 'YYYY-MM-DD'))
+Ca làm việc sử dụng function GET_GLOBAL_NAME(GET_AR_SHIFTNO(#{personId, jdbcType=VARCHAR},TO_CHAR(SYSDATE, 'YYYY-MM-DD'),#{interCpnyID, jdbcType=VARCHAR}),#{lang, jdbcType=VARCHAR})
+
+Khi Lưu check thêm cho tôi 1 điều kiện, sử dụng câu lệnh SQL: SELECT AR_GET_LEAVE_CLASH('',#{personId, jdbcType=VARCHAR}, #{fromTime, jdbcType=VARCHAR}, #{toTime, jdbcType=VARCHAR}) FROM DUAL; 
+Nếu kết quả trả về là > 0 thì báo lỗi: "Trùng với chấm công trước đó, xin kiểm tra thời gian này đã xin phép hay chưa!"
+Nếu kết quả trả về = -1 thì báo lỗi: "Ngày công đã chốt, xin kiểm tra lại!"
+Nếu kết quả trả về = -2 thì báo lỗi: "Thời gian đã khóa, xin kiểm tra lại!"
+
+Thêm ô checkbox để chọn có hủy đơn hay không, Sau khi tick chọn và bấm vào nút Hủy đơn ở bên cạnh nút Lưu thì sẽ cập nhật lại trường ACTIVITY của bảng ESS_LEAVE_APPLY_TB thành 1, đồng thời cập nhật lại trường AFFIRM_FLAG thành 14014310. Sau đó gọi thêm package PKG_AFFIRM_EMAIL.PR_DELETE_LEAVE_CONFIRM(
+            #{applyNo, jdbcType=VARCHAR, mode=IN},
+            #{message, jdbcType=VARCHAR, mode=OUT}
+        ). tiếp theo sử dụng câu lệnh SQL: SELECT SY.APPLY_NO, SY.APPLY_TYPE, SY.APPLY_FLAG
+          FROM SY_AFFIRM_EMAIL SY
+         WHERE EXISTS (SELECT 1
+                  FROM SY_AFFIRM_EMAIL SY2
+                 WHERE SY.APPLY_NO = SY2.APPLY_NO
+                   AND SY.APPLY_TYPE = SY2.APPLY_TYPE
+                   AND SY.APPLY_FLAG = SY2.APPLY_FLAG
+                   AND SY2.SEQ = (SELECT MAX(SEQ)
+                                    FROM SY_AFFIRM_EMAIL
+                                   WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}))
+                                   AND ROWNUM < 2. để lấy ra 3 giá trị APPLY_NO, APPLY_TYPE, APPLY_FLAG của đơn nghỉ phép vừa bị hủy, sau đó gọi tiếp package PKG_AFFIRM_EMAIL.PR_AFFIRM_CANCEL( #APPLY_NO#,
+                         #APPLY_TYPE#,
+                         #APPLY_FLAG#,
+                         #adminID#,
+                         #adminIP#,
+						 #message,jdbcType=VARCHAR,mode=OUT#), để thực hiện hủy đơn nghỉ phép.
+
+Thêm cho tôi điều kiện tìm kiếm  với trường Trạng thái đơn nghỉ phép - AFFIRM_FLAG của bảng ESS_LEAVE_APPLY_TB, có các giá trị sau:
+14014309 - Chờ duyệt
+14014308 - Đã duyệt
+14014307 - Đang duyệt
+14014306 - Gửi
+14014310 - Đã hủy. 
+Điều kiện tìm kiếm Trạng thái xác nhận - CONFIRM_FLAG của bảng ESS_LEAVE_APPLY_TB, có các giá trị sau: 0 - Chưa xác nhận
+1 - Đã xác nhận
+2 - Từ chối.
+Điều kiện tìm kiếm Loại đơn nghỉ phép - LEAVE_TYPE_CODE của bảng ESS_LEAVE_APPLY_TB, dữ liệu lấy lấy thông qua data-parent-code="21"
+
+Ở cột Thao tác này, nếu dòng dữ liệu có AFFIRM_FLAG = 14014308, thì hiển thị nút Lưu. Khi bấm váo tức là sẽ xóa đơn này khỏi bảng ESS_LEAVE_APPLY_TB, đồng thời cũng xóa luôn các dữ liệu liên quan đến đơn nghỉ phép này trong bảng SY_AFFIRM_EMAIL thông qua câu lệnh SQL: DELETE FROM SY_AFFIRM_EMAIL WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}. và trong bảng AR_APPLY_RESULT thông qua câu lệnh SQL: DELETE FROM AR_APPLY_RESULT WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}. Sau khi xóa xong thì sẽ Thêm mới lại một đơn mới theo những thông tin đã được chỉnh sửa của đơn nghỉ phép đó.
+
+Khi load dữ liệu ra chỉ những đơn nào có AFFIRM_FLAG = 14014308 (Đã duyệt) thì mới hiển thị checkbox. Và nút Lưu chỉ thực hiện với những đơn có trạng thái Đã duyệt. sau khi người dùng sửa thông tin của những đơn đã duyệt và tick vào ô checkbox, Khi bấm nút Lưu thì cũng thực hiện việc xóa đơn cũ và thêm đơn mới, giống như trên, nhưng khác là cái này thực hiện với nhiều đơn.
+
+ở phần thời lượng này, hãy áp dụng cách tính và hiển thị ra giống như lv_modalLeaveLength.
+
+Căn cứ vào fiel viewEvsAffirmorSetup.html, hãy tạo cho tôi một file viewEvsResultEmp.html - Kết quả đánh giá nằm trong module /evs/manage. Giao diện tham khảo hình ảnh. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT EVS_YEAR,
+       MAX(EVS_MONTH12) EVS_performance,
+       MAX(EVS_MONTH13) EVS_ability
+  FROM (SELECT EVS_YEAR,
+               DECODE(EVS_MONTH, '14015057', MAX(FINAL_GRADE)) EVS_performance,
+               DECODE(EVS_MONTH, 'ability', MAX(FINAL_GRADE)) EVS_ability
+          FROM (SELECT EVS.EVS_YEAR,
+                       DECODE(EVS.EVS_TYPE,
+                              'ability',
+                              'ability',
+                              DECODE(EVS.EVS_MONTH,
+                                     '14015058',
+                                     '14015050',
+                                     '14015059',
+                                     '14015057',
+                                     EVS.EVS_MONTH)) EVS_MONTH,
+                       CASE
+                         WHEN EVS.FINAL_GRADE = 'A' THEN
+                          'EX'
+                         WHEN EVS.FINAL_GRADE = 'B' THEN
+                          'VG'
+                         WHEN EVS.FINAL_GRADE = 'C' THEN
+                          'GD'
+                         WHEN EVS.FINAL_GRADE = 'D' THEN
+                          'NI'
+                         WHEN EVS.FINAL_GRADE = 'E' THEN
+                          'UN'
+                         ELSE
+                          EVS.FINAL_GRADE
+                       END FINAL_GRADE
+                  FROM EVS_OBJECT EVS
+                 WHERE PERSON_ID = #{personId, jdbcType=VARCHAR}
+                   AND PKG_EVS_PROCESS.GET_EVS_FEEDBACK(EVS.RESUME_SEQ, '14015077') = 1
+                   AND ACTIVITY = '14015361')
+         GROUP BY EVS_YEAR, EVS_MONTH)
+ GROUP BY EVS_YEAR
+ ORDER BY EVS_YEAR.
+
+ Căn cứ vào file viewEvsAffirmorSetup.html, hãy tạo cho tôi một file viewApprovalEmail.html - Thoogn tin phê duyệt (Chưa duyệt) nằm trong module /ess/infoApply. Giao diện tham khảo hình ảnh. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT SEQ,
+       AFFIRM_TYPE,
+       APPLY_NO,
+       APPLY_TYPE,
+       APPLY_PERSON_ID,
+       AFFIRM_PERSON_ID,
+       TITLE,
+       AFFIRM_LEVEL,
+       AFFIRM_FLAG,
+       AFFIRM_URL,
+       APPLY_FLAG,
+       APPLY_TYPE_CODE,
+       APPLY_PERSON_INFO,
+       GET_CODE_NAME(APPLY_AFFIRM_FLAG, 'vi') APPLY_AFFIRM_FLAG,
+       TO_CHAR(UPDATE_DATE, 'YYYY.MM.DD HH24:MI:SS') UPDATE_DATE,
+       ACTIVITY,
+       READ_FLAG
+  FROM SY_AFFIRM_EMAIL EM
+ WHERE ACTIVITY = 0
+   AND AFFIRM_PERSON_ID = #{adminID, jdbcType=VARCHAR}
+   AND APPLY_AFFIRM_FLAG NOT IN ('14014310', '14014309', '14014308')
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_LEAVE_APPLY_TB TB
+         WHERE TB.APPLY_NO = EM.APPLY_NO
+           AND TB.BATCH_YN = 2)
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_APPLY_OT OT
+         WHERE OT.APPLY_NO = EM.APPLY_NO
+           AND OT.BATCH_YN = 2)
+ ORDER BY CREATE_DATE DESC. Khi tick vào các dòng dữ liệu và bấm Duyệt (FLAG = 1) hoặc Từ chối (FLAG = 2) thì sẽ gọi package PKG_AFFIRM_EMAIL.PR_AFFIRM_EXECUTE(
+						 #APPLY_NO#,
+                         #APPLY_TYPE#,
+                         #APPLY_FLAG#,
+                         #FLAG#,
+                         #AFFIRM_CONTENT#,
+                         #adminID#,
+                         #adminIP#,
+                         #AFFIRM_LEVEL#,
+						 #message,jdbcType=VARCHAR,mode=OUT#), để thực hiện việc duyệt hoặc từ chối đơn. Sau khi duyệt hoặc từ chối xong thì sẽ tự động load lại trang viewApprovalEmail.html để cập nhật lại danh sách những đơn cần phê duyệt.
+
+vì modal này sẽ sử dụng nhiều lần ở nhiều file khác nhau nên tôi sẽ tạo một file riêng để chứa modal này, tên là viewApprovaledLeave.html. nằm trong module /ess/infoApply. Giao diện tham khảo hình ảnh. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT SEQ,
+       AFFIRM_TYPE,
+       APPLY_NO,
+       APPLY_TYPE,
+       APPLY_PERSON_ID,
+       AFFIRM_PERSON_ID,
+       TITLE,
+       AFFIRM_LEVEL,
+       AFFIRM_FLAG,
+       AFFIRM_URL,
+       APPLY_FLAG,
+       APPLY_TYPE_CODE,
+       APPLY_PERSON_INFO,
+       GET_CODE_NAME(APPLY_AFFIRM_FLAG, 'vi') APPLY_AFFIRM_FLAG,
+       TO_CHAR(UPDATE_DATE, 'YYYY.MM.DD HH24:MI:SS') UPDATE_DATE,
+       ACTIVITY,
+       READ_FLAG
+  FROM SY_AFFIRM_EMAIL EM
+ WHERE ACTIVITY = 0
+   AND AFFIRM_PERSON_ID = #{adminID, jdbcType=VARCHAR}
+   AND APPLY_AFFIRM_FLAG NOT IN ('14014310', '14014309', '14014308')
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_LEAVE_APPLY_TB TB
+         WHERE TB.APPLY_NO = EM.APPLY_NO
+           AND TB.BATCH_YN = 2)
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_APPLY_OT OT
+         WHERE OT.APPLY_NO = EM.APPLY_NO
+           AND OT.BATCH_YN = 2)
+ ORDER BY CREATE_DATE DESC. Khi tick vào các dòng dữ liệu và bấm Duyệt (FLAG = 1) hoặc Từ chối (FLAG = 2) thì sẽ gọi package PKG_AFFIRM_EMAIL.PR_AFFIRM_EXECUTE(
+						 #APPLY_NO#,
+                         #APPLY_TYPE#,
+                         #APPLY_FLAG#,
+                         #FLAG#,
+                         #AFFIRM_CONTENT#,
+                         #adminID#,
+                         #adminIP#,
+                         #AFFIRM_LEVEL#,
+						 #message,jdbcType=VARCHAR,mode=OUT#), để thực hiện việc duyệt hoặc từ chối đơn. Sau khi duyệt hoặc từ chối xong thì sẽ tự động load lại trang viewApprovalEmail.html để cập nhật lại danh sách những đơn cần phê duyệt.
+
+vì modal này sẽ sử dụng nhiều lần ở nhiều file khác nhau nên tôi sẽ tạo một file riêng để chứa modal này, tên là viewApprovaledLeave.html. nằm trong module /ess/infoApply. Giao diện tham khảo hình ảnh. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT SEQ,
+       AFFIRM_TYPE,
+       APPLY_NO,
+       APPLY_TYPE,
+       APPLY_PERSON_ID,
+       AFFIRM_PERSON_ID,
+       TITLE,
+       AFFIRM_LEVEL,
+       AFFIRM_FLAG,
+       AFFIRM_URL,
+       APPLY_FLAG,
+       APPLY_TYPE_CODE,
+       APPLY_PERSON_INFO,
+       GET_CODE_NAME(APPLY_AFFIRM_FLAG, 'vi') APPLY_AFFIRM_FLAG,
+       TO_CHAR(UPDATE_DATE, 'YYYY.MM.DD HH24:MI:SS') UPDATE_DATE,
+       ACTIVITY,
+       READ_FLAG
+  FROM SY_AFFIRM_EMAIL EM
+ WHERE ACTIVITY = 0
+   AND AFFIRM_PERSON_ID = #{adminID, jdbcType=VARCHAR}
+   AND APPLY_AFFIRM_FLAG NOT IN ('14014310', '14014309', '14014308')
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_LEAVE_APPLY_TB TB
+         WHERE TB.APPLY_NO = EM.APPLY_NO
+           AND TB.BATCH_YN = 2)
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_APPLY_OT OT
+         WHERE OT.APPLY_NO = EM.APPLY_NO
+           AND OT.BATCH_YN = 2)
+ ORDER BY CREATE_DATE DESC. Khi tick vào các dòng dữ liệu và bấm Duyệt (FLAG = 1) hoặc Từ chối (FLAG = 2) thì sẽ gọi package PKG_AFFIRM_EMAIL.PR_AFFIRM_EXECUTE(
+						 #APPLY_NO#,
+                         #APPLY_TYPE#,
+                         #APPLY_FLAG#,
+                         #FLAG#,
+                         #AFFIRM_CONTENT#,
+                         #adminID#,
+                         #adminIP#,
+                         #AFFIRM_LEVEL#,
+						 #message,jdbcType=VARCHAR,mode=OUT#), để thực hiện việc duyệt hoặc từ chối đơn. Sau khi duyệt hoặc từ chối xong thì sẽ tự động load lại trang viewApprovalEmail.html để cập nhật lại danh sách những đơn cần phê duyệt.
+
+vì modal này sẽ sử dụng nhiều lần ở nhiều file khác nhau nên hãy giúp tôi tạo một file riêng để chứa modal này, tên là viewApprovaledLeave.html. nằm trong module /ess/infoApply., khi bấm vào tên nhân viên sẽ hiển thị modal này như bình thường
+
+vì modal - ck_applyDetailModal này sẽ sử dụng nhiều lần ở nhiều file khác nhau nên hãy giúp tôi tạo một file riêng để chứa modal này, tên là viewAttendanceEx.html. nằm trong module /ess/infoApply. Tham khảo cách làm của viewApprovaledLeave của viewApplyAttenanceManagentInfoList_new.html khi bấm vào tên nhân viên sẽ hiển thị modal này như bình thường
+
+vì modal - otf_applyDetailModal này sẽ sử dụng nhiều lần ở nhiều file khác nhau nên hãy giúp tôi tạo một file riêng để chứa modal này, tên là viewApprovaledOt.html. nằm trong module /ess/infoApply. Tham khảo cách làm của viewApprovaledLeave của viewApplyAttenanceManagentInfoList_new.html khi bấm vào tên nhân viên sẽ hiển thị modal này như bình thường.
+
+link này là những đưòng dẫn /ess/infoApply/viewApprovaledOt và /ess/infoApply/viewApprovaledLeave và /ess/infoApply/viewAttendanceEx sẽ được gọi trong các file khác nhau khi click vào tên nhân viên để hiển thị modal tương ứng.tôi muốn khi bấm vào thì sẽ mở các modal tương ứng viewApprovaledOt hoặc viewApprovaledLeave hoặc viewAttendanceEx chứ không phải là mở một trang mới, nên tôi sẽ tạo 3 file riêng để chứa 3 modal này, khi bấm vào tên nhân viên sẽ hiện ra modal tương ứng.
+
+khi mở ra modal viewApprovaledLeave hoặc viewAttendanceEx hoặc viewApprovaledOt từ viewApprovalEmail.html. nếu AFFIRM_FLAG = 0 và AFFIRM_PERSON_ID = #{adminID}  thì ô Ý kiến sẽ hiển thị kiểu input để người dúng nhập Ý kiến, đồn thời hiện ra 2 nút Duyệt và Từ chối. nêu bấm Duyệt (FLAG = 1) hoặc Từ chối (FLAG = 2) thì sẽ gọi package
+ PKG_AFFIRM_EMAIL.PR_AFFIRM_EXECUTE(
+            #{applyNo,       jdbcType=VARCHAR, mode=IN},
+            #{applyType,     jdbcType=VARCHAR, mode=IN},
+            #{applyFlag,     jdbcType=VARCHAR, mode=IN},
+            #{flag,          jdbcType=INTEGER, mode=IN},
+            #{affirmContent, jdbcType=VARCHAR, mode=IN},
+            #{adminID,       jdbcType=VARCHAR, mode=IN},
+            #{adminIP,       jdbcType=VARCHAR, mode=IN},
+            #{affirmLevel,   jdbcType=VARCHAR, mode=IN},
+            #{message,       jdbcType=VARCHAR, mode=OUT}
+        ). Lưu ý chỉ khi mở modal từ viewApprovalEmail.html thì mới có chức năng duyệt hoặc từ chối, còn khi mở modal này từ những file khác thì sẽ chỉ hiển thị thông tin mà không có chức năng duyệt hoặc từ chối. Sau khi duyệt hoặc từ chối xong thì sẽ tự động load lại trang viewApprovalEmail.html để cập nhật lại danh sách những đơn cần phê duyệt.
+
+ở đây hãy hiển thị số lượng đơn nghỉ phép, đơn tăng ca và đơn nghỉ bất thường của nhân viên mà người dùng chưa duyệt, dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT COUNT(1)
+  FROM SY_AFFIRM_EMAIL EM
+ WHERE ACTIVITY = 0
+   AND AFFIRM_PERSON_ID = '35448370'
+   AND APPLY_AFFIRM_FLAG NOT IN ('14014310', '14014309', '14014308')
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_LEAVE_APPLY_TB TB
+         WHERE TB.APPLY_NO = EM.APPLY_NO
+           AND TB.BATCH_YN = 2)
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_APPLY_OT OT
+         WHERE OT.APPLY_NO = EM.APPLY_NO
+           AND OT.BATCH_YN = 2).
+khi bấm vào thì hiện ra 3 dòng tương ứng với số lượng đơn nghỉ phép, đơn tăng ca và đơn nghỉ bất thường của nhân viên mà người dùng chưa duyệt
+Dòng Nghỉ phép sẽ hiện ra số lượng đơn nghỉ phép dùng câu lệnh SQL: SELECT COUNT(1)
+  FROM SY_AFFIRM_EMAIL EM
+ WHERE ACTIVITY = 0
+   AND AFFIRM_PERSON_ID = '35448370'
+   AND APPLY_AFFIRM_FLAG NOT IN ('14014310', '14014309', '14014308')
+   AND APPLY_TYPE_CODE = '21'
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_LEAVE_APPLY_TB TB
+         WHERE TB.APPLY_NO = EM.APPLY_NO
+           AND TB.BATCH_YN = 2)
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_APPLY_OT OT
+         WHERE OT.APPLY_NO = EM.APPLY_NO
+           AND OT.BATCH_YN = 2).
+Dòng Tăng ca sẽ hiện ra số lượng đơn tăng ca dùng câu lệnh SQL: SELECT COUNT(1)
+  FROM SY_AFFIRM_EMAIL EM
+  WHERE ACTIVITY = 0
+    AND AFFIRM_PERSON_ID = '35448370'
+    AND APPLY_AFFIRM_FLAG NOT IN ('14014310', '14014309', '14014308')
+    AND APPLY_TYPE_CODE = '31'
+    AND NOT EXISTS (SELECT 1
+            FROM ESS_LEAVE_APPLY_TB TB
+          WHERE TB.APPLY_NO = EM.APPLY_NO
+            AND TB.BATCH_YN = 2)
+    AND NOT EXISTS (SELECT 1
+            FROM ESS_APPLY_OT OT
+          WHERE OT.APPLY_NO = EM.APPLY_NO
+            AND OT.BATCH_YN = 2).
+Dòng Nghỉ bất thường sẽ hiện ra số lượng đơn nghỉ bất thường dùng câu lệnh SQL: SELECT COUNT(1)
+  FROM SY_AFFIRM_EMAIL EM
+  WHERE ACTIVITY = 0
+    AND AFFIRM_PERSON_ID = '35448370'
+    AND APPLY_AFFIRM_FLAG NOT IN ('14014310', '14014309', '14014308')
+    AND APPLY_TYPE_CODE = '218197'
+    AND NOT EXISTS (SELECT 1
+            FROM ESS_LEAVE_APPLY_TB TB
+          WHERE TB.APPLY_NO = EM.APPLY_NO
+            AND TB.BATCH_YN = 2)
+    AND NOT EXISTS (SELECT 1
+            FROM ESS_APPLY_OT OT
+          WHERE OT.APPLY_NO = EM.APPLY_NO
+            AND OT.BATCH_YN = 2).
+Khi bấm vào từng dòng sẽ mở ra tab viewApprovalEmail.html để hiển thị danh sách những đơn tương ứng với điều kiện tìm kiếm loại đơn Nghỉ phép - APPLY_TYPE_CODE = '21', Tăng ca - APPLY_TYPE_CODE = '31', Nghỉ bất thường - APPLY_TYPE_CODE = '218197'.
+Bám vào Xem tất cả thông báo sẽ mở ra tab viewApprovalEmail.html để hiển thị tất cả.
+
+Thêm cho tôi điều kiện tìm kiếm: Loại đơn phê duyệt - APPLY_TYPE_CODE của bảng SY_AFFIRM_EMAIL, dữ liệu lấy lấy thông qua 
+<option value="">Lựa chọn</option>
+				<option value="31">Tăng ca</option>
+				<option value="21">Nghỉ phép</option>
+				<option value="218197">Nghỉ bất thường</option>.
+
+dựa vào viewApplyAttenanceManagentInfoList_new.html hãy tạo cho tôi một file viewLeaveConfirmList.html - Xác nhận nghỉ phép nằm trong module /ess/arConfirm. Giao diện tham khảo hình ảnh. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT EL.APPLY_NO,
+       TO_CHAR(EL.APPLY_TIME, 'DD-MM-YYYY') APPLY_TIME,
+       EL.PERSON_ID,
+       AR_GET_DAY_HOURS(EL.PERSON_ID,
+                        TO_CHAR(EL.LEAVE_FROM_TIME, 'YYYY/MM/DD')) DAY_HOURS,
+       TO_CHAR(EL.LEAVE_FROM_TIME, 'DD-MM-YYYY HH24:MI') LEAVE_FROM_TIME,
+       TO_CHAR(EL.LEAVE_TO_TIME, 'DD-MM-YYYY HH24:MI') LEAVE_TO_TIME,
+       trunc(EL.LEAVE_TO_TIME - SYSDATE) OVER_DAY,
+       trunc(((EL.LEAVE_TO_TIME - SYSDATE) - trunc(LEAVE_TO_TIME - SYSDATE)) * 24) OVER_HOUR,
+       EL.LEAVE_REASON,
+       EL.LEAVE_TYPE_CODE,
+       get_global_name(EL.LEAVE_TYPE_CODE, #{lang, jdbcType=VARCHAR}) LEAVE_TYPE_CODE_NAME,
+       EL.HR_COMMENT,
+       EL.APPLY_LENGTH,
+       EL.CONFIRM_FLAG,
+       EL.ACTIVITY,
+       EL.CREATED_BY,
+       GET_UPDATED_INFO(EL.CREATED_BY) CREATED_NAME,
+       HR.LOCAL_NAME,
+       HR.DEPTNO,
+       HR.EMPID,
+       get_dept_name(HR.DEPTNO, #{lang, jdbcType=VARCHAR}) DEPT_NAME,
+       HR.POST_GRADE_NO,
+       get_global_name(HR.POST_GRADE_NO, #{lang, jdbcType=VARCHAR}) POST_GRADE_NAME,
+       HR.POST_FAMILY,
+       get_global_name(HR.POST_FAMILY, #{lang, jdbcType=VARCHAR}) POST_FAMILY_NAME,
+       GET_UPDATED_INFO(EL.CONFIRM_BY) CONFIRM_BY
+  FROM ess_leave_apply_tb EL, HR_EMPLOYEE HR
+ WHERE EL.PERSON_ID = HR.PERSON_ID
+   AND EL.AFFIRM_FLAG = 14014308
+   AND EL.PERSON_ID NOT LIKE '111111%'
+   AND EL.ACTIVITY = '1'
+   AND EL.CPNY_ID = #{interCpnyID, jdbcType=VARCHAR}
+   AND EL.CONFIRM_FLAG = '0'
+ ORDER BY EL.APPLY_TIME DESC. Khi tick vào các dòng dữ liệu và bấm Duyệt (FLAG = 1) hoặc Từ chối (FLAG = 2) thì sẽ gọi package PKG_AFFIRM_EMAIL.PR_LEAVE_CONFIRM(
+						#APPLY_NO:VARCHAR#,	
+						#FLAG:VARCHAR#,
+						#HR_COMMENT:VARCHAR#,
+						#adminID:VARCHAR#,
+						#adminIP:VARCHAR#,
+						#message,jdbcType=VARCHAR,mode=OUT#), để thực hiện việc duyệt hoặc từ chối đơn. Hoặc người dùng có thể nhập trự tiếp Ý kiến sau đó bấm vào Duyệt hoặc Từ chối ở cột Nhân sự xác nhận. Sau khi duyệt hoặc từ chối xong thì sẽ tự động load lại trang viewLeaveConfirmList.html để cập nhật lại danh sách những đơn cần phê duyệt.
+
+Thêm cho tôi điều kiện tìm kiếm Trạng thái xác nhận - CONFIRM_FLAG của bảng ess_leave_apply_tb, có các giá trị sau: 0 - Chưa xác nhận, 1 - Đã xác nhận, 2 - Từ chối.
+
+Giống như viewLeaveConfirmList.html, hãy tạo cho tôi một file viewAttendanceExConfirm.html - Xác nhận nghỉ bất thường nằm trong module /ess/arConfirm. Giao diện tham khảo hình ảnh. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT EC.SEQ,
+       EC.APPLY_NO,
+       EC.PERSON_ID,
+       EC.APPLY_REASON,
+       EC.AFFIRM_FLAG,
+       TO_CHAR(EC.APPLY_TIME, 'DD-MM-YYYY') APPLY_TIME,
+       get_global_name(EC.AFFIRM_FLAG, #{lang, jdbcType=VARCHAR}) AFFIRM_FLAG_NAME,
+       get_global_name(get_ar_shiftno(EC.PERSON_ID, EC.AR_DATE_STR, #{cpnyId, jdbcType=VARCHAR}), #{lang, jdbcType=VARCHAR}) SHIFT_NAME,
+       EC.ITEM_NO,
+       get_global_name(EC.ITEM_NO, #{lang, jdbcType=VARCHAR}) ITEM_NAME,
+       TO_CHAR(TO_DATE(REPLACE(EC.AR_DATE_STR, '/', '-'), 'YYYY-MM-DD'),
+               'DD-MM-YYYY') AR_DATE_STR,
+       TO_CHAR(EC.IN_TIME, 'DD-MM-YYYY HH24:MI') IN_TIME,
+       TO_CHAR(EC.OUT_TIME, 'DD-MM-YYYY HH24:MI') OUT_TIME,
+       TO_CHAR(EC.FROM_TIME, 'DD-MM-YYYY HH24:MI') FROM_TIME,
+       TO_CHAR(EC.TO_TIME, 'DD-MM-YYYY HH24:MI') TO_TIME,
+       EC.CONFIRM_FLAG,
+       EC.HR_COMMENT,
+       HR.LOCAL_NAME,
+       HR.EMPID,
+       HR.DEPTNO,
+       get_dept_name(HR.DEPTNO, #{lang, jdbcType=VARCHAR}) DEPT_NAME,
+       HR.POST_GRADE_NO,
+       get_global_name(HR.POST_GRADE_NO, #{lang, jdbcType=VARCHAR}) POST_GRADE_NAME,
+       HR.POST_FAMILY,
+       get_global_name(HR.POST_FAMILY, #{lang, jdbcType=VARCHAR}) POST_FAMILY_NAME,
+       EC.ACTIVITY,
+       GET_UPDATED_INFO(EC.CONFIRM_BY) CONFIRM_BY,
+       GET_AR_TIME_BY_CPNYID(EC.PERSON_ID, EC.AR_DATE_STR, 'IN', #{cpnyId, jdbcType=VARCHAR}) INDOOR_TIME,
+       GET_AR_TIME_BY_CPNYID(EC.PERSON_ID, EC.AR_DATE_STR, 'OUT', #{cpnyId, jdbcType=VARCHAR}) OUTDOOR_TIME
+  FROM ESS_CARD_APPLY_TB EC, HR_EMPLOYEE HR
+ WHERE EC.PERSON_ID = HR.PERSON_ID
+   AND EC.AFFIRM_FLAG = '14014308'
+   AND EC.ACTIVITY = '1'
+   AND HR.PERSON_ID NOT LIKE '111111%'
+   AND EC.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+   AND EC.CONFIRM_FLAG = '0'
+ ORDER BY EC.AR_DATE_STR DESC. Khi tick vào các dòng dữ liệu và bấm Duyệt (FLAG = 1) hoặc Từ chối (FLAG = 2) thì sẽ gọi package PKG_AFFIRM_EMAIL.PR_ATTENDANCEEX_CONFIRM(
+						#APPLY_NO:VARCHAR#,	
+						#FLAG:VARCHAR#,
+						#HR_COMMENT:VARCHAR#,
+						#adminID:VARCHAR#,
+						#adminIP:VARCHAR#,
+						#message,jdbcType=VARCHAR,mode=OUT#), để thực hiện việc duyệt hoặc từ chối đơn. Hoặc người dùng có thể nhập trự tiếp Ý kiến sau đó bấm vào Duyệt hoặc Từ chối ở cột Nhân sự xác nhận. Sau khi duyệt hoặc từ chối xong thì sẽ tự động load lại trang viewAttendanceExConfirm.html để cập nhật lại danh sách những đơn cần phê duyệt.
+
+
+ở đây hãy hiển thị số lượng đơn nghỉ phép và đơn nghỉ bất thường của nhân viên mà cần xác nhận, dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT COUNT(1)
+  FROM ess_leave_apply_tb EL
+ WHERE EL.AFFIRM_FLAG = 14014308
+   AND EL.PERSON_ID NOT LIKE '111111%'
+   AND EL.ACTIVITY = '1'
+   AND EL.CPNY_ID = #{interCpnyID, jdbcType=VARCHAR}
+   AND EL.CONFIRM_FLAG = '0'.
+   và SELECT COUNT(1) FROM ESS_CARD_APPLY_TB EC
+ WHERE EC.AFFIRM_FLAG = '14014308'
+   AND EC.ACTIVITY = '1'
+   AND EC.PERSON_ID NOT LIKE '111111%'
+   AND EC.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+   AND EC.CONFIRM_FLAG = '0'.
+khi bấm vào thì hiện ra 2 dòng tương ứng với số lượng đơn nghỉ phép, và đơn nghỉ bất thường của nhân viên mà chưa xác nhận
+Dòng Nghỉ phép sẽ hiện ra số lượng đơn nghỉ phép dùng câu lệnh SQL: SELECT COUNT(1)
+  WHERE EL.AFFIRM_FLAG = 14014308
+   AND EL.PERSON_ID NOT LIKE '111111%'
+   AND EL.ACTIVITY = '1'
+   AND EL.CPNY_ID = #{interCpnyID, jdbcType=VARCHAR}
+   AND EL.CONFIRM_FLAG = '0'. Khi bấm vào thì sẽ mở ra tab viewLeaveConfirmList.html để hiển thị danh sách những đơn nghỉ phép cần xác nhận.
+Dòng Nghỉ bất thường sẽ hiện ra số lượng đơn nghỉ bất thường dùng câu lệnh SQL: SELECT COUNT(1)
+  FROM ESS_CARD_APPLY_TB EC
+ WHERE EC.AFFIRM_FLAG = '14014308'
+   AND EC.ACTIVITY = '1'
+   AND EC.PERSON_ID NOT LIKE '111111%'
+   AND EC.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+   AND EC.CONFIRM_FLAG = '0'. Khi bấm vào thì sẽ mở ra tab viewAttendanceExConfirm.html để hiển thị danh sách những đơn nghỉ bất thường cần xác nhận.
+
+
+Giống như viewApprovalEmail.html, hãy tạo cho tôi một file viewApprovaledEmail.html - Đơn đã duyệt nằm trong module /ess/infoApply. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT SEQ,
+       AFFIRM_TYPE,
+       APPLY_NO,
+       APPLY_TYPE,
+       APPLY_PERSON_ID,
+       AFFIRM_PERSON_ID,
+       TITLE,
+       AFFIRM_LEVEL,
+       AFFIRM_FLAG,
+       AFFIRM_URL,
+       APPLY_FLAG,
+       APPLY_TYPE_CODE,
+       APPLY_PERSON_INFO,
+       GET_CODE_NAME(APPLY_AFFIRM_FLAG, 'vi') APPLY_AFFIRM_FLAG,
+       TO_CHAR(UPDATE_DATE, 'DD.MM.YYYY HH24:MI:SS') UPDATE_DATE,
+       ACTIVITY,
+       READ_FLAG
+  FROM SY_AFFIRM_EMAIL EM
+ WHERE ACTIVITY IN ('0', '1')
+   AND AFFIRM_PERSON_ID = '35448370'
+   AND AFFIRM_TYPE NOT IN (3, 4)
+   AND APPLY_AFFIRM_FLAG IN ('14014308', '14014309', '14014310')
+   AND NOT EXISTS (SELECT 1
+          FROM ESS_LEAVE_APPLY_TB TB
+         WHERE TB.APPLY_NO = EM.APPLY_NO
+           AND TB.BATCH_YN = 2)
+   AND NOT EXISTS
+ (SELECT 1
+          FROM ESS_APPLY_OT OT
+         WHERE OT.APPLY_NO = EM.APPLY_NO
+           AND OT.BATCH_YN = 2)
+   AND CREATE_DATE >=
+       TO_DATE(TO_CHAR(SYSDATE, 'YYYY.MM') || '.01', 'YYYY.MM.DD')
+ ORDER BY CREATE_DATE DESC.
+
+ Giống như viewApprovalEmail.html, hãy tạo cho tôi một file viewNoticeedEmail.html - Đơn đã duyệt nằm trong module /ess/infoApply. Dữ liệu lấy ra dựa vào câu lệnh SQL: SELECT SEQ,
+       AFFIRM_TYPE,
+       APPLY_NO,
+       APPLY_TYPE,
+       APPLY_PERSON_ID,
+       AFFIRM_PERSON_ID,
+       TITLE,
+       AFFIRM_LEVEL,
+       AFFIRM_FLAG,
+       AFFIRM_URL,
+       APPLY_FLAG,
+       APPLY_TYPE_CODE,
+       APPLY_PERSON_INFO,
+       GET_CODE_NAME(APPLY_AFFIRM_FLAG, 'vi') APPLY_AFFIRM_FLAG,
+       TO_CHAR(UPDATE_DATE, 'DD.MM.YYYY HH24:MI:SS') UPDATE_DATE,
+       ACTIVITY,
+       READ_FLAG
+  FROM SY_AFFIRM_EMAIL
+ WHERE AFFIRM_PERSON_ID = #{adminID, jdbcType=VARCHAR}
+   AND AFFIRM_TYPE IN (3, 4)
+   AND CREATE_DATE >=
+       ADD_MONTHS(TO_DATE(TO_CHAR(SYSDATE, 'YYYY.MM') || '.01',
+                          'YYYY.MM.DD'),
+                  -1)
+ ORDER BY CREATE_DATE DESC
+
+
+ Giống như viewApplyAttenanceManagentInfoList_new.html, hãy tạo cho tôi một file viewApplyAttenanceBatchInfoList.html - Xin nghỉ phép nằm trong module /ess/infoApplyAttendance. vì giao diện viewApplyAttenanceBatchInfoList là dùng cho người quản lý, vậy nên hãy sao chép lại giống như viewApplyAttenanceManagentInfoList_new.html, cả về giao diện và chức năng.
+
+ 
+Khi chọn ra được nhân việc thì sẽ tự động điền luôn Phòng ban sau đó sử dụng person_id của nhân viên đó cùng với ngày hiện tại (dạng YYYY-MM-DD) để điền các thông tin của nhân viên đó vào các trường tương ứng như:
+Thời gian bắt đầu sử dụng function get_ar_shift_start_time(#{personId, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{interCpnyID, jdbcType=VARCHAR}) (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+Thời gian kết thúc sử dụng function get_ar_shift_end_time(#{personId, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{interCpnyID, jdbcType=VARCHAR}) (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+Phép năm còn lại sử dụng function GET_VAC_COUNT(#{personId, jdbcType=VARCHAR}, #{interCpnyID, jdbcType=VARCHAR}, TO_CHAR(Thời gian bắt đầu, 'YYYY-MM-DD'), TO_CHAR(Thời gian kết thúc, 'YYYY-MM-DD'))
+Ca làm việc sử dụng function GET_GLOBAL_NAME(GET_AR_SHIFTNO(#{personId, jdbcType=VARCHAR},TO_CHAR(SYSDATE, 'YYYY-MM-DD'),#{interCpnyID, jdbcType=VARCHAR}),#{lang, jdbcType=VARCHAR})
+
+Khi Lưu check thêm cho tôi 1 điều kiện, sử dụng câu lệnh SQL: SELECT AR_GET_LEAVE_CLASH('',#{personId, jdbcType=VARCHAR}, #{fromTime, jdbcType=VARCHAR}, #{toTime, jdbcType=VARCHAR}) FROM DUAL; 
+Nếu kết quả trả về là > 0 thì báo lỗi: "Trùng với chấm công trước đó, xin kiểm tra thời gian này đã xin phép hay chưa!"
+Nếu kết quả trả về = -1 thì báo lỗi: "Ngày công đã chốt, xin kiểm tra lại!"
+Nếu kết quả trả về = -2 thì báo lỗi: "Thời gian đã khóa, xin kiểm tra lại!"
+
+Thêm ô checkbox để chọn có hủy đơn hay không, Sau khi tick chọn và bấm vào nút Hủy đơn ở bên cạnh nút Lưu thì sẽ cập nhật lại trường ACTIVITY của bảng ESS_APPLY_OT thành 1, đồng thời cập nhật lại trường AFFIRM_FLAG thành 14014310. Sau đó gọi thêm package PKG_AFFIRM_EMAIL.PR_DELETE_OT_CONFIRM(
+            #{applyNo, jdbcType=VARCHAR, mode=IN},
+            #{message, jdbcType=VARCHAR, mode=OUT}
+        ). tiếp theo sử dụng câu lệnh SQL: SELECT SY.APPLY_NO, SY.APPLY_TYPE, SY.APPLY_FLAG
+          FROM SY_AFFIRM_EMAIL SY
+         WHERE EXISTS (SELECT 1
+                  FROM SY_AFFIRM_EMAIL SY2
+                 WHERE SY.APPLY_NO = SY2.APPLY_NO
+                   AND SY.APPLY_TYPE = SY2.APPLY_TYPE
+                   AND SY.APPLY_FLAG = SY2.APPLY_FLAG
+                   AND SY2.SEQ = (SELECT MAX(SEQ)
+                                    FROM SY_AFFIRM_EMAIL
+                                   WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}))
+                                   AND ROWNUM < 2. để lấy ra 3 giá trị APPLY_NO, APPLY_TYPE, APPLY_FLAG của đơn tăng ca vừa bị hủy, sau đó gọi tiếp package PKG_AFFIRM_EMAIL.PR_AFFIRM_CANCEL( #APPLY_NO#,
+                         #APPLY_TYPE#,
+                         #APPLY_FLAG#,
+                         #adminID#,
+                         #adminIP#,
+						 #message,jdbcType=VARCHAR,mode=OUT#), để thực hiện hủy đơn tăng ca.
+
+Thêm cho tôi điều kiện tìm kiếm  với trường Trạng thái đơn tăng ca - AFFIRM_FLAG của bảng ESS_LEAVE_APPLY_TB, có các giá trị sau:
+14014309 - Chờ duyệt
+14014308 - Đã duyệt
+14014307 - Đang duyệt
+14014306 - Gửi
+14014310 - Đã hủy. 
+Điều kiện tìm kiếm Trạng thái xác nhận - CONFIRM_FLAG của bảng ESS_LEAVE_APPLY_TB, có các giá trị sau: 0 - Chưa xác nhận
+1 - Đã xác nhận
+2 - Từ chối.
+
+
+Ở cột Thao tác này, nếu dòng dữ liệu có AFFIRM_FLAG = 14014308, thì hiển thị nút Lưu. Khi bấm váo tức là sẽ xóa đơn này khỏi bảng ESS_APPLY_OT, đồng thời cũng xóa luôn các dữ liệu liên quan đến đơn tăng ca này trong bảng SY_AFFIRM_EMAIL thông qua câu lệnh SQL: DELETE FROM SY_AFFIRM_EMAIL WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}. và trong bảng AR_APPLY_RESULT thông qua câu lệnh SQL: DELETE FROM AR_APPLY_RESULT WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}. Sau khi xóa xong thì sẽ Thêm mới lại một đơn mới theo những thông tin đã được chỉnh sửa của đơn tăng ca đó.
+
+Khi load dữ liệu ra chỉ những đơn nào có AFFIRM_FLAG = 14014308 (Đã duyệt) thì mới hiển thị checkbox. Và nút Lưu chỉ thực hiện với những đơn có trạng thái Đã duyệt. sau khi người dùng sửa thông tin của những đơn đã duyệt và tick vào ô checkbox, Khi bấm nút Lưu thì cũng thực hiện việc xóa đơn cũ và thêm đơn mới, giống như trên, nhưng khác là cái này thực hiện với nhiều đơn.
+
+ở phần thời lượng này, hãy áp dụng cách tính và hiển thị ra giống như lv_modalLeaveLength.
+
+Khi chọn ra được nhân viên thì sẽ tự động điền luôn Phòng ban sau đó sử dụng person_id của nhân viên đó cùng với ngày tăng ca - applyOtDate (dạng YYYY-MM-DD) để điền các thông tin của nhân viên đó vào các trường tương ứng như:
+Loại tăng ca sử dụng function GET_GLOBAL_NAME(GET_OT_TYPE_CODE(#{personId, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, 0, 0), #{lang, jdbcType=VARCHAR})
+
+Nếu GET_OT_TYPE_CODE(#{personId, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, 0, 0) = '32'
+thì Thời gian bắt đầu sử dụng function get_ar_shift_end_time(#{personId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}) (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+Thời gian kết thúc sử dụng function get_ar_shift_end_time(#{personId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}) + 2h (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+
+Nếu GET_OT_TYPE_CODE(#{personId, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, 0, 0) != '32'
+thì Thời gian bắt đầu sử dụng function get_ar_shift_start_time(#{personId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}) (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+Thời gian kết thúc sử dụng function get_ar_shift_end_time(#{personId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}) (function này khi get dữ liệu ra sẽ có định dạng là YYYY-MM-DD HH24:MI)
+
+Thời lượng sử dụng function GET_OT_LENGTH_SPC(#personId#,#cpnyId#,#applyOtDate#,GET_OT_TYPE_CODE(#{personId, jdbcType=VARCHAR}, #{cpnyId, jdbcType=VARCHAR}, #{applyOtDate, jdbcType=VARCHAR}, 0, 0),TO_CHAR(Thời gian bắt đầu, 'HH24:MI'), TO_CHAR(Thời gian kết thúc, 'HH24:MI'),#DEDUCT_YN#).

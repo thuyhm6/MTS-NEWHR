@@ -47,4 +47,6 @@ public class ArOvertimeManagentDto extends EmployeeNameDto {
     private String detailToDateTime;
     private String fromDate;
     private String toDate;
+    private String indoorTime;
+    private String outdoorTime;
 }

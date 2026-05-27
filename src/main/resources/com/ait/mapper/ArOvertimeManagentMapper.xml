@@ -48,6 +48,8 @@
         <result column="AFFIRM_STR" property="affirmStr" />
         <result column="DETAIL_FROM_DATE_TIME" property="detailFromDateTime" />
         <result column="DETAIL_TO_DATE_TIME" property="detailToDateTime" />
+        <result column="INDOOR_TIME" property="indoorTime" />
+        <result column="OUTDOOR_TIME" property="outdoorTime" />
     </resultMap>
 
     <resultMap id="ArOvertimeDefaultResultMap" type="com.ait.ar.attendanceMintenance.dto.ArOvertimeManagentDto">
@@ -55,6 +57,15 @@
         <result column="OT_TYPE_NAME" property="otTypeName" />
         <result column="OT_APPLY_HOUR" property="otApplyHour" />
         <result column="DEDUCT_YN" property="deductYn" />
+    </resultMap>
+
+    <resultMap id="ArOvertimeAutoFillResultMap" type="com.ait.ar.attendanceMintenance.dto.ArOvertimeManagentDto">
+        <result column="DEPT_NAME" property="deptName" />
+        <result column="OT_TYPE_CODE" property="otTypeCode" />
+        <result column="OT_TYPE_NAME" property="otTypeName" />
+        <result column="OT_FROM_TIME" property="otFromTime" />
+        <result column="OT_TO_TIME" property="otToTime" />
+        <result column="OT_APPLY_HOUR" property="otApplyHour" />
     </resultMap>
 
     <resultMap id="ArOvertimeImportTempResultMap" type="com.ait.ar.attendanceMintenance.dto.ArOvertimeImportTempDto">
@@ -165,6 +176,8 @@
             TO_CHAR(A.ADJUST_YN) AS ADJUST_YN,
             TO_CHAR(A.OT_FROM_TIME, 'YYYY-MM-DD HH24:MI') AS DETAIL_FROM_DATE_TIME,
             TO_CHAR(A.OT_TO_TIME, 'YYYY-MM-DD HH24:MI') AS DETAIL_TO_DATE_TIME,
+            GET_AR_MAC_TIME(A.PERSON_ID, TO_CHAR(A.APPLY_OT_DATE, 'YYYY-MM-DD'), 'IN') AS INDOOR_TIME,
+            GET_AR_MAC_TIME(A.PERSON_ID, TO_CHAR(A.APPLY_OT_DATE, 'YYYY-MM-DD'), 'OUT') AS OUTDOOR_TIME,
             (
                 SELECT LISTAGG('&lt;p&gt;' || S.AFFIRM_LEVEL || '. ' || NVL(HE.EMPID, '') || ' - ' || NVL(HE.LOCAL_NAME, '') || '&lt;/p&gt;', '')
                        WITHIN GROUP (ORDER BY S.AFFIRM_LEVEL)
@@ -187,6 +200,12 @@
         </if>
         <if test="toDate != null and toDate != ''">
             AND A.APPLY_OT_DATE &lt; TO_DATE(#{toDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 1
+        </if>
+        <if test="affirmFlag != null and affirmFlag != ''">
+            AND TO_CHAR(A.AFFIRM_FLAG) = #{affirmFlag, jdbcType=VARCHAR}
+        </if>
+        <if test="confirmFlag != null and confirmFlag != ''">
+            AND TO_CHAR(A.CONFIRM_FLAG) = #{confirmFlag, jdbcType=VARCHAR}
         </if>
         ORDER BY A.CREATE_DATE DESC, E.EMPID
     </select>
@@ -266,8 +285,8 @@
             SELECT
                 A.SEQ,
                 A.AFFIRM_TYPE,
-                DECODE(A.AFFIRM_TYPE, '1', '审核', '2', '协议', '3', '通告', '4', '企案', '审核') AS AFFIRM_TYPE_NAME,
-                A.APPLY_NO,
+                DECODE(A.AFFIRM_TYPE, '1', 'Approval', '2', 'Agreement', '3', 'Announcement', '4', 'Proposal', 'Approval') AS AFFIRM_TYPE_NAME,
+                TO_CHAR(A.APPLY_NO) AS APPLY_NO,
                 A.APPLY_TYPE,
                 A.APPLY_FLAG,
                 A.APPLY_PERSON_ID,
@@ -279,12 +298,10 @@
                 A.APPLY_TYPE_CODE,
                 A.APPLY_PERSON_INFO,
                 A.ACTIVITY,
-                DECODE(
-                    A.AFFIRM_TYPE,
-                    '3', DECODE(A.AFFIRM_FLAG, '0', '未通告', '已通告'),
-                    '4', DECODE(A.AFFIRM_FLAG, '2', '取消', '提交'),
-                    DECODE(A.AFFIRM_FLAG, '0', '未审批', '1', '已通过', '已否决')
-                ) AS AFFIRM_FLAG_NAME,
+                DECODE(A.AFFIRM_TYPE, '3', DECODE(A.AFFIRM_FLAG, '0', 'Unannounced', 'Announced'),
+                                      '4', DECODE(A.AFFIRM_FLAG, '2', 'Cancelled', 'Submitted'),
+                                           DECODE(A.AFFIRM_FLAG, '0', 'Pending', '1', 'Approved', 'Rejected')
+                                     ) AS AFFIRM_FLAG_NAME,
                 HR.LOCAL_NAME || '/' || GET_CODE_NAME(HR.POST_GRADE_NO, #{lang, jdbcType=VARCHAR}) AS AFFIRM_NAME,
                 GET_DEPT_NAME(HR.DEPTNO, #{lang, jdbcType=VARCHAR}) AS DEPTNAME,
                 A.APPLY_AFFIRM_FLAG AS APPLY_AFFIRM_FLAG_NO,
@@ -293,7 +310,7 @@
                 A.AFFIRM_CONTENT
             FROM SY_AFFIRM_EMAIL A
             INNER JOIN HR_EMPLOYEE HR ON A.AFFIRM_PERSON_ID = HR.PERSON_ID
-            WHERE TO_CHAR(A.APPLY_NO) = #{applyNo, jdbcType=VARCHAR}
+            WHERE A.APPLY_NO = TO_NUMBER(#{applyNo, jdbcType=VARCHAR})
             <if test="applyType != null and applyType != ''">
                 AND A.APPLY_TYPE = #{applyType, jdbcType=VARCHAR}
             </if>
@@ -323,7 +340,7 @@
                 TO_CHAR(B.CONFIRM_DATE, 'DD/MM/YYYY HH24:MI:SS') AS UPDATE_DATE,
                 '' AS AFFIRM_CONTENT
             FROM ESS_APPLY_OT B
-            WHERE TO_CHAR(B.APPLY_NO) = #{applyNo, jdbcType=VARCHAR}
+            WHERE B.APPLY_NO = TO_NUMBER(#{applyNo, jdbcType=VARCHAR})
         ) T
         ORDER BY TO_NUMBER(T.AFFIRM_LEVEL)
     </select>
@@ -354,6 +371,73 @@
             ) AS OT_TYPE_CODE
             FROM DUAL
         ) O
+    </select>
+
+    <select id="selectAutoFillOtInfo"
+            parameterType="com.ait.ar.attendanceMintenance.dto.ArOvertimeManagentDto"
+            resultMap="ArOvertimeAutoFillResultMap">
+        WITH OT_CODE AS (
+            SELECT GET_OT_TYPE_CODE(
+                #{personId, jdbcType=VARCHAR},
+                #{cpnyId, jdbcType=VARCHAR},
+                REPLACE(#{applyOtDate, jdbcType=VARCHAR}, '-', '/'),
+                0, 0
+            ) AS OT_TYPE_CODE
+            FROM DUAL
+        ),
+        SHIFT_INFO AS (
+            SELECT
+                OC.OT_TYPE_CODE,
+                get_ar_shift_start_time(
+                    #{personId, jdbcType=VARCHAR},
+                    #{applyOtDate, jdbcType=VARCHAR},
+                    #{cpnyId, jdbcType=VARCHAR}
+                ) AS SHIFT_START,
+                get_ar_shift_end_time(
+                    #{personId, jdbcType=VARCHAR},
+                    #{applyOtDate, jdbcType=VARCHAR},
+                    #{cpnyId, jdbcType=VARCHAR}
+                ) AS SHIFT_END
+            FROM OT_CODE OC
+        ),
+        OT_TIMES AS (
+            SELECT
+                SI.OT_TYPE_CODE,
+                CASE WHEN SI.OT_TYPE_CODE = '32'
+                    THEN SI.SHIFT_END
+                    ELSE SI.SHIFT_START
+                END AS FROM_DT,
+                CASE WHEN SI.OT_TYPE_CODE = '32'
+                    THEN TO_CHAR(
+                            TO_DATE(SI.SHIFT_END, 'YYYY-MM-DD HH24:MI') + 2/24,
+                            'YYYY-MM-DD HH24:MI'
+                         )
+                    ELSE SI.SHIFT_END
+                END AS TO_DT
+            FROM SHIFT_INFO SI
+        )
+        SELECT
+            GET_DEPT_NAME(E.DEPTNO, #{lang, jdbcType=VARCHAR}) AS DEPT_NAME,
+            OT.OT_TYPE_CODE,
+            GET_GLOBAL_NAME(OT.OT_TYPE_CODE, #{lang, jdbcType=VARCHAR}) AS OT_TYPE_NAME,
+            OT.FROM_DT AS OT_FROM_TIME,
+            OT.TO_DT AS OT_TO_TIME,
+            CASE WHEN OT.FROM_DT IS NOT NULL AND OT.TO_DT IS NOT NULL
+                THEN GET_OT_LENGTH_SPC(
+                    #{personId, jdbcType=VARCHAR},
+                    #{cpnyId, jdbcType=VARCHAR},
+                    REPLACE(#{applyOtDate, jdbcType=VARCHAR}, '-', '/'),
+                    OT.OT_TYPE_CODE,
+                    SUBSTR(OT.FROM_DT, 12),
+                    SUBSTR(OT.TO_DT, 12),
+                    #{deductYn, jdbcType=VARCHAR}
+                )
+                ELSE NULL
+            END AS OT_APPLY_HOUR
+        FROM HR_EMPLOYEE E
+        CROSS JOIN OT_TIMES OT
+        WHERE E.PERSON_ID = #{personId, jdbcType=VARCHAR}
+          AND E.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
     </select>
 
     <select id="selectImportTempList" resultMap="ArOvertimeImportTempResultMap">
@@ -518,8 +602,57 @@
         )}
     </update>
 
+    <update id="cancelOvertimeApply">
+        UPDATE ESS_APPLY_OT
+        SET ACTIVITY = 1,
+            AFFIRM_FLAG = 14014310,
+            UPDATE_DATE = SYSDATE,
+            UPDATED_BY = #{adminID, jdbcType=VARCHAR},
+            UPDATED_IP = #{adminIP, jdbcType=VARCHAR}
+        WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}
+    </update>
+
+    <resultMap id="CancelAffirmEmailResultMap" type="com.ait.sy.syAffirm.dto.SyAffirmEmailDto">
+        <result property="applyNo" column="APPLY_NO" />
+        <result property="applyType" column="APPLY_TYPE" />
+        <result property="applyFlag" column="APPLY_FLAG" />
+    </resultMap>
+
+    <select id="selectCancelAffirmEmail" resultMap="CancelAffirmEmailResultMap">
+        SELECT SY.APPLY_NO, SY.APPLY_TYPE, SY.APPLY_FLAG
+          FROM SY_AFFIRM_EMAIL SY
+         WHERE EXISTS (SELECT 1
+                  FROM SY_AFFIRM_EMAIL SY2
+                 WHERE SY.APPLY_NO = SY2.APPLY_NO
+                   AND SY.APPLY_TYPE = SY2.APPLY_TYPE
+                   AND SY.APPLY_FLAG = SY2.APPLY_FLAG
+                   AND SY2.SEQ = (SELECT MAX(SEQ)
+                                    FROM SY_AFFIRM_EMAIL
+                                   WHERE APPLY_NO = TO_NUMBER(#{applyNo, jdbcType=VARCHAR})))
+           AND ROWNUM &lt; 2
+    </select>
+
+    <update id="callAffirmCancel" statementType="CALLABLE">
+        {CALL PKG_AFFIRM_EMAIL.PR_AFFIRM_CANCEL(
+            #{applyNo, jdbcType=VARCHAR, mode=IN},
+            #{applyType, jdbcType=VARCHAR, mode=IN},
+            #{applyFlag, jdbcType=VARCHAR, mode=IN},
+            #{adminID, jdbcType=VARCHAR, mode=IN},
+            #{adminIP, jdbcType=VARCHAR, mode=IN},
+            #{message, jdbcType=VARCHAR, mode=OUT}
+        )}
+    </update>
+
     <select id="selectAffirmorListBySql" resultMap="AffirmorSqlResultMap" statementType="STATEMENT">
         ${affirmSql}
     </select>
+
+    <delete id="deleteOvertimeApplyByApplyNo">
+        DELETE FROM ESS_APPLY_OT WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="deleteApplyResultByApplyNo">
+        DELETE FROM AR_APPLY_RESULT WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}
+    </delete>
 
 </mapper>

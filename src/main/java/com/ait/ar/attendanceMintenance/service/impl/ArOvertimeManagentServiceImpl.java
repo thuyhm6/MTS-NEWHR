@@ -4,8 +4,12 @@ import com.ait.ar.attendanceMintenance.dto.ArOvertimeImportTempDto;
 import com.ait.ar.attendanceMintenance.dto.ArOvertimeManagentDto;
 import com.ait.ar.attendanceMintenance.mapper.ArOvertimeManagentMapper;
 import com.ait.ar.attendanceMintenance.service.ArOvertimeManagentService;
+import com.ait.ess.empinfo.dto.EssPersonalInfoDto;
+import com.ait.ess.empinfo.mapper.EssPersonalInfoMapper;
 import com.ait.sy.syAffirm.dto.SyAffirmEmailDto;
 import com.ait.sy.syAffirm.mapper.SyAffirmEmailMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,7 @@ import java.util.Map;
 @Service
 public class ArOvertimeManagentServiceImpl implements ArOvertimeManagentService {
 
+    private static final Logger log = LoggerFactory.getLogger(ArOvertimeManagentServiceImpl.class);
     private static final String OT_TYPE_NO = "31";
     private static final String APPLY_AFFIRM_FLAG = "14014306";
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -33,6 +38,9 @@ public class ArOvertimeManagentServiceImpl implements ArOvertimeManagentService 
 
     @Autowired
     private SyAffirmEmailMapper affirmEmailMapper;
+
+    @Autowired
+    private EssPersonalInfoMapper essPersonalInfoMapper;
 
     @Override
     public List<ArOvertimeManagentDto> getList(ArOvertimeManagentDto dto) {
@@ -84,6 +92,26 @@ public class ArOvertimeManagentServiceImpl implements ArOvertimeManagentService 
         resolvedDto.setOtToTime(safeDto.getOtToTime());
         resolvedDto.setDeductYn(safeDto.getDeductYn());
         return resolvedDto;
+    }
+
+    @Override
+    public ArOvertimeManagentDto getAutoFillOtInfo(ArOvertimeManagentDto dto) {
+        ArOvertimeManagentDto safeDto = dto == null ? new ArOvertimeManagentDto() : dto;
+        String personId = safeString(safeDto.getPersonId());
+        String applyOtDate = normalizeDate(safeString(safeDto.getApplyOtDate()));
+        if (personId.isEmpty() || applyOtDate.isEmpty()) {
+            return new ArOvertimeManagentDto();
+        }
+        safeDto.setPersonId(personId);
+        safeDto.setApplyOtDate(applyOtDate);
+        safeDto.setDeductYn(defaultString(safeDto.getDeductYn(), "0"));
+        try {
+            ArOvertimeManagentDto result = mapper.selectAutoFillOtInfo(safeDto);
+            return result != null ? result : new ArOvertimeManagentDto();
+        } catch (Exception e) {
+            log.warn("Auto-fill OT info failed for person={}, date={}: {}", personId, applyOtDate, e.getMessage());
+            return new ArOvertimeManagentDto();
+        }
     }
 
     @Override
@@ -167,6 +195,15 @@ public class ArOvertimeManagentServiceImpl implements ArOvertimeManagentService 
         mapper.callDeleteOtConfirm(deleteParams);
 
         String lastName = buildLastName(dto);
+        EssPersonalInfoDto empInfo = essPersonalInfoMapper.findMyInfo(personId);
+        String applyPersonInfo;
+        if (empInfo != null) {
+            applyPersonInfo = safeString(empInfo.getLocalName()) + " / "
+                    + safeString(empInfo.getPostGradeName()) + " / "
+                    + safeString(empInfo.getDeptName());
+        } else {
+            applyPersonInfo = safeString(dto.getLocalName()) + " (" + safeString(dto.getEmpId()) + ")";
+        }
 
         // 3. Insert duyệt mức 0 (Người tạo)
         SyAffirmEmailDto affirmor0 = new SyAffirmEmailDto();
@@ -179,7 +216,7 @@ public class ArOvertimeManagentServiceImpl implements ArOvertimeManagentService 
         affirmor0.setApplyAffirmFlag(APPLY_AFFIRM_FLAG);
         affirmor0.setApplyFlag("0");
         affirmor0.setLastName(lastName);
-
+        affirmor0.setApplyPersonInfo(applyPersonInfo);
         affirmEmailMapper.delete(applyNo);
         affirmEmailMapper.insert(affirmor0);
 
@@ -216,8 +253,72 @@ public class ArOvertimeManagentServiceImpl implements ArOvertimeManagentService 
             affirmor.setApplyFlag("0");
             affirmor.setAffirmPersonId(affirmor.getAffirmorId());
             affirmor.setLastName(lastName);
+            affirmor.setApplyPersonInfo(applyPersonInfo);
             affirmEmailMapper.insert(affirmor);
         }
+    }
+
+    @Override
+    @Transactional
+    public void cancelOvertimeApply(String applyNo) {
+        String resolvedApplyNo = safeString(applyNo);
+        if (resolvedApplyNo.isEmpty()) {
+            throw new IllegalArgumentException("Mã đơn tăng ca không hợp lệ.");
+        }
+
+        // 1. Cập nhật ACTIVITY = 1, AFFIRM_FLAG = 14014310
+        mapper.cancelOvertimeApply(resolvedApplyNo);
+
+        // 2. Gọi PKG_AFFIRM_EMAIL.PR_DELETE_OT_CONFIRM
+        Map<String, Object> deleteParams = new HashMap<>();
+        deleteParams.put("applyNo", resolvedApplyNo);
+        deleteParams.put("message", "");
+        mapper.callDeleteOtConfirm(deleteParams);
+
+        String deleteMsg = safeString(deleteParams.get("message"));
+        if (isProcedureErrorMessage(deleteMsg)) {
+            throw new IllegalStateException(deleteMsg);
+        }
+
+        // 3. Lấy APPLY_NO, APPLY_TYPE, APPLY_FLAG từ SY_AFFIRM_EMAIL
+        SyAffirmEmailDto affirmEmail = mapper.selectCancelAffirmEmail(resolvedApplyNo);
+        if (affirmEmail == null) {
+            return;
+        }
+
+        // 4. Gọi PKG_AFFIRM_EMAIL.PR_AFFIRM_CANCEL
+        Map<String, Object> cancelParams = new HashMap<>();
+        cancelParams.put("applyNo", affirmEmail.getApplyNo());
+        cancelParams.put("applyType", affirmEmail.getApplyType());
+        cancelParams.put("applyFlag", affirmEmail.getApplyFlag());
+        cancelParams.put("message", "");
+        mapper.callAffirmCancel(cancelParams);
+
+        String cancelMsg = safeString(cancelParams.get("message"));
+        if (isProcedureErrorMessage(cancelMsg)) {
+            throw new IllegalStateException(cancelMsg);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resubmitOvertimeApply(ArOvertimeManagentDto dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Dữ liệu tăng ca không hợp lệ.");
+        }
+        String applyNo = safeString(dto.getApplyNo());
+        if (applyNo.isEmpty()) {
+            throw new IllegalArgumentException("Mã đơn tăng ca không hợp lệ.");
+        }
+
+        // Xóa dữ liệu liên quan theo đúng thứ tự khóa ngoại
+        mapper.deleteApplyResultByApplyNo(applyNo);
+        affirmEmailMapper.delete(applyNo);
+        mapper.deleteOvertimeApplyByApplyNo(applyNo);
+
+        // Tạo mới với applyNo rỗng để save() tự cấp số mới
+        dto.setApplyNo("");
+        save(dto);
     }
 
     private String buildLastName(ArOvertimeManagentDto dto) {

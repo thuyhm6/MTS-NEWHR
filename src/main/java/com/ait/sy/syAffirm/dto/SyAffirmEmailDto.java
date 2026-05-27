@@ -52,4 +52,8 @@ public class SyAffirmEmailDto {
     private String positionName;
     private String postionName;
     private String affirmorId;
+
+    // --- Tham số tìm kiếm (chưa duyệt) ---
+    private String titleSearch;
+    private String applyTypeCodeSearch;
 }

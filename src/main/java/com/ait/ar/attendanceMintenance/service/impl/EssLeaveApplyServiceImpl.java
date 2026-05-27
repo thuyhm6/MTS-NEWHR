@@ -6,6 +6,11 @@ import com.ait.sy.syAffirm.dto.SyAffirmEmailDto;
 import com.ait.sy.syAffirm.mapper.SyAffirmEmailMapper;
 import com.ait.ar.attendanceMintenance.mapper.EssLeaveApplyMapper;
 import com.ait.ar.attendanceMintenance.service.EssLeaveApplyService;
+import com.ait.ess.empinfo.dto.EssPersonalInfoDto;
+import com.ait.ess.empinfo.mapper.EssPersonalInfoMapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +24,8 @@ import java.util.Map;
 @Service
 public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
 
+    private static final Logger log = LoggerFactory.getLogger(EssLeaveApplyServiceImpl.class);
+
     private static final String APPLY_TYPE_NO = "21";
     //private static final String APPLY_TYPE_NO = "31";
     private static final String APPLY_AFFIRM_FLAG = "14014306";
@@ -28,6 +35,9 @@ public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
 
     @Autowired
     private SyAffirmEmailMapper affirmorMapper;
+
+    @Autowired
+    private EssPersonalInfoMapper essPersonalInfoMapper;
 
     @Override
     public List<EssLeaveApplyDto> getList(EssLeaveApplyDto dto) {
@@ -96,6 +106,13 @@ public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
         }
         params.put("personId", personId);
         params.put("applyTypeNo", APPLY_TYPE_NO);
+
+        // Kiểm tra xung đột thời gian trước khi lưu.
+        // Bỏ qua record có AFFIRM_FLAG IN ('14014309','14014310') hoặc CONFIRM_FLAG = 0.
+        String currentApplyNo = applyNoObj != null ? applyNoObj.toString().trim() : "";
+        checkTimeConflict(params, currentApplyNo);
+        checkLeaveClash(params);
+
         // 1. Insert/Update thủ tục Leave Apply
         if (isNew) {
             applyNo = essLeaveApplymapper.getNextApplySeq().toString();
@@ -114,6 +131,16 @@ public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
                     + params.get("leaveToTime") + "]";
         }
 
+        EssPersonalInfoDto empInfo = essPersonalInfoMapper.findMyInfo(personId);
+        String applyPersonInfo;
+        if (empInfo != null) {
+            applyPersonInfo = safeString(empInfo.getLocalName()) + " / "
+                    + safeString(empInfo.getPostGradeName()) + " / "
+                    + safeString(empInfo.getDeptName());
+        } else {
+            applyPersonInfo = safeString(params.get("localName")) + " (" + safeString(params.get("empId")) + ")";
+        }
+
         // 2. Cập nhật tiến trình phê duyệt (xóa cũ)
         params.put("message", "");
         essLeaveApplymapper.callDeleteLeaveConfirm(params); // call delete procedure
@@ -129,6 +156,7 @@ public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
         affirmor0.setApplyAffirmFlag("14014306");
         affirmor0.setApplyFlag("0");
         affirmor0.setLastName(lastName);
+        affirmor0.setApplyPersonInfo(applyPersonInfo);
         affirmor0.setApplyNo(applyNo);
 
         affirmorMapper.delete(applyNo);
@@ -161,6 +189,7 @@ public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
                 affirmor.setApplyFlag("0");
                 affirmor.setAffirmPersonId(affirmor.getAffirmorId());
                 affirmor.setLastName(lastName);
+                affirmor.setApplyPersonInfo(applyPersonInfo);
                 affirmorMapper.insert(affirmor);
             }
         }
@@ -196,6 +225,136 @@ public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
         return result != null ? result : new HashMap<>();
     }
 
+    @Override
+    public Map<String, Object> calcLeaveLengthForPerson(String personId, String fromTime, String toTime, String leaveTypeCode) {
+        log.info("calcLeaveLengthForPerson personId={} from={} to={} type={}", personId, fromTime, toTime, leaveTypeCode);
+        try {
+            Map<String, Object> result = essLeaveApplymapper.selectLeaveLengthForPerson(
+                    toTrimmedString(personId),
+                    toTrimmedString(fromTime),
+                    toTrimmedString(toTime),
+                    toTrimmedString(leaveTypeCode));
+            return result != null ? result : new HashMap<>();
+        } catch (Exception e) {
+            log.error("calcLeaveLengthForPerson error personId={}", personId, e);
+            return new HashMap<>();
+        }
+    }
+
+    @Override
+    public Map<String, Object> getEmpDefaultInfo(String personId) {
+        log.info("getEmpDefaultInfo personId={}", personId);
+        try {
+            Map<String, Object> result = essLeaveApplymapper.selectEmpDefaultInfo(toTrimmedString(personId));
+            return result != null ? result : new HashMap<>();
+        } catch (Exception e) {
+            log.error("getEmpDefaultInfo error personId={}", personId, e);
+            return new HashMap<>();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void cancelLeaveApplyByApplyNo(String applyNo) {
+        String trimmedApplyNo = toTrimmedString(applyNo);
+        if (trimmedApplyNo.isEmpty()) {
+            throw new IllegalArgumentException("applyNo is required");
+        }
+        log.info("cancelLeaveApplyByApplyNo applyNo={}", trimmedApplyNo);
+
+        // 1. Cập nhật ACTIVITY=1, AFFIRM_FLAG=14014310
+        Map<String, Object> updateParams = new HashMap<>();
+        updateParams.put("applyNo", trimmedApplyNo);
+        essLeaveApplymapper.updateCancelLeaveApply(updateParams);
+
+        // 2. Gọi PKG_AFFIRM_EMAIL.PR_DELETE_LEAVE_CONFIRM
+        Map<String, Object> deleteParams = new HashMap<>();
+        deleteParams.put("applyNo", trimmedApplyNo);
+        deleteParams.put("message", "");
+        essLeaveApplymapper.callDeleteLeaveConfirm(deleteParams);
+        String deleteMsg = toTrimmedString(deleteParams.get("message"));
+        if (isProcedureErrorMessage(deleteMsg)) {
+            throw new IllegalStateException(deleteMsg);
+        }
+
+        // 3. Lấy APPLY_NO, APPLY_TYPE, APPLY_FLAG từ SY_AFFIRM_EMAIL
+        Map<String, Object> affirmInfo = essLeaveApplymapper.selectAffirmEmailForCancel(trimmedApplyNo);
+
+        // 4. Gọi PKG_AFFIRM_EMAIL.PR_AFFIRM_CANCEL
+        if (affirmInfo != null) {
+            Map<String, Object> cancelParams = new HashMap<>();
+            cancelParams.put("applyNo", toTrimmedString(affirmInfo.get("APPLY_NO")));
+            cancelParams.put("applyType", toTrimmedString(affirmInfo.get("APPLY_TYPE")));
+            cancelParams.put("applyFlag", toTrimmedString(affirmInfo.get("APPLY_FLAG")));
+            cancelParams.put("message", "");
+            essLeaveApplymapper.callAffirmCancel(cancelParams);
+            String cancelMsg = toTrimmedString(cancelParams.get("message"));
+            if (isProcedureErrorMessage(cancelMsg)) {
+                throw new IllegalStateException(cancelMsg);
+            }
+        } else {
+            log.warn("cancelLeaveApplyByApplyNo: no affirm email record found for applyNo={}", trimmedApplyNo);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resubmitLeaveApply(Map<String, Object> params) {
+        String oldApplyNo = toTrimmedString(params.get("applyNo"));
+        if (oldApplyNo.isEmpty()) {
+            throw new IllegalArgumentException("applyNo là bắt buộc để tạo lại đơn");
+        }
+        log.info("resubmitLeaveApply oldApplyNo={}", oldApplyNo);
+
+        // 1. Xóa đơn cũ khỏi ESS_LEAVE_APPLY_TB
+        essLeaveApplymapper.deleteLeaveApplyByApplyNo(oldApplyNo);
+
+        // 2. Xóa SY_AFFIRM_EMAIL liên quan đến đơn cũ
+        affirmorMapper.delete(oldApplyNo);
+
+        // 3. Xóa AR_APPLY_RESULT liên quan đến đơn cũ
+        essLeaveApplymapper.deleteArApplyResult(oldApplyNo);
+
+        // 4. Tạo mới đơn với thông tin đã chỉnh sửa
+        params.put("applyNo", "");
+        saveLeaveApply(params);
+    }
+
+    private void checkLeaveClash(Map<String, Object> params) {
+        String personId = toTrimmedString(params.get("personId"));
+        String fromTime = toTrimmedString(params.get("leaveFromTime"));
+        String toTime   = toTrimmedString(params.get("leaveToTime"));
+        log.info("checkLeaveClash personId={} from={} to={}", personId, fromTime, toTime);
+        try {
+            Integer result = essLeaveApplymapper.selectLeaveClash(personId, fromTime, toTime);
+            if (result == null) return;
+            if (result > 0) {
+                throw new IllegalStateException("Trùng với chấm công trước đó, xin kiểm tra thời gian này đã xin phép hay chưa!");
+            } else if (result == -1) {
+                throw new IllegalStateException("Ngày công đã chốt, xin kiểm tra lại!");
+            } else if (result == -2) {
+                throw new IllegalStateException("Thời gian đã khóa, xin kiểm tra lại!");
+            }
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("checkLeaveClash error personId={}", personId, e);
+            throw new IllegalStateException("Lỗi kiểm tra xung đột chấm công: " + e.getMessage());
+        }
+    }
+
+    private void checkTimeConflict(Map<String, Object> params, String currentApplyNo) {
+        Map<String, Object> conflictParams = new HashMap<>();
+        conflictParams.put("personId", params.get("personId"));
+        conflictParams.put("leaveFromTime", params.get("leaveFromTime"));
+        conflictParams.put("leaveToTime", params.get("leaveToTime"));
+        conflictParams.put("applyNo", currentApplyNo != null ? currentApplyNo : "");
+        int conflictCount = essLeaveApplymapper.countConflictLeaveApply(conflictParams);
+        if (conflictCount > 0) {
+            throw new IllegalStateException("Thời gian nghỉ phép bị xung đột với đơn đã tồn tại.");
+        }
+    }
+
     private String toTrimmedString(Object value) {
         return value == null ? "" : value.toString().trim();
     }
@@ -208,5 +367,9 @@ public class EssLeaveApplyServiceImpl implements EssLeaveApplyService {
         return normalized.contains("ora-")
                 || normalized.contains("error")
                 || normalized.contains("loi");
+    }
+
+    private String safeString(Object value) {
+        return value == null ? "" : value.toString().trim();
     }
 }

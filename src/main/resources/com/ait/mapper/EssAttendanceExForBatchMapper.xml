@@ -322,7 +322,7 @@
             SELECT
                 A.SEQ,
                 A.AFFIRM_TYPE,
-                DECODE(A.AFFIRM_TYPE, '1', '审核', '2', '协议', '3', '通告', '4', '企案', '审核') AS AFFIRM_TYPE_NAME,
+                DECODE(A.AFFIRM_TYPE,  '1', 'Approval',  '2', 'Agreement',  '3', 'Announcement',  '4', 'Proposal',  'Approval') AS AFFIRM_TYPE_NAME,
                 A.APPLY_NO,
                 A.APPLY_TYPE,
                 A.APPLY_FLAG,
@@ -337,9 +337,9 @@
                 A.ACTIVITY,
                 DECODE(
                     A.AFFIRM_TYPE,
-                    '3', DECODE(A.AFFIRM_FLAG, '0', '未通告', '已通告'),
-                    '4', DECODE(A.AFFIRM_FLAG, '2', '取消', '提交'),
-                    DECODE(A.AFFIRM_FLAG, '0', '未审批', '1', '已通过', '已否决')
+                    '3', DECODE(A.AFFIRM_FLAG, '0', 'Not Announced', 'Announced'),
+                    '4', DECODE(A.AFFIRM_FLAG, '2', 'Cancelled', 'Submitted'),
+                    DECODE(A.AFFIRM_FLAG, '0', 'Not Approved', '1', 'Approved', 'Rejected')
                 ) AS AFFIRM_FLAG_NAME,
                 HR.LOCAL_NAME || '/' || GET_CODE_NAME(HR.POST_GRADE_NO, #{lang, jdbcType=VARCHAR}) AS AFFIRM_NAME,
                 GET_DEPT_NAME(HR.DEPTNO, #{lang, jdbcType=VARCHAR}) AS DEPTNAME,

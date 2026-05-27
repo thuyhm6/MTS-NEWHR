@@ -11,6 +11,12 @@ import java.util.Map;
 public interface SyAffirmEmailMapper {
     List<SyAffirmEmailDto> selectList(SyAffirmEmailDto dto);
 
+    List<SyAffirmEmailDto> selectApprovalEmailList(SyAffirmEmailDto dto);
+
+    List<SyAffirmEmailDto> selectApprovaledEmailList(SyAffirmEmailDto dto);
+
+    void callAffirmExecute(Map<String, Object> params);
+
     SyAffirmEmailDto selectById(@Param("seq") String seq);
 
     int insert(SyAffirmEmailDto dto);
@@ -21,9 +27,17 @@ public interface SyAffirmEmailMapper {
 
     /**
      * Gọi Oracle Function GET_AFFIRMOR_LIST_IMPROVE
-     * 
+     *
      * @param params chứa các tham số đầu vào và key "resultList" để nhận dữ liệu
      *               đầu ra
      */
     void getAffirmorList(Map<String, Object> params);
+
+    int countPendingApprovals(SyAffirmEmailDto dto);
+
+    int countHrmPendingLeave();
+
+    int countHrmPendingAnomalous();
+
+    List<SyAffirmEmailDto> selectNoticeedEmailList(SyAffirmEmailDto dto);
 }

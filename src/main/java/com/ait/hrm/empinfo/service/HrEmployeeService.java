@@ -134,5 +134,5 @@ public interface HrEmployeeService {
      */
     boolean existsByEmpId(String empId);
 
-    List<EmpMonthlyStatsDto> getEmpMonthlyStats();
+    List<EmpMonthlyStatsDto> getEmpMonthlyStats(int year);
 }

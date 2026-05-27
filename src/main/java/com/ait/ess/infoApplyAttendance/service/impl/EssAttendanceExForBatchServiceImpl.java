@@ -2,6 +2,8 @@ package com.ait.ess.infoApplyAttendance.service.impl;
 
 import com.ait.ar.attendanceMintenance.dto.EssLeaveApplyDto;
 import com.ait.ar.attendanceMintenance.mapper.ArAttendanceSearchMapper;
+import com.ait.ess.empinfo.dto.EssPersonalInfoDto;
+import com.ait.ess.empinfo.mapper.EssPersonalInfoMapper;
 import com.ait.ess.infoApplyAttendance.dto.EssAttendanceExForBatchDto;
 import com.ait.ess.infoApplyAttendance.mapper.EssAttendanceExForBatchMapper;
 import com.ait.ess.infoApplyAttendance.service.EssAttendanceExForBatchService;
@@ -35,6 +37,9 @@ public class EssAttendanceExForBatchServiceImpl implements EssAttendanceExForBat
 
     @Autowired
     private ArAttendanceSearchMapper arAttendanceSearchMapper;
+
+    @Autowired
+    private EssPersonalInfoMapper essPersonalInfoMapper;
 
     @Override
     public List<EssAttendanceExForBatchDto> getAttendanceExForBatchList(EssAttendanceExForBatchDto params) {
@@ -168,6 +173,16 @@ public class EssAttendanceExForBatchServiceImpl implements EssAttendanceExForBat
             lastName = "Abnormal Attendance Application(" + personName + ")[Date：" + fromDateTime + " ~ " + toDateTime + "]";
         }
 
+        EssPersonalInfoDto empInfo = essPersonalInfoMapper.findMyInfo(personId);
+        String applyPersonInfo;
+        if (empInfo != null) {
+            applyPersonInfo = safeString(empInfo.getLocalName()) + " / "
+                    + safeString(empInfo.getPostGradeName()) + " / "
+                    + safeString(empInfo.getDeptName());
+        } else {
+            applyPersonInfo = safeString(row.getLocalName()) + " (" + safeString(row.getEmpId()) + ")";
+        }
+
         //Insert duyệt mức 0 (Người tạo)
         SyAffirmEmailDto affirmor0 = new SyAffirmEmailDto();
         affirmor0.setAffirmType("4");
@@ -179,6 +194,7 @@ public class EssAttendanceExForBatchServiceImpl implements EssAttendanceExForBat
         affirmor0.setApplyAffirmFlag(APPLY_AFFIRM_FLAG);
         affirmor0.setApplyFlag("1");
         affirmor0.setLastName(lastName);
+        affirmor0.setApplyPersonInfo(applyPersonInfo);
 
         affirmorMapper.delete(applyNo);
         affirmorMapper.insert(affirmor0);
@@ -215,6 +231,7 @@ public class EssAttendanceExForBatchServiceImpl implements EssAttendanceExForBat
             affirmor.setApplyFlag("1");
             affirmor.setAffirmPersonId(affirmor.getAffirmorId());
             affirmor.setLastName(lastName);
+            affirmor.setApplyPersonInfo(applyPersonInfo);
             affirmorMapper.insert(affirmor);
         }
     }

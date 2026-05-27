@@ -43,7 +43,7 @@
         FROM HR_EMPLOYEE HE
         LEFT JOIN HR_PERSONAL_INFO HP ON HE.PERSON_ID = HP.PERSON_ID AND HP.ACTIVITY = 1
         LEFT JOIN HR_DEPARTMENT D ON HE.DEPTNO = D.DEPTNO
-        WHERE HE.PERSON_ID = #{personId} 
+        WHERE HE.PERSON_ID = #{personId, jdbcType=VARCHAR} 
           AND HE.ACTIVITY = 1
     </select>
 

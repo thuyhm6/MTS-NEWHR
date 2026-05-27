@@ -86,7 +86,13 @@ window.EmployeeSearchModal = {
                 },
                 { data: 'empId', defaultContent: '' },
                 { data: 'localName', defaultContent: '' },
-                { data: 'deptNo', defaultContent: '' },
+                {
+                    data: null,
+                    defaultContent: '',
+                    render: function (data, type, row) {
+                        return row.deptName || row.deptNo || '';
+                    }
+                },
                 { data: 'position', defaultContent: '' }
             ],
             createdRow: function (row, data, dataIndex) {

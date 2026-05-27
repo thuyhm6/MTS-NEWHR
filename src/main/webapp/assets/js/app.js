@@ -391,6 +391,7 @@ class Dragula {
 // Swiper Slider
 class SwiperSlider {
     initSwiperSlider() {
+        if (typeof Swiper === 'undefined') return;
 
         //Default Swiper
         var swiper = new Swiper("[data-swiper='default']", {

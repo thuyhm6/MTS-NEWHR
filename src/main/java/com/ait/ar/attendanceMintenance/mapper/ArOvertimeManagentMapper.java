@@ -21,6 +21,8 @@ public interface ArOvertimeManagentMapper {
 
     ArOvertimeManagentDto selectDefaultOtInfo(ArOvertimeManagentDto dto);
 
+    ArOvertimeManagentDto selectAutoFillOtInfo(ArOvertimeManagentDto dto);
+
     List<ArOvertimeImportTempDto> selectImportTempList(@Param("errorOnly") String errorOnly);
 
     void callImportOtTemp(Map<String, Object> params);
@@ -33,5 +35,15 @@ public interface ArOvertimeManagentMapper {
 
     void callDeleteOtConfirm(Map<String, Object> params);
 
+    void cancelOvertimeApply(@Param("applyNo") String applyNo);
+
+    SyAffirmEmailDto selectCancelAffirmEmail(@Param("applyNo") String applyNo);
+
+    void callAffirmCancel(Map<String, Object> params);
+
     List<SyAffirmEmailDto> selectAffirmorListBySql(@Param("affirmSql") String affirmSql);
+
+    void deleteOvertimeApplyByApplyNo(@Param("applyNo") String applyNo);
+
+    void deleteApplyResultByApplyNo(@Param("applyNo") String applyNo);
 }

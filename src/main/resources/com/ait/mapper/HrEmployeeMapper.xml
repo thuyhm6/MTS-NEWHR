@@ -397,6 +397,7 @@
             he.EMPID as empId,
             he.LOCAL_NAME as localName,
             he.DEPTNO as deptNo,
+            get_dept_name(he.DEPTNO, #{lang, jdbcType=VARCHAR}) as deptName,
             he.POSITION as position
         <include refid="baseFromClause"/>
         <include refid="baseWhereClause"/>
@@ -427,6 +428,22 @@
             AND (he.EMPID LIKE '%' || #{keyword, jdbcType=VARCHAR} || '%'
                 OR CONVERTTOUNSIGN(UPPER(he.LOCAL_NAME)) LIKE '%' || CONVERTTOUNSIGN(UPPER(#{keyword, jdbcType=VARCHAR})) || '%')
         </if>
+        AND EXISTS (
+              SELECT B1.DEPTID
+              FROM HR_DEPARTMENT B1
+              WHERE B1.DEPTNO = he.DEPTNO
+              START WITH B1.DEPTNO IN (
+                  SELECT HRD.DEPTID
+                  FROM HR_DEPARTMENT HRD
+                  WHERE HRD.MANAGER_EMP_ID = #{adminID, jdbcType=VARCHAR}
+              )
+              CONNECT BY PRIOR B1.DEPTNO = B1.PARENT_DEPT_NO
+              UNION
+              SELECT ASI.DEPTNO
+              FROM AR_SUPERVISOR_INFO ASI
+              WHERE ASI.DEPTNO = he.DEPTNO
+                AND ASI.PERSON_ID = #{adminID, jdbcType=VARCHAR}
+          )
         ORDER BY he.EMPID ASC
     </select>
 
@@ -783,11 +800,12 @@
         ORDER BY POSITION
     </select>
 
-    <!-- Thống kê nhân viên đang làm việc theo từng tháng trong năm hiện tại -->
+    <!-- Thống kê nhân viên theo từng tháng trong năm được chỉ định -->
     <resultMap id="EmpMonthlyStatsResultMap" type="com.ait.hrm.empinfo.dto.EmpMonthlyStatsDto">
         <result column="MONTH_NUM"        property="monthNum"/>
         <result column="EMP_COUNT"        property="empCount"/>
         <result column="NEW_JOINER_COUNT" property="newJoinerCount"/>
+        <result column="LEAVER_COUNT"     property="leaverCount"/>
     </resultMap>
 
     <select id="selectEmpMonthlyStats" resultMap="EmpMonthlyStatsResultMap">
@@ -806,12 +824,20 @@
                 WHERE n.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
                   AND TRUNC(n.DATE_STARTED) &gt;= m.MONTH_START
                   AND TRUNC(n.DATE_STARTED) &lt;= m.MONTH_END
-            ) AS NEW_JOINER_COUNT
+            ) AS NEW_JOINER_COUNT,
+            (
+                SELECT COUNT(*)
+                FROM hr_employee lv
+                WHERE lv.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+                  AND lv.DATE_LEFT IS NOT NULL
+                  AND TRUNC(lv.DATE_LEFT) &gt;= m.MONTH_START
+                  AND TRUNC(lv.DATE_LEFT) &lt;= m.MONTH_END
+            ) AS LEAVER_COUNT
         FROM (
             SELECT
                 LEVEL AS MONTH_NUM,
-                TRUNC(ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), LEVEL - 1), 'MM') AS MONTH_START,
-                LAST_DAY(ADD_MONTHS(TRUNC(SYSDATE, 'YEAR'), LEVEL - 1))    AS MONTH_END
+                TRUNC(ADD_MONTHS(TO_DATE(TO_CHAR(#{year, jdbcType=INTEGER}) || '-01-01', 'YYYY-MM-DD'), LEVEL - 1), 'MM') AS MONTH_START,
+                LAST_DAY(ADD_MONTHS(TO_DATE(TO_CHAR(#{year, jdbcType=INTEGER}) || '-01-01', 'YYYY-MM-DD'), LEVEL - 1))    AS MONTH_END
             FROM DUAL
             CONNECT BY LEVEL &lt;= 12
         ) m

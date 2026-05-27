@@ -14,6 +14,5 @@ public interface EssPersonalInfoMapper {
      * Lấy thông tin cơ bản + cá nhân theo personId
      * Join HR_EMPLOYEE + HR_PERSONAL_INFO + HR_DEPARTMENT
      */
-    EssPersonalInfoDto findMyInfo(@Param("personId") String personId,
-                                  @Param("lang") String lang);
+    EssPersonalInfoDto findMyInfo(@Param("personId") String personId);
 }

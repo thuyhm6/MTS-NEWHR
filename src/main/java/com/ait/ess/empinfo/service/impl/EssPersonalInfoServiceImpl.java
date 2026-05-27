@@ -32,8 +32,8 @@ public class EssPersonalInfoServiceImpl implements EssPersonalInfoService {
     private HrEmergencyAddressMapper emergencyMapper;
 
     @Override
-    public EssPersonalInfoDto getMyInfo(String personId, String lang) {
-        return essPersonalInfoMapper.findMyInfo(personId, lang);
+    public EssPersonalInfoDto getMyInfo(String personId) {
+        return essPersonalInfoMapper.findMyInfo(personId);
     }
 
     @Override

@@ -44,6 +44,7 @@
         <result property="leaveTypeNo" column="LEAVE_TYPE_NO" />
         <result property="leaveTypeCode" column="LEAVE_TYPE_CODE" />
         <result property="applyLength" column="APPLY_LENGTH" />
+        <result property="dayHours" column="DAY_HOURS" />
         <result property="applyTime" column="CREATE_DATE" />
         <result property="affirmFlag" column="AFFIRM_FLAG" />
         <result property="confirmFlag" column="CONFIRM_FLAG" />
@@ -152,14 +153,15 @@
             A.LEAVE_TYPE_NO,
             A.LEAVE_TYPE_CODE,
             A.APPLY_LENGTH,
+            AR_GET_DAY_HOURS(A.PERSON_ID, TO_CHAR(A.LEAVE_FROM_TIME, 'YYYY/MM/DD')) AS DAY_HOURS,
             GET_VAC_COUNT(A.PERSON_ID, A.CPNY_ID, TO_CHAR(A.LEAVE_FROM_TIME, 'YYYY-MM-DD'), TO_CHAR(A.LEAVE_TO_TIME, 'YYYY-MM-DD')) AS ANNUAL_LEAVE_COUNT,
             TO_CHAR(A.CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE,
             GET_DEPT_NAME(E.DEPTNO, #{lang, jdbcType=VARCHAR}) AS DEPT_NAME,
             A.AFFIRM_FLAG,
-            A.CREATED_BY,
+            GET_UPDATED_INFO(A.CREATED_BY) AS CREATED_BY,
             A.CREATED_IP,
             TO_CHAR(A.UPDATE_DATE, 'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE,
-            A.UPDATED_BY,
+            GET_UPDATED_INFO(A.UPDATED_BY) AS UPDATED_BY,
             A.UPDATED_IP,
             (
                 SELECT LISTAGG('&lt;p&gt;' || S.AFFIRM_LEVEL || '. ' || NVL(HE.EMPID, '') || ' - ' || NVL(HE.LOCAL_NAME, '') || '&lt;/p&gt;', '')
@@ -184,6 +186,31 @@
         <if test="toDate != null and toDate != ''">
             AND A.LEAVE_FROM_TIME &lt; TO_DATE(#{toDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 1
         </if>
+        <if test="affirmFlag != null and affirmFlag != ''">
+            AND A.AFFIRM_FLAG = #{affirmFlag, jdbcType=VARCHAR}
+        </if>
+        <if test="confirmFlag != null and confirmFlag != ''">
+            AND TO_CHAR(A.CONFIRM_FLAG) = #{confirmFlag, jdbcType=VARCHAR}
+        </if>
+        <if test="leaveTypeCode != null and leaveTypeCode != ''">
+            AND A.LEAVE_TYPE_CODE = #{leaveTypeCode, jdbcType=VARCHAR}
+        </if>
+        AND EXISTS (
+              SELECT B1.DEPTID
+              FROM HR_DEPARTMENT B1
+              WHERE B1.DEPTNO = E.DEPTNO
+              START WITH B1.DEPTNO IN (
+                  SELECT HRD.DEPTID
+                  FROM HR_DEPARTMENT HRD
+                  WHERE HRD.MANAGER_EMP_ID = #{adminID, jdbcType=VARCHAR}
+              )
+              CONNECT BY PRIOR B1.DEPTNO = B1.PARENT_DEPT_NO
+              UNION
+              SELECT ASI.DEPTNO
+              FROM AR_SUPERVISOR_INFO ASI
+              WHERE ASI.DEPTNO = E.DEPTNO
+                AND ASI.PERSON_ID = #{adminID, jdbcType=VARCHAR}
+          )
         ORDER BY A.CREATE_DATE DESC, E.EMPID
     </select>
 
@@ -245,7 +272,7 @@
             SELECT
                 A.SEQ,
                 A.AFFIRM_TYPE,
-                DECODE(A.AFFIRM_TYPE, '1', '审核', '2', '协议', '3', '通告', '4', '企案', '审核') AS AFFIRM_TYPE_NAME,
+                DECODE(A.AFFIRM_TYPE,  '1', 'Approval',  '2', 'Agreement',  '3', 'Announcement',  '4', 'Proposal',  'Approval') AS AFFIRM_TYPE_NAME,
                 A.APPLY_NO,
                 A.APPLY_TYPE,
                 A.APPLY_FLAG,
@@ -258,12 +285,10 @@
                 A.APPLY_TYPE_CODE,
                 A.APPLY_PERSON_INFO,
                 A.ACTIVITY,
-                DECODE(
-                    A.AFFIRM_TYPE,
-                    '3', DECODE(A.AFFIRM_FLAG, '0', '未通告', '已通告'),
-                    '4', DECODE(A.AFFIRM_FLAG, '2', '取消', '提交'),
-                    DECODE(A.AFFIRM_FLAG, '0', '未审批', '1', '已通过', '已否决')
-                ) AS AFFIRM_FLAG_NAME,
+                DECODE(A.AFFIRM_TYPE, '3', DECODE(A.AFFIRM_FLAG, '0', 'Unannounced', 'Announced'),
+                                      '4', DECODE(A.AFFIRM_FLAG, '2', 'Cancelled', 'Submitted'),
+                                        DECODE(A.AFFIRM_FLAG, '0', 'Pending', '1', 'Approved', 'Rejected')
+                                    ) AS AFFIRM_FLAG_NAME,
                 HR.LOCAL_NAME || '/' || GET_CODE_NAME(HR.POST_GRADE_NO, #{lang, jdbcType=VARCHAR}) AS AFFIRM_NAME,
                 GET_DEPT_NAME(HR.DEPTNO, #{lang, jdbcType=VARCHAR}) AS DEPTNAME,
                 A.APPLY_AFFIRM_FLAG AS APPLY_AFFIRM_FLAG_NO,
@@ -336,7 +361,7 @@
             ESS.LEAVE_REASON,
             ESS.AFFIRM_FLAG,
             GET_GLOBAL_NAME(ESS.AFFIRM_FLAG, #{lang, jdbcType=VARCHAR}) AS AFFIRM_FLAG_NAME,
-            ESS.UPLOAD_BY,
+            GET_UPDATED_INFO(ESS.UPLOAD_BY) AS UPLOAD_BY,
             TO_CHAR(ESS.UPLOAD_DATE, 'YYYY-MM-DD HH24:MI:SS') AS UPLOAD_DATE,
             ESS.CPNY_ID,
             ESS.LINE_ID,
@@ -436,6 +461,10 @@
         DELETE FROM AR_APPLY_RESULT WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}
     </delete>
 
+    <delete id="deleteLeaveApplyByApplyNo">
+        DELETE FROM ESS_LEAVE_APPLY_TB WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}
+    </delete>
+
     <select id="selectLeaveLength" resultType="map">
         SELECT
             AR_GET_DAY_HOURS(#{adminID, jdbcType=VARCHAR},
@@ -492,7 +521,7 @@
             A.HR_COMMENT,
             A.CONFIRM_FLAG,
             GET_GLOBAL_NAME(A.CONFIRM_FLAG, #{lang, jdbcType=VARCHAR}) AS CONFIRM_FLAG_NAME,
-            A.CREATED_BY,
+            GET_UPDATED_INFO(A.CREATED_BY) AS CREATED_BY,
             A.CREATED_IP,
             A.LEAVE_TYPE_CODE
         FROM ESS_LEAVE_APPLY_TB A
@@ -548,6 +577,100 @@
                AND A.ACTIVITY = 1
                AND SYSDATE BETWEEN A.STRT_DATE AND A.END_DATE
         )
+    </select>
+
+    <select id="selectEmpDefaultInfo" resultType="map">
+        WITH SHIFT_DATA AS (
+            SELECT
+                get_ar_shift_start_time(#{personId, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{cpnyId, jdbcType=VARCHAR}) AS START_TIME,
+                get_ar_shift_end_time(#{personId, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{cpnyId, jdbcType=VARCHAR}) AS END_TIME
+            FROM DUAL
+        )
+        SELECT
+            SD.START_TIME,
+            SD.END_TIME,
+            GET_VAC_COUNT(
+                #{personId, jdbcType=VARCHAR},
+                #{cpnyId, jdbcType=VARCHAR},
+                SUBSTR(NVL(SD.START_TIME, TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI')), 1, 10),
+                SUBSTR(NVL(SD.END_TIME, TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI')), 1, 10)
+            ) AS VAC_COUNT,
+            GET_GLOBAL_NAME(
+                GET_AR_SHIFTNO(#{personId, jdbcType=VARCHAR}, TO_CHAR(SYSDATE, 'YYYY-MM-DD'), #{cpnyId, jdbcType=VARCHAR}),
+                #{lang, jdbcType=VARCHAR}
+            ) AS SHIFT_NAME,
+            GET_DEPT_NAME(HE.DEPTNO, #{lang, jdbcType=VARCHAR}) AS DEPT_NAME
+        FROM SHIFT_DATA SD, HR_EMPLOYEE HE
+        WHERE HE.PERSON_ID = #{personId, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectLeaveLengthForPerson" resultType="map">
+        SELECT
+            GET_AR_LEAVE_LENGTH(
+                #{personId, jdbcType=VARCHAR},
+                #{cpnyId, jdbcType=VARCHAR},
+                TO_DATE(#{fromTime, jdbcType=VARCHAR}, 'YYYY-MM-DD HH24:MI'),
+                TO_DATE(#{toTime, jdbcType=VARCHAR}, 'YYYY-MM-DD HH24:MI'),
+                GET_CODE_NO(#{leaveTypeCode, jdbcType=VARCHAR}, '21', #{cpnyId, jdbcType=VARCHAR}, 'CODE')
+            ) AS LEAVE_LENGTH
+        FROM DUAL
+    </select>
+
+    <select id="selectLeaveClash" resultType="java.lang.Integer">
+        SELECT AR_GET_LEAVE_CLASH('', #{personId, jdbcType=VARCHAR}, #{fromTime, jdbcType=VARCHAR}, #{toTime, jdbcType=VARCHAR}) FROM DUAL
+    </select>
+
+    <update id="updateCancelLeaveApply">
+        UPDATE ESS_LEAVE_APPLY_TB
+        SET ACTIVITY = 1,
+            AFFIRM_FLAG = '14014310',
+            UPDATE_DATE = SYSDATE,
+            UPDATED_BY = #{adminID, jdbcType=VARCHAR},
+            UPDATED_IP = #{adminIP, jdbcType=VARCHAR}
+        WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectAffirmEmailForCancel" resultType="map">
+        SELECT SY.APPLY_NO, SY.APPLY_TYPE, SY.APPLY_FLAG
+          FROM SY_AFFIRM_EMAIL SY
+         WHERE EXISTS (SELECT 1
+                  FROM SY_AFFIRM_EMAIL SY2
+                 WHERE SY.APPLY_NO = SY2.APPLY_NO
+                   AND SY.APPLY_TYPE = SY2.APPLY_TYPE
+                   AND SY.APPLY_FLAG = SY2.APPLY_FLAG
+                   AND SY2.SEQ = (SELECT MAX(SEQ)
+                                    FROM SY_AFFIRM_EMAIL
+                                   WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}))
+           AND ROWNUM &lt; 2
+    </select>
+
+    <update id="callAffirmCancel" statementType="CALLABLE">
+        {CALL PKG_AFFIRM_EMAIL.PR_AFFIRM_CANCEL(
+            #{applyNo, jdbcType=VARCHAR, mode=IN},
+            #{applyType, jdbcType=VARCHAR, mode=IN},
+            #{applyFlag, jdbcType=VARCHAR, mode=IN},
+            #{adminID, jdbcType=VARCHAR, mode=IN},
+            #{adminIP, jdbcType=VARCHAR, mode=IN},
+            #{message, jdbcType=VARCHAR, mode=OUT}
+        )}
+    </update>
+
+    <!--
+        Kiểm tra xung đột thời gian nghỉ phép của cùng một nhân viên.
+        Bỏ qua record bị huỷ/từ chối (AFFIRM_FLAG IN '14014309','14014310') hoặc chưa xác nhận HR (CONFIRM_FLAG = 0).
+    -->
+    <select id="countConflictLeaveApply" resultType="int">
+        SELECT COUNT(*)
+        FROM ESS_LEAVE_APPLY_TB A
+        WHERE A.PERSON_ID = #{personId, jdbcType=VARCHAR}
+          AND A.ACTIVITY = 1
+          AND A.AFFIRM_FLAG NOT IN ('14014309', '14014310')
+          AND NVL(A.CONFIRM_FLAG, 0) != 0
+          AND A.LEAVE_FROM_TIME &lt; TO_DATE(#{leaveToTime, jdbcType=VARCHAR}, 'YYYY-MM-DD HH24:MI')
+          AND A.LEAVE_TO_TIME &gt; TO_DATE(#{leaveFromTime, jdbcType=VARCHAR}, 'YYYY-MM-DD HH24:MI')
+        <if test="applyNo != null and applyNo != '' and applyNo != '0'">
+          AND TO_CHAR(A.APPLY_NO) != #{applyNo, jdbcType=VARCHAR}
+        </if>
     </select>
 
 </mapper>

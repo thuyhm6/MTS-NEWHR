@@ -15,7 +15,7 @@ public interface EssPersonalInfoService {
     /**
      * Lấy thông tin cá nhân và thông tin cơ bản
      */
-    EssPersonalInfoDto getMyInfo(String personId, String lang);
+    EssPersonalInfoDto getMyInfo(String personId);
 
     /**
      * Lấy danh sách địa chỉ của cá nhân

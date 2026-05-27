@@ -47,4 +47,33 @@ public interface EssLeaveApplyMapper {
 
     int cancelMyLeaveApplyList(@Param("applyNos") List<String> applyNos);
 
+    Map<String, Object> selectEmpDefaultInfo(@Param("personId") String personId);
+
+    Map<String, Object> selectLeaveLengthForPerson(@Param("personId") String personId,
+                                                   @Param("fromTime") String fromTime,
+                                                   @Param("toTime") String toTime,
+                                                   @Param("leaveTypeCode") String leaveTypeCode);
+
+    /**
+     * Đếm số bản ghi xung đột thời gian trong ESS_LEAVE_APPLY_TB.
+     * Bỏ qua record có AFFIRM_FLAG IN ('14014309','14014310') hoặc CONFIRM_FLAG = 0.
+     */
+    int countConflictLeaveApply(Map<String, Object> params);
+
+    /**
+     * Gọi hàm AR_GET_LEAVE_CLASH để kiểm tra xung đột chấm công / khóa ngày công.
+     * Kết quả: >0 = trùng chấm công, -1 = ngày công đã chốt, -2 = thời gian đã khóa.
+     */
+    Integer selectLeaveClash(@Param("personId") String personId,
+                             @Param("fromTime") String fromTime,
+                             @Param("toTime") String toTime);
+
+    void updateCancelLeaveApply(Map<String, Object> params);
+
+    Map<String, Object> selectAffirmEmailForCancel(@Param("applyNo") String applyNo);
+
+    void callAffirmCancel(Map<String, Object> params);
+
+    void deleteLeaveApplyByApplyNo(@Param("applyNo") String applyNo);
+
 }

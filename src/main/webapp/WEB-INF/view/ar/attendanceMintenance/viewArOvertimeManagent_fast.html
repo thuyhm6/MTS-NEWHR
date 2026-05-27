@@ -22,7 +22,27 @@
                             <label for="otf_searchToDate" class="form-label" th:text="#{common.toDate}">Đến ngày</label>
                             <input type="date" class="form-control" id="otf_searchToDate">
                         </div>
-                        <div class="col-md-4 d-flex align-items-end flex-wrap gap-1">
+                        <div class="col-md-2">
+                            <label for="otf_searchAffirmFlag" class="form-label" th:text="#{arOtf.affirmFlag}">Trạng thái đơn tăng ca</label>
+                            <select class="form-select" id="otf_searchAffirmFlag">
+                                <option value="" th:text="#{common.all}">Tất cả</option>
+                                <option value="14014309" th:text="#{arOtf.affirmFlag.waitApprove}">Chờ duyệt</option>
+                                <option value="14014308" th:text="#{arOtf.affirmFlag.approved}">Đã duyệt</option>
+                                <option value="14014307" th:text="#{arOtf.affirmFlag.approving}">Đang duyệt</option>
+                                <option value="14014306" th:text="#{arOtf.affirmFlag.sent}">Gửi</option>
+                                <option value="14014310" th:text="#{arOtf.status.cancelled}">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="otf_searchConfirmFlag" class="form-label" th:text="#{arOtf.confirmFlag}">Trạng thái xác nhận</label>
+                            <select class="form-select" id="otf_searchConfirmFlag">
+                                <option value="" th:text="#{common.all}">Tất cả</option>
+                                <option value="0" th:text="#{arOtf.confirmFlag.notConfirmed}">Chưa xác nhận</option>
+                                <option value="1" th:text="#{arOtf.confirmFlag.confirmed}">Đã xác nhận</option>
+                                <option value="2" th:text="#{arOtf.confirmFlag.rejected}">Từ chối</option>
+                            </select>
+                        </div>
+                        <div class="col-12 d-flex flex-wrap gap-1">
                             <button type="button" class="btn btn-primary" onclick="otfSearchData()">
                                 <i class="bx bx-search"></i> <span th:text="#{common.search}">Tìm kiếm</span>
                             </button>
@@ -31,6 +51,9 @@
                             </button>
                             <button type="button" class="btn btn-success" onclick="otfAddEmptyRow()">
                                 <i class="bx bx-plus"></i> <span th:text="#{common.addNew}">Thêm mới</span>
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="otfSaveChecked()">
+                                <i class="bx bx-save"></i> <span th:text="#{common.save}">Lưu</span>
                             </button>
                             <button type="button" class="btn btn-info text-white" onclick="otfDownloadTemplate()">
                                 <i class="bx bx-download"></i> <span th:text="#{common.downloadTemplate}">Tải File Mẫu</span>
@@ -46,6 +69,7 @@
                             style="min-width: 1900px;">
                             <thead class="table-light text-center align-middle">
                                 <tr>
+                                    <th><input type="checkbox" id="otf_checkAll" onclick="otfToggleCheckAll(this)"></th>
                                     <th>No</th>
                                     <th th:text="#{common.empName}">Nhân viên</th>
                                     <th th:text="#{common.deptName}">Phòng ban</th>
@@ -53,7 +77,10 @@
                                     <th th:text="#{arOtf.otDate}">Ngày tăng ca</th>
                                     <th th:text="#{arOtf.fromHour}">Từ giờ</th>
                                     <th th:text="#{arOtf.toHour}">Đến giờ</th>
+                                    <th th:text="#{ps.col.indoorTime}">Giờ vào</th>
+                                    <th th:text="#{ps.col.outdoorTime}">Giờ ra</th>
                                     <th th:text="#{common.hours}">Số giờ</th>
+                                    <th th:text="#{impOt.deductYn}">Báo cơm / Nghỉ ngơi (30')</th>
                                     <th th:text="#{common.reason}">Lý do</th>
                                     <th th:text="#{common.status}">Trạng thái</th>
                                     <th th:text="#{common.creator}">Người tạo</th>
@@ -71,122 +98,33 @@
     </div>
 </div>
 
-<div class="modal fade" id="otf_applyDetailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="otf_applyDetailTitle" th:text="#{arOtf.applyOt}">[Xin tăng ca]</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive mb-3">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="table-light text-center" style="width: 160px;" th:text="#{arOtf.applyTitle}">Tiêu đề</th>
-                                <td id="otf_modalApplyTitle"></td>
-                            </tr>
-                            <tr>
-                                <th class="table-light text-center" th:text="#{arOtf.applicant}">Người đăng ký</th>
-                                <td id="otf_modalApplicant"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <thead class="table-light text-center">
-                            <tr>
-                                <th style="width: 50px;" th:text="#{common.stt}">STT</th>
-                                <th style="width: 90px;" th:text="#{arOtf.approvalSeq}">Trình tự duyệt</th>
-                                <th style="width: 110px;" th:text="#{arOtf.approvalStatus}">Trạng thái duyệt</th>
-                                <th th:text="#{common.empName}">Họ tên</th>
-                                <th th:text="#{arOtf.opinion}">Ý kiến</th>
-                                <th style="width: 170px;" th:text="#{arOtf.actionTime}">Thời gian thực hiện</th>
-                                <th style="width: 120px;" th:text="#{common.deptName}">Phòng ban</th>
-                            </tr>
-                        </thead>
-                        <tbody id="otf_modalApprovalBody"></tbody>
-                    </table>
-                </div>
-
-                <h6 class="fw-bold mb-2" th:text="#{arOtf.empInfo}">Thông tin nhân viên</h6>
-                <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="table-light text-center" style="width: 100px;" th:text="#{common.empName}">Họ tên</th>
-                                <td id="otf_modalEmpName"></td>
-                                <th class="table-light text-center" style="width: 100px;" th:text="#{common.empId}">Mã nhân viên</th>
-                                <td id="otf_modalEmpId"></td>
-                            </tr>
-                            <tr>
-                                <th class="table-light text-center" th:text="#{common.deptName}">Phòng ban</th>
-                                <td id="otf_modalEmpDept"></td>
-                                <th class="table-light text-center" th:text="#{attSearch.position}">Chức vụ</th>
-                                <td id="otf_modalEmpPost"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h6 class="fw-bold mb-2" th:text="#{arOtf.otInfo}">Thông tin tăng ca</h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <thead class="table-light text-center">
-                            <tr>
-                                <th th:text="#{arOtf.otType}">Loại tăng ca</th>
-                                <th style="width: 140px;" th:text="#{arOtf.otDate}">Ngày tăng ca</th>
-                                <th style="width: 170px;" th:text="#{arOtf.otBegin}">Bắt đầu</th>
-                                <th style="width: 170px;" th:text="#{arOtf.otEnd}">Kết thúc</th>
-                                <th style="width: 140px;" th:text="#{common.hours}">Số giờ</th>
-                                <th th:text="#{common.reason}">Lý do</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="otf_modalType" class="text-center"></td>
-                                <td id="otf_modalDate" class="text-center"></td>
-                                <td id="otf_modalFrom" class="text-center"></td>
-                                <td id="otf_modalTo" class="text-center"></td>
-                                <td id="otf_modalHour" class="text-center"></td>
-                                <td id="otf_modalRemark" class="text-center"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
-            </div>
-        </div>
-    </div>
-</div>
+<th:block th:replace="~{ess/infoApply/viewApprovaledOt :: approvalOtModal}"></th:block>
 
 <template id="fragmentScripts">
+    <th:block th:replace="~{ess/infoApply/viewApprovaledOt :: approvalOtScript}"></th:block>
     <script th:inline="javascript">
         var _otf_i18n = {
             selectEmp: /*[[#{arOtf.selectEmp}]]*/ 'Chọn NV...',
-            loadingData: /*[[#{arOtf.loadingData}]]*/ 'Đang tải dữ liệu...',
-            loadingApproval: /*[[#{arOtf.loadingApproval}]]*/ 'Đang tải dữ liệu phê duyệt...',
-            noApprovalData: /*[[#{arOtf.noApprovalData}]]*/ 'Không có dữ liệu phê duyệt',
-            loadFailed: /*[[#{arOtf.loadFailed}]]*/ 'Tải dữ liệu thất bại',
             msgNotSelectEmp: /*[[#{arOtf.msg.notSelectEmp}]]*/ 'Chưa chọn nhân viên',
             msgNotSelectDate: /*[[#{arOtf.msg.notSelectDate}]]*/ 'Chưa chọn ngày tăng ca',
             msgNotEnterTime: /*[[#{arOtf.msg.notEnterTime}]]*/ 'Chưa nhập giờ tăng ca',
             msgNoHour: /*[[#{arOtf.msg.noHour}]]*/ 'Không tính được số giờ tăng ca',
-            msgNoApplyNo: /*[[#{arOtf.msg.noApplyNo}]]*/ 'Không tìm thấy số đơn để xem chi tiết',
             noEmpComp: /*[[#{arOtf.noEmpComp}]]*/ 'Chưa có component tìm nhân viên.',
             importResult: /*[[#{arOtf.importResult}]]*/ 'Kết quả nhập',
-            applyOt: /*[[#{arOtf.applyOt}]]*/ 'Xin tăng ca'
+            cancelApply: /*[[#{arOtf.cancelApply}]]*/ 'Hủy đơn',
+            statusCancelled: /*[[#{arOtf.status.cancelled}]]*/ 'Đã hủy',
+            confirmCancelApply: /*[[#{arOtf.msg.confirmCancelApply}]]*/ 'Bạn có chắc chắn muốn hủy đơn tăng ca này không?',
+            msgNotCheckCancel: /*[[#{arOtf.msg.notCheckCancel}]]*/ 'Vui lòng tích chọn ô hủy đơn trước khi thực hiện',
+            cancelApplySuccess: /*[[#{arOtf.msg.cancelApplySuccess}]]*/ 'Hủy đơn tăng ca thành công',
+            confirmResubmit: /*[[#{arOtf.msg.confirmResubmit}]]*/ 'Đơn này đã được duyệt. Lưu sẽ xóa đơn hiện tại và tạo lại đơn mới. Bạn có muốn tiếp tục không?',
+            resubmitSuccess: /*[[#{arOtf.msg.resubmitSuccess}]]*/ 'Đã lưu lại đơn tăng ca thành công',
+            msgNoCheckedRows: 'Vui lòng chọn ít nhất một dòng để lưu',
+            saveBatchSuccess: 'Lưu thành công {n} dòng',
+            saveBatchFailed: 'Một số dòng lưu thất bại'
         };
         var _otf_table;
         var _otf_addedRows = [];
         var _otf_pageBooted = false;
-        var _otf_detailModal = null;
-        var _otf_detailCache = {};
-        var _otf_detailPending = {};
         var _otf_rowEventsBound = false;
 
         // Basic helpers
@@ -220,57 +158,6 @@
 
         function otfSetText(selector, value) {
             $(selector).text(value || '');
-        }
-
-        // Detail modal helpers
-        function otfBuildDetailCacheKey(applyNo, applyType) {
-            return (applyNo || '') + '|' + (applyType || '');
-        }
-
-        function otfFindRowByApplyNo(applyNo) {
-            if (!applyNo || !_otf_table) {
-                return null;
-            }
-
-            var rows = _otf_table.rows().data().toArray();
-            for (var i = 0; i < rows.length; i++) {
-                if (String(rows[i].applyNo || '') === String(applyNo)) {
-                    return rows[i];
-                }
-            }
-            return null;
-        }
-
-        function otfBuildPreviewDetail(rowData) {
-            if (!rowData) {
-                return null;
-            }
-
-            var detail = $.extend(true, {}, rowData);
-            if (!detail.detailFromDateTime && detail.applyOtDate && detail.otFromTime) {
-                detail.detailFromDateTime = otfComposeDateTimeValue(detail.applyOtDate, detail.otFromTime);
-            }
-            if (!detail.detailToDateTime && detail.applyOtDate && detail.otToTime) {
-                detail.detailToDateTime = otfComposeDateTimeValue(detail.applyOtDate, detail.otToTime);
-            }
-
-            return {
-                otInfo: detail,
-                employeeInfo: detail,
-                approvalList: []
-            };
-        }
-
-        function otfInvalidateDetailCache() {
-            _otf_detailCache = {};
-            _otf_detailPending = {};
-        }
-
-        function otfEnsureDetailModal() {
-            if (!_otf_detailModal && window.bootstrap && document.getElementById('otf_applyDetailModal')) {
-                _otf_detailModal = new bootstrap.Modal(document.getElementById('otf_applyDetailModal'));
-            }
-            return _otf_detailModal;
         }
 
         // Date/time helpers
@@ -458,6 +345,7 @@
             rowData.otFromTime = timeInfo.fromDateTime;
             rowData.otToTime = timeInfo.toDateTime;
             rowData.otApplyHour = $tr.find('.otf-apply-hour').text() || '';
+            rowData.deductYn = $tr.find('.otf-in-deduct').is(':checked') ? '1' : '0';
             rowData.applyOtRemark = $tr.find('.otf-in-remark').val() || '';
             return rowData;
         }
@@ -479,6 +367,46 @@
             rowData.otTypeCode = otTypeCode;
             rowData.otTypeName = otTypeName || '';
             rowData.otApplyHour = otApplyHour || '';
+        }
+
+        function otfAutoFillByEmp($tr, personId, applyOtDate) {
+            if (!personId || !applyOtDate) return;
+            var rowData = otfGetRowData($tr);
+            if (!rowData) return;
+            var deductYn = $tr.find('.otf-in-deduct').is(':checked') ? '1' : '0';
+
+            $.ajax({
+                url: '/ar/attendanceMintenance/api/overtime/auto-fill-by-emp',
+                type: 'GET',
+                data: { personId: personId, applyOtDate: applyOtDate, deductYn: deductYn },
+                success: function (data) {
+                    if (!data) return;
+                    if (data.deptName) {
+                        rowData.deptName = data.deptName;
+                        $tr.find('td').eq(3).text(data.deptName);
+                    }
+                    rowData.otTypeCode = data.otTypeCode || '';
+                    rowData.otTypeName = data.otTypeName || '';
+                    $tr.find('.otf-in-type-code').val(data.otTypeCode || '');
+                    $tr.find('.otf-in-type-name').text(data.otTypeName || '');
+                    var fromVal = otfNormalizeDateTimeValue(data.otFromTime || '');
+                    var toVal = otfNormalizeDateTimeValue(data.otToTime || '');
+                    if (fromVal) {
+                        $tr.find('.otf-in-from').val(fromVal);
+                        rowData.otFromTime = fromVal;
+                    }
+                    if (toVal) {
+                        $tr.find('.otf-in-to').val(toVal);
+                        rowData.otToTime = toVal;
+                    }
+                    var applyHour = data.otApplyHour || '';
+                    if (!applyHour && fromVal && toVal) {
+                        applyHour = otfCalcApplyHour(applyOtDate, fromVal, toVal);
+                    }
+                    $tr.find('.otf-apply-hour').text(applyHour || '');
+                    rowData.otApplyHour = applyHour || '';
+                }
+            });
         }
 
         function otfResolveDefaultOtInfo($tr) {
@@ -553,14 +481,33 @@
             _otf_rowEventsBound = true;
 
             $('#otf_dataTable tbody').off('input.otf', '.otf-in-date, .otf-in-from, .otf-in-to, .otf-in-remark');
-            $('#otf_dataTable tbody').off('change.otf', '.otf-in-date, .otf-in-from, .otf-in-to');
+            $('#otf_dataTable tbody').off('change.otf', '.otf-in-date, .otf-in-from, .otf-in-to, .otf-in-deduct');
 
             $('#otf_dataTable tbody').on('input.otf', '.otf-in-date, .otf-in-from, .otf-in-to, .otf-in-remark', function () {
                 otfUpdateRowState($(this).closest('tr'), false);
             });
 
-            $('#otf_dataTable tbody').on('change.otf', '.otf-in-date, .otf-in-from, .otf-in-to', function () {
+            $('#otf_dataTable tbody').on('change.otf', '.otf-in-from, .otf-in-to', function () {
                 otfUpdateRowState($(this).closest('tr'), true);
+            });
+
+            $('#otf_dataTable tbody').on('change.otf', '.otf-in-date', function () {
+                var $tr = $(this).closest('tr');
+                var rowData = otfGetRowData($tr);
+                if (rowData && rowData.isNew) {
+                    var personId = ($tr.find('.otf-in-personid').val() || '').trim();
+                    if (personId) {
+                        otfAutoFillByEmp($tr, personId, $(this).val());
+                        return;
+                    }
+                }
+                otfUpdateRowState($tr, true);
+            });
+
+            $('#otf_dataTable tbody').on('change.otf', '.otf-in-deduct', function () {
+                var $tr = $(this).closest('tr');
+                otfSyncRowData($tr);
+                otfResolveDefaultOtInfo($tr);
             });
         }
 
@@ -569,29 +516,9 @@
                 empId: $('#otf_searchEmpId').val(),
                 localName: $('#otf_searchEmpName').val(),
                 fromDate: $('#otf_searchFromDate').val(),
-                toDate: $('#otf_searchToDate').val()
-            };
-        }
-
-        function otfCreateEmptyRow() {
-            return {
-                isNew: true,
-                applyNo: '',
-                empId: '',
-                localName: '',
-                personId: '',
-                deptName: '',
-                otTypeCode: '',
-                applyOtDate: otfFormatDate(new Date()),
-                otFromTime: '',
-                otToTime: '',
-                otApplyHour: '',
-                applyOtRemark: '',
-                affirmFlag: '',
-                affirmStr: '',
-                createdBy: '',
-                updatedBy: '',
-                deductYn: '0'
+                toDate: $('#otf_searchToDate').val(),
+                affirmFlag: $('#otf_searchAffirmFlag').val(),
+                confirmFlag: $('#otf_searchConfirmFlag').val()
             };
         }
 
@@ -609,22 +536,26 @@
                 pageLength: 25,
                 processing: true,
                 columnDefs: [
-                    { targets: 0, width: '15px' },
-                    { targets: 1, width: '180px' },
-                    { targets: 2, width: '140px' },
-                    { targets: 3, width: '100px' },
-                    { targets: 4, width: '90px' },
+                    { targets: 0, width: '30px', orderable: false },
+                    { targets: 1, width: '15px' },
+                    { targets: 2, width: '180px' },
+                    { targets: 3, width: '140px' },
+                    { targets: 4, width: '100px' },
                     { targets: 5, width: '120px' },
-                    { targets: 6, width: '120px' },
-                    { targets: 7, width: '60px' },
-                    { targets: 8, width: '220px' },
-                    { targets: 9, width: '120px' },
-                    { targets: 10, width: '100px' },
-                    { targets: 11, width: '100px' },
-                    { targets: 12, width: '180px' },
-                    { targets: 13, width: '50px' }
+                    { targets: 6, width: '180px' },
+                    { targets: 7, width: '180px' },
+                    { targets: 8, width: '80px' },
+                    { targets: 9, width: '80px' },
+                    { targets: 10, width: '60px' },
+                    { targets: 11, width: '80px', orderable: false },
+                    { targets: 12, width: '220px' },
+                    { targets: 13, width: '120px' },
+                    { targets: 14, width: '100px' },
+                    { targets: 15, width: '100px' },
+                    { targets: 16, width: '180px' },
+                    { targets: 17, width: '130px' }
                 ],
-                fixedColumns: hasFixedColumns ? { leftColumns: 2 } : false,
+                fixedColumns: hasFixedColumns ? { leftColumns: 3 } : false,
                 initComplete: function () {
                     this.api().columns.adjust();
                     otfBindRowEvents();
@@ -644,6 +575,15 @@
                     }
                 },
                 columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        className: 'text-center',
+                        render: function (data, type, row) {
+                            var checked = row.isNew ? ' checked' : '';
+                            return '<input type="checkbox" class="otf-row-chk"' + checked + '>';
+                        }
+                    },
                     {
                         data: null,
                         render: function (data, type, row, meta) {
@@ -718,10 +658,29 @@
                         }
                     },
                     {
+                        data: 'indoorTime',
+                        className: 'text-center align-middle',
+                        render: function (data) { return otfEscHtml(data || ''); }
+                    },
+                    {
+                        data: 'outdoorTime',
+                        className: 'text-center align-middle',
+                        render: function (data) { return otfEscHtml(data || ''); }
+                    },
+                    {
                         data: 'otApplyHour',
                         className: 'text-end align-middle',
                         render: function (data) {
                             return '<span class="otf-apply-hour">' + otfEscHtml(data || '') + '</span>';
+                        }
+                    },
+                    
+                    {
+                        data: 'deductYn',
+                        className: 'text-center align-middle',
+                        render: function (data) {
+                            var checked = (data === '1' || data === 1) ? ' checked' : '';
+                            return '<input type="checkbox" class="otf-in-deduct"' + checked + '>';
                         }
                     },
                     {
@@ -738,6 +697,7 @@
                             if (data === '14014307') return '<span class="badge bg-info">Đang duyệt</span>';
                             if (data === '14014308') return '<span class="badge bg-success">Đã duyệt</span>';
                             if (data === '14014309') return '<span class="badge bg-danger">Từ chối</span>';
+                            if (data === '14014310') return '<span class="badge bg-secondary">' + _otf_i18n.statusCancelled + '</span>';
                             return data || '';
                         }
                     },
@@ -763,122 +723,22 @@
                         data: null,
                         className: 'text-center',
                         render: function (data, type, row) {
+                            if (row.isNew) {
+                                var newRowId = String(row._newRowId || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                                return '<button class="btn btn-sm btn-danger" onclick="otfRemoveNewRow(this, \'' + newRowId + '\')" title="Xóa dòng">'
+                                    + '<i class="bx bx-trash"></i>'
+                                    + '</button>';
+                            }
                             var rowPersonId = String(row.personId || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-                            return '<button class="btn btn-sm btn-primary" onclick="otfSaveLine(this, \'' + (row.applyNo || '') + '\', \'' + rowPersonId + '\')">'
-                                + '<i class="bx bx-save"></i>'
-                                + '</button>';
+                            if (row.affirmFlag === '14014308') {
+                                return '<button class="btn btn-sm btn-warning" title="' + _otf_i18n.confirmResubmit + '" onclick="otfResubmitLine(this, \'' + (row.applyNo || '') + '\', \'' + rowPersonId + '\')">'
+                                    + '<i class="bx bx-save"></i>'
+                                    + '</button>';
+                            }
+                            return '';
                         }
                     }
                 ]
-            });
-        }
-
-        function otfBuildApplyTitle(info) {
-            if (!info) return '';
-            return (info.otTypeName || '') + '/Apply(' + (info.localName || '') + ')[Date: '
-                + (info.detailFromDateTime || '') + ' ~ ' + (info.detailToDateTime || '') + ']';
-        }
-
-        function otfResetApplyDetailModal() {
-            otfSetText('#otf_modalApplyTitle', '');
-            otfSetText('#otf_modalApplicant', '');
-            otfSetText('#otf_modalEmpName', '');
-            otfSetText('#otf_modalEmpId', '');
-            otfSetText('#otf_modalEmpDept', '');
-            otfSetText('#otf_modalEmpPost', '');
-            otfSetText('#otf_modalType', '');
-            otfSetText('#otf_modalDate', '');
-            otfSetText('#otf_modalFrom', '');
-            otfSetText('#otf_modalTo', '');
-            otfSetText('#otf_modalHour', '');
-            otfSetText('#otf_modalRemark', '');
-            $('#otf_modalApprovalBody').html('<tr><td colspan="7" class="text-center text-muted">' + _otf_i18n.loadingData + '</td></tr>');
-        }
-
-        function otfRenderApprovalRows(approvalList) {
-            if (!approvalList || !approvalList.length) {
-                $('#otf_modalApprovalBody').html('<tr><td colspan="7" class="text-center text-muted">' + _otf_i18n.noApprovalData + '</td></tr>');
-                return;
-            }
-            var html = '';
-            approvalList.forEach(function (item, index) {
-                var stt = item.affirmLevel || (index + 1);
-                if (String(stt) === '100') {
-                    stt = 'HR';
-                }
-                html += '<tr>'
-                    + '<td class="text-center">' + otfEscHtml(stt) + '</td>'
-                    + '<td class="text-center">' + otfEscHtml(item.affirmTypeName || '') + '</td>'
-                    + '<td class="text-center">' + otfEscHtml(item.affirmFlagName || '') + '</td>'
-                    + '<td>' + otfEscHtml(item.affirmName || '') + '</td>'
-                    + '<td>' + otfEscHtml(item.affirmContent || '') + '</td>'
-                    + '<td class="text-center">' + otfEscHtml(item.updateDate || '') + '</td>'
-                    + '<td class="text-center">' + otfEscHtml(item.deptName || '') + '</td>'
-                    + '</tr>';
-            });
-            $('#otf_modalApprovalBody').html(html);
-        }
-
-        function otfRenderApplyDetail(data) {
-            var otInfo = data && data.otInfo ? data.otInfo : {};
-            var employeeInfo = data && data.employeeInfo ? data.employeeInfo : otInfo;
-            var approvalList = data && data.approvalList ? data.approvalList : [];
-            $('#otf_applyDetailTitle').text('[' + (otInfo.otTypeName || _otf_i18n.applyOt) + ']');
-            otfSetText('#otf_modalApplyTitle', otfBuildApplyTitle(otInfo));
-            otfSetText('#otf_modalApplicant', (employeeInfo.localName || '') + '/' + (employeeInfo.postGradeName || '') + '/' + (employeeInfo.deptName || ''));
-            otfSetText('#otf_modalEmpName', employeeInfo.localName || '');
-            otfSetText('#otf_modalEmpId', employeeInfo.empId || '');
-            otfSetText('#otf_modalEmpDept', employeeInfo.deptName || '');
-            otfSetText('#otf_modalEmpPost', employeeInfo.postGradeName || '');
-            otfSetText('#otf_modalType', otInfo.otTypeName || '');
-            otfSetText('#otf_modalDate', otInfo.applyOtDate || '');
-            otfSetText('#otf_modalFrom', otInfo.detailFromDateTime || '');
-            otfSetText('#otf_modalTo', otInfo.detailToDateTime || '');
-            otfSetText('#otf_modalHour', otInfo.otApplyHour || '');
-            otfSetText('#otf_modalRemark', otInfo.applyOtRemark || '');
-            otfRenderApprovalRows(approvalList);
-        }
-
-        function otfShowDetailPreview(applyNo, applyType) {
-            var cacheKey = otfBuildDetailCacheKey(applyNo, applyType || '');
-            var previewData = otfBuildPreviewDetail(otfFindRowByApplyNo(applyNo));
-
-            if (previewData) {
-                otfRenderApplyDetail(previewData);
-                $('#otf_modalApprovalBody').html('<tr><td colspan="7" class="text-center text-muted">' + _otf_i18n.loadingApproval + '</td></tr>');
-            }
-            if (_otf_detailCache[cacheKey]) {
-                otfRenderApplyDetail(_otf_detailCache[cacheKey]);
-            }
-
-            return cacheKey;
-        }
-
-        function otfFetchApplyDetail(applyNo, applyType, cacheKey) {
-            if (_otf_detailPending[cacheKey]) {
-                return;
-            }
-
-            _otf_detailPending[cacheKey] = true;
-            $.ajax({
-                url: '/ar/attendanceMintenance/api/overtime/detail',
-                type: 'GET',
-                data: {
-                    applyNo: applyNo,
-                    applyType: applyType || ''
-                },
-                success: function (res) {
-                    var responseData = res || {};
-                    _otf_detailCache[cacheKey] = responseData;
-                    otfRenderApplyDetail(responseData);
-                },
-                error: function () {
-                    $('#otf_modalApprovalBody').html('<tr><td colspan="7" class="text-center text-danger">' + _otf_i18n.loadFailed + '</td></tr>');
-                    toastr && toastr.error(_otf_i18n.loadFailed);
-                },
-                complete: function () {
-                    delete _otf_detailPending[cacheKey];
-                }
             });
         }
 
@@ -891,9 +751,6 @@
                 return;
             }
             _otf_pageBooted = true;
-            if (window.bootstrap && document.getElementById('otf_applyDetailModal')) {
-                _otf_detailModal = new bootstrap.Modal(document.getElementById('otf_applyDetailModal'));
-            }
             otfInitDate();
             otfInitTable();
         }
@@ -965,9 +822,32 @@
         };
 
         window.otfAddEmptyRow = function () {
-            _otf_addedRows.unshift(otfCreateEmptyRow());
+            var newRow = {
+                isNew: true,
+                _newRowId: Date.now() + '_' + Math.floor(Math.random() * 1e6),
+                applyNo: '',
+                empId: '',
+                localName: '',
+                personId: '',
+                deptName: '',
+                otTypeCode: '',
+                applyOtDate: otfFormatDate(new Date()),
+                otFromTime: '',
+                otToTime: '',
+                indoorTime: '',
+                outdoorTime: '',
+                otApplyHour: '',
+                applyOtRemark: '',
+                affirmFlag: '',
+                affirmStr: '',
+                createdBy: '',
+                updatedBy: '',
+                deductYn: '0'
+            };
+            _otf_addedRows.unshift(newRow);
             if (_otf_table) {
-                _otf_table.ajax.reload(null, false);
+                var currentData = _otf_table.data().toArray();
+                _otf_table.clear().rows.add([newRow].concat(currentData)).draw();
             }
         };
 
@@ -981,9 +861,10 @@
                     rowData.personId = emp.personId;
                     rowData.empId = emp.empId;
                     rowData.localName = emp.localName;
-                    rowData.deptName = emp.deptName || rowData.deptName || '';
-                    otfSyncRowData($tr);
-                    otfResolveDefaultOtInfo($tr);
+                    rowData.deptName = emp.deptName || '';
+                    $tr.find('td').eq(3).text(emp.deptName || '');
+                    var applyOtDate = $tr.find('.otf-in-date').val() || otfFormatDate(new Date());
+                    otfAutoFillByEmp($tr, emp.personId, applyOtDate);
                 });
             } else {
                 alert(_otf_i18n.noEmpComp);
@@ -991,17 +872,7 @@
         };
 
         window.otfOpenApplyDetail = function (applyNo, applyType) {
-            if (!applyNo) {
-                toastr && toastr.warning(_otf_i18n.msgNoApplyNo);
-                return;
-            }
-            otfEnsureDetailModal();
-            otfResetApplyDetailModal();
-            var cacheKey = otfShowDetailPreview(applyNo, applyType);
-            if (_otf_detailModal) {
-                _otf_detailModal.show();
-            }
-            otfFetchApplyDetail(applyNo, applyType, cacheKey);
+            vaotOpenApplyDetail(applyNo, applyType);
         };
 
         window.otfSaveLine = function (btn, applyNo, rowPersonId) {
@@ -1026,7 +897,6 @@
                     $btn.html(originalHtml).prop('disabled', false);
                     if (res && res.success) {
                         toastr && toastr.success(res.message || 'Lưu thành công');
-                        otfInvalidateDetailCache();
                         if (saveContext.rowData.isNew) {
                             _otf_addedRows.shift();
                         }
@@ -1041,6 +911,185 @@
                 }
             });
         };
+
+        window.otfResubmitLine = function (btn, applyNo, rowPersonId) {
+            if (!confirm(_otf_i18n.confirmResubmit)) {
+                return;
+            }
+            var $tr = $(btn).closest('tr');
+            var saveContext = otfBuildSaveContext($tr, applyNo, rowPersonId);
+            if (!otfValidateSaveContext(saveContext)) {
+                return;
+            }
+            var payload = otfBuildSavePayload(applyNo, saveContext);
+
+            var $btn = $(btn);
+            var originalHtml = $btn.html();
+            $btn.html('<i class="bx bx-loader bx-spin"></i>').prop('disabled', true);
+
+            $.ajax({
+                url: '/ar/attendanceMintenance/api/overtime/resubmit',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    $btn.html(originalHtml).prop('disabled', false);
+                    if (res && res.success) {
+                        toastr && toastr.success(res.message || _otf_i18n.resubmitSuccess);
+                        _otf_table.ajax.reload(null, false);
+                    } else {
+                        toastr && toastr.error((res && res.error) || 'Lỗi lưu dữ liệu');
+                    }
+                },
+                error: function () {
+                    $btn.html(originalHtml).prop('disabled', false);
+                    toastr && toastr.error('Lỗi khi gửi dữ liệu');
+                }
+            });
+        };
+
+        window.otfToggleCancelBtn = function (chk) {
+            var $btn = $(chk).closest('td').find('.otf-cancel-btn');
+            $btn.prop('disabled', !$(chk).is(':checked'));
+        };
+
+        window.otfCancelLine = function (btn, applyNo) {
+            var $btn = $(btn);
+            var $chk = $btn.closest('td').find('.otf-cancel-chk');
+            if (!$chk.is(':checked')) {
+                toastr && toastr.warning(_otf_i18n.msgNotCheckCancel);
+                return;
+            }
+            if (!confirm(_otf_i18n.confirmCancelApply)) {
+                return;
+            }
+            var originalHtml = $btn.html();
+            $btn.html('<i class="bx bx-loader bx-spin"></i>').prop('disabled', true);
+            $.ajax({
+                url: '/ar/attendanceMintenance/api/overtime/cancel',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ applyNo: applyNo }),
+                success: function (res) {
+                    if (res && res.success) {
+                        toastr && toastr.success(_otf_i18n.cancelApplySuccess);
+                        if (_otf_table) {
+                            _otf_table.ajax.reload(null, false);
+                        }
+                    } else {
+                        $btn.html(originalHtml).prop('disabled', false);
+                        toastr && toastr.error((res && res.error) || 'Lỗi khi hủy đơn');
+                    }
+                },
+                error: function () {
+                    $btn.html(originalHtml).prop('disabled', false);
+                    toastr && toastr.error('Lỗi khi gửi yêu cầu hủy đơn');
+                }
+            });
+        };
+
+        window.otfToggleCheckAll = function (chkAll) {
+            $('#otf_dataTable tbody tr').each(function () {
+                $(this).find('.otf-row-chk').prop('checked', $(chkAll).is(':checked'));
+            });
+        };
+
+        window.otfRemoveNewRow = function (btn, newRowId) {
+            _otf_addedRows = _otf_addedRows.filter(function (r) {
+                return r._newRowId !== newRowId;
+            });
+            if (_otf_table) {
+                _otf_table.rows(function (idx, data) {
+                    return data && data._newRowId === newRowId;
+                }).remove().draw(false);
+            }
+        };
+
+        window.otfSaveChecked = function () {
+            var rows = [];
+            $('#otf_dataTable tbody tr').each(function () {
+                var $tr = $(this);
+                if ($tr.find('.otf-row-chk').is(':checked')) {
+                    var rowData = _otf_table ? _otf_table.row($tr).data() : null;
+                    if (rowData) {
+                        rows.push({ $tr: $tr, rowData: rowData });
+                    }
+                }
+            });
+
+            if (rows.length === 0) {
+                toastr && toastr.warning(_otf_i18n.msgNoCheckedRows);
+                return;
+            }
+
+            var payloads = [];
+            for (var i = 0; i < rows.length; i++) {
+                var item = rows[i];
+                var saveContext = otfBuildSaveContext(item.$tr, item.rowData.applyNo || '', item.rowData.personId || '');
+                if (!otfValidateSaveContext(saveContext)) {
+                    return;
+                }
+                payloads.push({
+                    payload: otfBuildSavePayload(item.rowData.applyNo || '', saveContext),
+                    isNew: !!item.rowData.isNew,
+                    newRowId: item.rowData._newRowId || null,
+                    isResubmit: !item.rowData.isNew && item.rowData.affirmFlag === '14014308'
+                });
+            }
+
+            var total = payloads.length;
+            var done = 0;
+            var errors = [];
+            var successNewRowIds = [];
+
+            payloads.forEach(function (item) {
+                var url = item.isResubmit
+                    ? '/ar/attendanceMintenance/api/overtime/resubmit'
+                    : '/ar/attendanceMintenance/api/overtime/save';
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(item.payload),
+                    success: function (res) {
+                        done++;
+                        if (res && res.success) {
+                            if (item.newRowId) {
+                                successNewRowIds.push(item.newRowId);
+                            }
+                        } else {
+                            errors.push((res && res.error) || 'Lỗi lưu dữ liệu');
+                        }
+                        if (done === total) {
+                            otfFinalizeBatchSave(total, errors, successNewRowIds);
+                        }
+                    },
+                    error: function () {
+                        done++;
+                        errors.push('Lỗi khi gửi dữ liệu');
+                        if (done === total) {
+                            otfFinalizeBatchSave(total, errors, successNewRowIds);
+                        }
+                    }
+                });
+            });
+        };
+
+        function otfFinalizeBatchSave(total, errors, successNewRowIds) {
+            successNewRowIds.forEach(function (id) {
+                _otf_addedRows = _otf_addedRows.filter(function (r) { return r._newRowId !== id; });
+            });
+            if (errors.length > 0) {
+                toastr && toastr.error(_otf_i18n.saveBatchFailed);
+            } else {
+                var msg = _otf_i18n.saveBatchSuccess.replace('{n}', total);
+                toastr && toastr.success(msg);
+            }
+            if (_otf_table) {
+                _otf_table.ajax.reload(null, false);
+            }
+        }
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', otfBootPage);

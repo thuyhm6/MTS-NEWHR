@@ -21,6 +21,18 @@ public class SyAffirmEmailController {
     @Autowired
     private SyAffirmEmailService service;
 
+    @GetMapping("/pending-counts")
+    @ResponseBody
+    public ResponseEntity<Map<String, Integer>> getPendingCounts() {
+        return ResponseEntity.ok(service.getPendingApprovalCounts());
+    }
+
+    @GetMapping("/hrm-pending-counts")
+    @ResponseBody
+    public ResponseEntity<Map<String, Integer>> getHrmPendingCounts() {
+        return ResponseEntity.ok(service.getHrmPendingCounts());
+    }
+
     @GetMapping("/list")
     public ResponseEntity<List<SyAffirmEmailDto>> getList(SyAffirmEmailDto dto) {
         return ResponseEntity.ok(service.getList(dto));

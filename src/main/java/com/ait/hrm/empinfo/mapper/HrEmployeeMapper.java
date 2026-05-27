@@ -97,5 +97,5 @@ public interface HrEmployeeMapper {
             @Param("deptCodes") List<String> deptCodes,
             @Param("empOffice") String empOffice);
 
-    List<EmpMonthlyStatsDto> selectEmpMonthlyStats();
+    List<EmpMonthlyStatsDto> selectEmpMonthlyStats(@Param("year") int year);
 }

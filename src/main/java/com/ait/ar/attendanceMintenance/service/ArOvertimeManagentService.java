@@ -14,9 +14,15 @@ public interface ArOvertimeManagentService {
 
     ArOvertimeManagentDto getDefaultOtInfo(ArOvertimeManagentDto dto);
 
+    ArOvertimeManagentDto getAutoFillOtInfo(ArOvertimeManagentDto dto);
+
     List<ArOvertimeImportTempDto> getImportTempList(String errorOnly);
 
     String importTempToOfficial();
 
     void save(ArOvertimeManagentDto dto);
+
+    void cancelOvertimeApply(String applyNo);
+
+    void resubmitOvertimeApply(ArOvertimeManagentDto dto);
 }

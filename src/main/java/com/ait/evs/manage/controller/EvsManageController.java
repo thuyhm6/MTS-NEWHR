@@ -1,6 +1,7 @@
 package com.ait.evs.manage.controller;
 
 import com.ait.evs.manage.dto.EvsAffirmRuleDto;
+import com.ait.evs.manage.dto.EvsResultEmpDto;
 import com.ait.evs.manage.dto.EvsAffirmTarget1AbilityDto;
 import com.ait.evs.manage.dto.EvsAffirmTarget1Dto;
 import com.ait.evs.manage.dto.EvsAffirmTarget2AbilityDto;
@@ -23,6 +24,7 @@ import com.ait.evs.manage.dto.EvsResultDto;
 import com.ait.evs.manage.dto.EvsScheduleDto;
 import com.ait.evs.manage.dto.EvsScoreDto;
 import com.ait.evs.manage.service.EvsAffirmRuleService;
+import com.ait.evs.manage.service.EvsResultEmpService;
 import com.ait.evs.manage.service.EvsAffirmTarget1AbilityService;
 import com.ait.evs.manage.service.EvsAffirmTarget2AbilityService;
 import com.ait.evs.manage.service.EvsAffirmTarget1Service;
@@ -114,6 +116,9 @@ public class EvsManageController {
 
     @Autowired
     private EvsAffirmTarget2Service evsAffirmTarget2Service;
+
+    @Autowired
+    private EvsResultEmpService evsResultEmpService;
 
     @GetMapping("/viewResumeList")
     public String viewResumeList() {
@@ -1166,6 +1171,19 @@ public class EvsManageController {
         } catch (Exception e) {
             return ResponseEntity.ok(Map.of("success", false, "message", e.getMessage()));
         }
+    }
+
+    // ── Lịch sử kết quả đánh giá nhân viên (EVS_OBJECT) ──────────────────────
+
+    @GetMapping("/viewEvsResultEmp")
+    public String viewEvsResultEmp() {
+        return "evs/manage/viewEvsResultEmp";
+    }
+
+    @GetMapping("/api/evsResultEmp/list")
+    @ResponseBody
+    public ResponseEntity<List<EvsResultEmpDto>> getEvsResultEmpList() {
+        return ResponseEntity.ok(evsResultEmpService.getList(new EvsResultEmpDto()));
     }
 
     @GetMapping("/api/confirmTarget1/objectList")

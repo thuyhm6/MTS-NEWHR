@@ -88,7 +88,13 @@
                             <i class="bx bx-bar-chart-alt-2 text-primary me-1"></i>
                             <span th:text="#{hrm.chart.personnel.title}">Tình hình nhân sự</span>
                         </h6>
-                        <span id="hrm_chartYear" class="text-muted small fw-semibold"></span>
+                        <div class="d-flex align-items-center gap-2">
+                            <select id="hrm_chartYear" class="form-select form-select-sm" style="width:90px"></select>
+                            <a id="hrm_exportBtn" href="#" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+                                <i class="bx bx-download"></i>
+                                <span th:text="#{hrm.chart.export}">Xuất Excel</span>
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body py-2">
                         <canvas id="hrm_empMonthlyChart" height="110"></canvas>
@@ -135,102 +141,125 @@
             (function() {
                 var _hrm_chart_i18n = {
                     totalEmp  : /*[[#{hrm.chart.personnel.totalEmp}]]*/ 'Tổng nhân viên',
-                    newJoiner : /*[[#{hrm.chart.personnel.newJoiner}]]*/ 'Nhân viên mới'
+                    newJoiner : /*[[#{hrm.chart.personnel.newJoiner}]]*/ 'Nhân viên mới',
+                    leaver    : /*[[#{hrm.chart.personnel.leaver}]]*/ 'Nhân viên nghỉ việc'
                 };
 
                 var _hrm_monthLabels = (function() {
                     var months = [];
-                    for (var i = 1; i <= 12; i++) {
-                        months.push('T' + i);
-                    }
+                    for (var i = 1; i <= 12; i++) { months.push('T' + i); }
                     return months;
                 })();
 
-                document.getElementById('hrm_chartYear').textContent = new Date().getFullYear();
+                var _hrm_chartInstance = null;
+                var _hrm_currentYear   = new Date().getFullYear();
 
-                $.ajax({
-                    url: '/hrm/api/empMonthlyStats',
-                    type: 'GET',
-                    success: function(data) {
-                        var empCounts    = new Array(12).fill(0);
-                        var joinerCounts = new Array(12).fill(0);
-                        if (data && data.length) {
-                            data.forEach(function(d) {
-                                var idx = d.monthNum - 1;
-                                empCounts[idx]    = d.empCount;
-                                joinerCounts[idx] = d.newJoinerCount;
-                            });
-                        }
-                        var ctx = document.getElementById('hrm_empMonthlyChart').getContext('2d');
-                        new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: _hrm_monthLabels,
-                                datasets: [
-                                    {
-                                        label: _hrm_chart_i18n.totalEmp,
-                                        type: 'bar',
-                                        data: empCounts,
-                                        backgroundColor: 'rgba(74, 144, 226, 0.7)',
-                                        borderColor: 'rgba(74, 144, 226, 1)',
-                                        borderWidth: 1,
-                                        yAxisID: 'y-left'
-                                    },
-                                    {
-                                        label: _hrm_chart_i18n.newJoiner,
-                                        type: 'line',
-                                        data: joinerCounts,
-                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                        backgroundColor: 'rgba(255, 99, 132, 0.15)',
-                                        borderWidth: 2,
-                                        pointRadius: 4,
-                                        lineTension: 0.3,
-                                        fill: true,
-                                        yAxisID: 'y-right'
-                                    }
-                                ]
-                            },
-                            options: {
-                                responsive: true,
-                                legend: {
-                                    position: 'top',
-                                    labels: { boxWidth: 12, fontSize: 11 }
-                                },
-                                tooltips: { mode: 'index', intersect: false },
-                                scales: {
-                                    xAxes: [{
-                                        gridLines: { display: false },
-                                        ticks: { fontSize: 10 }
-                                    }],
-                                    yAxes: [
+                /* Khởi tạo dropdown năm (5 năm trước đến năm hiện tại) */
+                (function initYearSelect() {
+                    var sel = document.getElementById('hrm_chartYear');
+                    for (var y = _hrm_currentYear; y >= _hrm_currentYear - 4; y--) {
+                        var opt = document.createElement('option');
+                        opt.value = y;
+                        opt.textContent = y;
+                        if (y === _hrm_currentYear) opt.selected = true;
+                        sel.appendChild(opt);
+                    }
+                    sel.addEventListener('change', function() {
+                        loadChart(parseInt(this.value));
+                    });
+                })();
+
+                /* Cập nhật link xuất Excel theo năm */
+                function updateExportLink(year) {
+                    var btn = document.getElementById('hrm_exportBtn');
+                    if (btn) btn.href = '/hrm/api/empMonthlyStats/export?year=' + year;
+                }
+
+                function loadChart(year) {
+                    updateExportLink(year);
+                    $.ajax({
+                        url: '/hrm/api/empMonthlyStats',
+                        type: 'GET',
+                        data: { year: year },
+                        success: function(data) {
+                            var empCounts    = new Array(12).fill(0);
+                            var joinerCounts = new Array(12).fill(0);
+                            var leaverCounts = new Array(12).fill(0);
+                            if (data && data.length) {
+                                data.forEach(function(d) {
+                                    var idx = d.monthNum - 1;
+                                    empCounts[idx]    = d.empCount;
+                                    joinerCounts[idx] = d.newJoinerCount;
+                                    leaverCounts[idx] = d.leaverCount;
+                                });
+                            }
+                            if (_hrm_chartInstance) {
+                                _hrm_chartInstance.destroy();
+                            }
+                            var ctx = document.getElementById('hrm_empMonthlyChart').getContext('2d');
+                            _hrm_chartInstance = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: _hrm_monthLabels,
+                                    datasets: [
                                         {
-                                            id: 'y-left',
-                                            type: 'linear',
-                                            position: 'left',
+                                            label: _hrm_chart_i18n.totalEmp,
+                                            data: empCounts,
+                                            backgroundColor: 'rgba(74, 144, 226, 0.75)',
+                                            borderColor: 'rgba(74, 144, 226, 1)',
+                                            borderWidth: 1,
+                                            barPercentage: 0.75,
+                                            categoryPercentage: 0.85
+                                        },
+                                        {
+                                            label: _hrm_chart_i18n.newJoiner,
+                                            data: joinerCounts,
+                                            backgroundColor: 'rgba(40, 167, 69, 0.75)',
+                                            borderColor: 'rgba(40, 167, 69, 1)',
+                                            borderWidth: 1,
+                                            barPercentage: 0.75,
+                                            categoryPercentage: 0.85
+                                        },
+                                        {
+                                            label: _hrm_chart_i18n.leaver,
+                                            data: leaverCounts,
+                                            backgroundColor: 'rgba(220, 53, 69, 0.75)',
+                                            borderColor: 'rgba(220, 53, 69, 1)',
+                                            borderWidth: 1,
+                                            barPercentage: 0.75,
+                                            categoryPercentage: 0.85
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: true,
+                                    legend: {
+                                        position: 'top',
+                                        labels: { boxWidth: 12, fontSize: 11 }
+                                    },
+                                    tooltips: { mode: 'index', intersect: false },
+                                    scales: {
+                                        xAxes: [{
+                                            gridLines: { display: false },
+                                            ticks: { fontSize: 10 }
+                                        }],
+                                        yAxes: [{
                                             ticks: {
                                                 beginAtZero: true,
                                                 fontSize: 10,
                                                 callback: function(v) { return Number.isInteger(v) ? v : null; }
                                             },
                                             gridLines: { drawBorder: false }
-                                        },
-                                        {
-                                            id: 'y-right',
-                                            type: 'linear',
-                                            position: 'right',
-                                            ticks: {
-                                                beginAtZero: true,
-                                                fontSize: 10,
-                                                callback: function(v) { return Number.isInteger(v) ? v : null; }
-                                            },
-                                            gridLines: { drawOnChartArea: false }
-                                        }
-                                    ]
+                                        }]
+                                    }
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
+                }
+
+                updateExportLink(_hrm_currentYear);
+                loadChart(_hrm_currentYear);
             })();
         </script>
 

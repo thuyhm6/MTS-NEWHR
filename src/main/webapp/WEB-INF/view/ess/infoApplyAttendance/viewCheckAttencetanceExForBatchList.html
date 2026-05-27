@@ -93,115 +93,18 @@
     </div>
 </div>
 
-<div class="modal fade" id="ck_applyDetailModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ck_applyDetailTitle"
-                    th:text="'[' + #{ck.modal.title} + ']'">[Thông tin phê duyệt]</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive mb-3">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="table-light text-center" style="width: 160px;" th:text="#{ck.modal.applyTitle}">Tiêu đề</th>
-                                <td id="ck_modalApplyTitle"></td>
-                            </tr>
-                            <tr>
-                                <th class="table-light text-center" th:text="#{ck.modal.requester}">Người xin phép</th>
-                                <td id="ck_modalApplicant"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <thead class="table-light text-center">
-                            <tr>
-                                <th style="width: 50px;" th:text="#{ck.modal.stt}">STT</th>
-                                <th style="width: 90px;" th:text="#{ck.modal.approvalSeq}">Trình tự duyệt</th>
-                                <th style="width: 110px;" th:text="#{ck.modal.approvalStatus}">Trạng thái duyệt</th>
-                                <th th:text="#{ck.col.localName}">Họ tên</th>
-                                <th th:text="#{ck.modal.opinion}">Ý kiến</th>
-                                <th style="width: 170px;" th:text="#{ck.modal.actionTime}">Thời gian thực hiện</th>
-                                <th style="width: 120px;" th:text="#{ck.col.deptName}">Phòng ban</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ck_modalApprovalBody"></tbody>
-                    </table>
-                </div>
-
-                <h6 class="fw-bold mb-2" th:text="#{ck.modal.empInfoTitle}">Thông tin nhân viên</h6>
-                <div class="table-responsive mb-4">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="table-light text-center" style="width: 100px;" th:text="#{ck.modal.empName}">Họ tên</th>
-                                <td id="ck_modalEmpName"></td>
-                                <th class="table-light text-center" style="width: 100px;" th:text="#{ck.modal.empId}">Mã nhân viên</th>
-                                <td id="ck_modalEmpId"></td>
-                            </tr>
-                            <tr>
-                                <th class="table-light text-center" th:text="#{ck.modal.empDept}">Phòng ban</th>
-                                <td id="ck_modalEmpDept"></td>
-                                <th class="table-light text-center" th:text="#{ck.modal.empPost}">Chức vụ</th>
-                                <td id="ck_modalEmpPost"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h6 class="fw-bold mb-2" th:text="#{ck.modal.applyInfo}">Thông tin xin phép</h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm align-middle mb-0">
-                        <thead class="table-light text-center">
-                            <tr>
-                                <th th:text="#{ck.modal.leaveType}">Loại nghỉ phép</th>
-                                <th style="width: 170px;" th:text="#{ck.modal.leaveFrom}">Thời gian bắt đầu</th>
-                                <th style="width: 170px;" th:text="#{ck.modal.leaveTo}">Thời gian kết thúc</th>
-                                <th style="width: 140px;" th:text="#{ck.modal.duration}">Thời lượng</th>
-                                <th th:text="#{ck.modal.remark}">Lý do</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="ck_modalLeaveType" class="text-center"></td>
-                                <td id="ck_modalLeaveFrom" class="text-center"></td>
-                                <td id="ck_modalLeaveTo" class="text-center"></td>
-                                <td id="ck_modalLeaveLength" class="text-center"></td>
-                                <td id="ck_modalLeaveReason" class="text-center"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    th:text="#{ck.btn.close}">Đóng</button>
-            </div>
-        </div>
-    </div>
-</div>
+<th:block th:replace="~{ess/infoApply/viewAttendanceEx :: attendanceExModal}"></th:block>
 
 <template id="fragmentScripts">
+    <th:block th:replace="~{ess/infoApply/viewAttendanceEx :: attendanceExScript}"></th:block>
     <script th:inline="javascript">
         var _ck_table = null;
         var _ck_pageBooted = false;
         var _ck_selectedDeptCodes = [];
-        var _ck_detailModal = null;
 
         /* i18n */
         var _ck_i18n = {
-            allOption          : /*[[#{ck.js.allOption}]]*/ '-- Tất cả --',
-            loading            : /*[[#{ck.js.loading}]]*/ 'Đang tải dữ liệu...',
-            noApprovalData     : /*[[#{ck.js.noApprovalData}]]*/ 'Không có dữ liệu phê duyệt',
-            loadDetailFailed   : /*[[#{ck.js.loadDetailFailed}]]*/ 'Tải dữ liệu thất bại',
-            loadApprovalFailed : /*[[#{ck.js.loadApprovalFailed}]]*/ 'Không tải được thông tin phê duyệt',
-            noApplyNo          : /*[[#{ck.js.noApplyNo}]]*/ 'Không tìm thấy số đơn để xem chi tiết',
-            approvalInfoTitle  : /*[[#{ck.js.approvalInfoTitle}]]*/ 'Thông tin phê duyệt'
+            allOption : /*[[#{ck.js.allOption}]]*/ '-- Tất cả --'
         };
 
         function ckFormatDate(dateObj) {
@@ -307,7 +210,7 @@
                             if (!applyNo) {
                                 return name;
                             }
-                            return '<a href="javascript:void(0)" onclick="ckOpenApplyDetail(\'' + applyNo + '\', \'' + applyType + '\')">' + ckEscHtml(name) + '</a>';
+                            return '<a href="javascript:void(0)" onclick="atexOpenApplyDetail(\'' + applyNo + '\', \'' + applyType + '\')">' + ckEscHtml(name) + '</a>';
                         }
                     },
                     { data: 'deptName' },
@@ -334,9 +237,6 @@
                 return;
             }
             _ck_pageBooted = true;
-            if (window.bootstrap && document.getElementById('ck_applyDetailModal')) {
-                _ck_detailModal = new bootstrap.Modal(document.getElementById('ck_applyDetailModal'));
-            }
             ckInitDefaultDateRange();
             ckInitDeptSelector();
             $.when(ckLoadShiftOptions()).always(function () {
@@ -382,114 +282,6 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
         }
-
-        function ckSetText(selector, value) {
-            $(selector).text(value || '');
-        }
-
-        function ckBuildApplyTitle(info) {
-            var leaveTypeName = info.leaveTypeName || '';
-            var localName = info.localName || '';
-            var fromTime = info.leaveFromTime || '';
-            var toTime = info.leaveToTime || '';
-            if (!leaveTypeName && !localName && !fromTime && !toTime) {
-                return '';
-            }
-            return leaveTypeName + '/Apply(' + localName + ')[Date: ' + fromTime + ' ~ ' + toTime + ']';
-        }
-
-        function ckResetApplyDetailModal() {
-            ckSetText('#ck_modalApplyTitle', '');
-            ckSetText('#ck_modalApplicant', '');
-            ckSetText('#ck_modalEmpName', '');
-            ckSetText('#ck_modalEmpId', '');
-            ckSetText('#ck_modalEmpDept', '');
-            ckSetText('#ck_modalEmpPost', '');
-            ckSetText('#ck_modalLeaveType', '');
-            ckSetText('#ck_modalLeaveFrom', '');
-            ckSetText('#ck_modalLeaveTo', '');
-            ckSetText('#ck_modalLeaveLength', '');
-            ckSetText('#ck_modalLeaveReason', '');
-            $('#ck_modalApprovalBody').html('<tr><td colspan="7" class="text-center text-muted">' + _ck_i18n.loading + '</td></tr>');
-        }
-
-        function ckRenderApprovalRows(approvalList) {
-            if (!approvalList || !approvalList.length) {
-                $('#ck_modalApprovalBody').html('<tr><td colspan="7" class="text-center text-muted">' + _ck_i18n.noApprovalData + '</td></tr>');
-                return;
-            }
-
-            var html = '';
-            approvalList.forEach(function (item, index) {
-                var stt = item.affirmLevel || (index + 1);
-                if (String(stt) === '100') {
-                    stt = 'HR';
-                }
-                html += '<tr>'
-                    + '<td class="text-center">' + ckEscHtml(stt) + '</td>'
-                    + '<td class="text-center">' + ckEscHtml(item.affirmTypeName || '') + '</td>'
-                    + '<td class="text-center">' + ckEscHtml(item.affirmFlagName || '') + '</td>'
-                    + '<td>' + ckEscHtml(item.affirmName || '') + '</td>'
-                    + '<td>' + ckEscHtml(item.affirmContent || '') + '</td>'
-                    + '<td class="text-center">' + ckEscHtml(item.updateDate || '') + '</td>'
-                    + '<td class="text-center">' + ckEscHtml(item.deptName || '') + '</td>'
-                    + '</tr>';
-            });
-            $('#ck_modalApprovalBody').html(html);
-        }
-
-        function ckRenderApplyDetail(data) {
-            var leaveInfo = data && data.leaveInfo ? data.leaveInfo : {};
-            var employeeInfo = data && data.employeeInfo ? data.employeeInfo : leaveInfo;
-            var approvalList = data && data.approvalList ? data.approvalList : [];
-
-            $('#ck_applyDetailTitle').text('[' + (leaveInfo.leaveTypeName || _ck_i18n.approvalInfoTitle) + ']');
-            ckSetText('#ck_modalApplyTitle', ckBuildApplyTitle(leaveInfo));
-            ckSetText('#ck_modalApplicant', (employeeInfo.localName || '') + '/' + (employeeInfo.postGradeName || '') + '/' + (employeeInfo.deptName || ''));
-
-            ckSetText('#ck_modalEmpName', employeeInfo.localName || '');
-            ckSetText('#ck_modalEmpId', employeeInfo.empId || '');
-            ckSetText('#ck_modalEmpDept', employeeInfo.deptName || '');
-            ckSetText('#ck_modalEmpPost', employeeInfo.postGradeName || '');
-
-            ckSetText('#ck_modalLeaveType', leaveInfo.leaveTypeName || '');
-            ckSetText('#ck_modalLeaveFrom', leaveInfo.leaveFromTime || '');
-            ckSetText('#ck_modalLeaveTo', leaveInfo.leaveToTime || '');
-            ckSetText('#ck_modalLeaveLength', leaveInfo.applyLength || '');
-            ckSetText('#ck_modalLeaveReason', leaveInfo.leaveReason || '');
-
-            ckRenderApprovalRows(approvalList);
-        }
-
-        window.ckOpenApplyDetail = function (applyNo, applyType) {
-            if (!applyNo) {
-                toastr && toastr.warning(_ck_i18n.noApplyNo);
-                return;
-            }
-            if (!_ck_detailModal && window.bootstrap && document.getElementById('ck_applyDetailModal')) {
-                _ck_detailModal = new bootstrap.Modal(document.getElementById('ck_applyDetailModal'));
-            }
-            ckResetApplyDetailModal();
-            if (_ck_detailModal) {
-                _ck_detailModal.show();
-            }
-
-            $.ajax({
-                url: '/ess/infoApplyAttendance/api/checkAttendanceEx/detail',
-                type: 'GET',
-                data: {
-                    applyNo: applyNo,
-                    applyType: applyType || ''
-                },
-                success: function (res) {
-                    ckRenderApplyDetail(res || {});
-                },
-                error: function () {
-                    $('#ck_modalApprovalBody').html('<tr><td colspan="7" class="text-center text-danger">' + _ck_i18n.loadDetailFailed + '</td></tr>');
-                    toastr && toastr.error(_ck_i18n.loadApprovalFailed);
-                }
-            });
-        };
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', ckBootPage);

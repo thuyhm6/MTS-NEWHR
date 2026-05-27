@@ -15,6 +15,9 @@ public class EmployeeSearchResponse {
     @JsonProperty("deptNo")
     private String deptNo;
 
+    @JsonProperty("deptName")
+    private String deptName;
+
     @JsonProperty("position")
     private String position;
 
@@ -70,6 +73,14 @@ public class EmployeeSearchResponse {
 
     public void setDeptNo(String deptNo) {
         this.deptNo = deptNo;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
     }
 
     public String getPosition() {

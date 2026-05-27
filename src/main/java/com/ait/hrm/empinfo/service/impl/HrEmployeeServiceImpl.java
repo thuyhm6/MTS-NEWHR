@@ -191,11 +191,11 @@ public class HrEmployeeServiceImpl implements HrEmployeeService {
     }
 
     @Override
-    public List<EmpMonthlyStatsDto> getEmpMonthlyStats() {
+    public List<EmpMonthlyStatsDto> getEmpMonthlyStats(int year) {
         try {
-            return hrEmployeeMapper.selectEmpMonthlyStats();
+            return hrEmployeeMapper.selectEmpMonthlyStats(year);
         } catch (Exception e) {
-            log.error("Error getting emp monthly stats", e);
+            log.error("Error getting emp monthly stats year={}", year, e);
             return List.of();
         }
     }

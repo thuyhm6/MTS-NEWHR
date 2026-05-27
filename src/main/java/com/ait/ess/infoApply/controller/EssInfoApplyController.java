@@ -6,6 +6,8 @@ import com.ait.ess.infoApply.dto.EssPersonOtInfoDto;
 import com.ait.ess.infoApply.service.EssCwaAbnormalService;
 import com.ait.ess.infoApply.service.EssOtApplyService;
 import com.ait.ess.infoApply.service.EssPersonOtInfoService;
+import com.ait.sy.syAffirm.dto.SyAffirmEmailDto;
+import com.ait.sy.syAffirm.service.SyAffirmEmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,9 @@ public class EssInfoApplyController {
 
     @Autowired
     private EssPersonOtInfoService essPersonOtInfoService;
+
+    @Autowired
+    private SyAffirmEmailService syAffirmEmailService;
 
     @GetMapping("/viewSSTOtApplyInfo")
     public String viewSSTOtApplyInfo() {
@@ -107,6 +112,66 @@ public class EssInfoApplyController {
     @ResponseBody
     public ResponseEntity<List<EssPersonOtInfoDto>> getOtItemList() {
         return ResponseEntity.ok(essPersonOtInfoService.getOtItemList());
+    }
+
+    @GetMapping("/viewApprovalEmail")
+    public String viewApprovalEmail() {
+        return "ess/infoApply/viewApprovalEmail";
+    }
+
+    @GetMapping("/api/approvalEmail/list")
+    @ResponseBody
+    public ResponseEntity<List<SyAffirmEmailDto>> getApprovalEmailList(SyAffirmEmailDto dto) {
+        return ResponseEntity.ok(syAffirmEmailService.getApprovalEmailList(dto));
+    }
+
+    @GetMapping("/viewApprovaledEmail")
+    public String viewApprovaledEmail() {
+        return "ess/infoApply/viewApprovaledEmail";
+    }
+
+    @GetMapping("/api/approvaledEmail/list")
+    @ResponseBody
+    public ResponseEntity<List<SyAffirmEmailDto>> getApprovaledEmailList(SyAffirmEmailDto dto) {
+        return ResponseEntity.ok(syAffirmEmailService.getApprovaledEmailList(dto));
+    }
+
+    @PostMapping("/api/approvalEmail/execute")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> executeApproval(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> items = (List<Map<String, Object>>) request.get("items");
+            if (items == null || items.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Không có đơn nào được chọn.");
+                return ResponseEntity.ok(response);
+            }
+            String errors = syAffirmEmailService.executeAffirm(items);
+            if (errors.isEmpty()) {
+                response.put("success", true);
+            } else {
+                response.put("success", false);
+                response.put("message", errors.trim());
+            }
+        } catch (Exception e) {
+            log.error("Failed to execute approval", e);
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/viewNoticeedEmail")
+    public String viewNoticeedEmail() {
+        return "ess/infoApply/viewNoticeedEmail";
+    }
+
+    @GetMapping("/api/noticeedEmail/list")
+    @ResponseBody
+    public ResponseEntity<List<SyAffirmEmailDto>> getNoticeedEmailList(SyAffirmEmailDto dto) {
+        return ResponseEntity.ok(syAffirmEmailService.getNoticeedEmailList(dto));
     }
 
     @GetMapping("/viewShowCwaAbnormalApply")
