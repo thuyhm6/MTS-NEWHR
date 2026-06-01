@@ -185,6 +185,8 @@ public class ExcelController {
             return excelService.buildTemplate(loadShiftList(), loadCodeList("21"), templateName);
         } else if ("OvertimeApply_add_Template".equalsIgnoreCase(templateName)) {
             return excelService.buildTemplate(null, null, templateName);
+        } else if ("Card_Template".equalsIgnoreCase(templateName)) {
+            return excelService.buildCardRecordTemplate();
         } else {
             return excelService.buildTemplate(null, null, templateName);
         }

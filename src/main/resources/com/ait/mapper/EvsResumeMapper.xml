@@ -219,6 +219,9 @@
         WHERE CPNY_ID  = #{cpnyId, jdbcType=VARCHAR}
           AND EVS_TYPE = #{evsType, jdbcType=VARCHAR}
           AND ACTIVITY != '0'
+          <if test="evsLevel != null and evsLevel != ''">
+            AND PKG_EVS_PROCESS.GET_EVS_LIMIT(#{adminID, jdbcType=VARCHAR}, SEQ, #{evsLevel, jdbcType=VARCHAR}) != 0
+          </if>
         ORDER BY EVS_YEAR DESC, STANDARD_DATE DESC
     </select>
 

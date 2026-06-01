@@ -166,11 +166,21 @@ class LazyLoader {
         try {
             const response = await fetch(safeUrl.toString());
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
+
             const content = await response.text();
             element.innerHTML = content;
             element.removeAttribute('data-src');
-            
+
+            // Script tags bên trong innerHTML không tự thực thi — phải re-create để kích hoạt
+            element.querySelectorAll('script').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr =>
+                    newScript.setAttribute(attr.name, attr.value)
+                );
+                newScript.textContent = oldScript.textContent;
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+
         } catch (error) {
             throw new Error(`Failed to load content from ${url}: ${error.message}`);
         }
@@ -427,7 +437,7 @@ class LazyChart {
     loadChartJS() {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            script.src = '/assets/js/chart.js';
             script.onload = resolve;
             script.onerror = reject;
             document.head.appendChild(script);

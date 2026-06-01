@@ -75,13 +75,6 @@
                 <div class="card h-100 mb-0">
                     <div class="card-header py-2 d-flex align-items-center gap-2">
                         <h6 class="card-title flex-grow-1 mb-0" th:text="#{dashboard.chart.title}">Biểu đồ chấm công &amp; Tăng ca</h6>
-                        <span class="small text-muted" th:text="#{dashboard.chart.standardDate}">Ngày chuẩn:</span>
-                        <input type="text" id="db_standardDate"
-                               class="form-control form-control-sm js-daterangepicker"
-                               data-drp-format="DD/MM/YYYY"
-                               data-drp-trigger-change="true"
-                               autocomplete="off"
-                               style="width:120px;">
                     </div>
                     <div class="card-body p-2">
                         <div id="db_attendanceOtChart"></div>
@@ -90,128 +83,15 @@
             </div> <!-- end col -->
         </div> <!-- end row -->
 
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Conversions</h5>
-                        <div id="conversions" class="apex-charts mb-2 mt-n2"></div>
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <p class="text-muted mb-2">This Week</p>
-                                <h3 class="text-dark mb-3">23.5k</h3>
-                            </div> <!-- end col -->
-                            <div class="col-6">
-                                <p class="text-muted mb-2">Last Week</p>
-                                <h3 class="text-dark mb-3">41.05k</h3>
-                            </div> <!-- end col -->
-                        </div> <!-- end row -->
-                        <div class="text-center">
-                            <button type="button" class="btn btn-light shadow-none w-100">View Details</button>
-                        </div> <!-- end row -->
-                    </div>
-                </div>
-            </div> <!-- end left chart card -->
+        <!-- Banner image -->
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <img src="/assets/images/Cameras_BannerPC.png" alt="Banner"
+                     class="img-fluid rounded"
+                     style="max-width: 80%; box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);">
+            </div>
+        </div>
 
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Sessions by Country</h5>
-                        <div id="world-map-markers" style="height: 316px">
-                        </div>
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <p class="text-muted mb-2">This Week</p>
-                                <h3 class="text-dark mb-3">23.5k</h3>
-                            </div> <!-- end col -->
-                            <div class="col-6">
-                                <p class="text-muted mb-2">Last Week</p>
-                                <h3 class="text-dark mb-3">41.05k</h3>
-                            </div> <!-- end col -->
-                        </div> <!-- end row -->
-                    </div>
-                </div> <!-- end card-->
-            </div> <!-- end col -->
-
-            
-
-            <div class="col-xl-4 d-none">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title">Recent Transactions</h4>
-                        <div>
-                            <a href="#!" class="btn btn-sm btn-primary">
-                                <i class="bx bx-plus me-1"></i>Add
-                            </a>
-                        </div>
-                    </div> <!-- end card-header-->
-                    <div class="card-body p-0">
-                        <div class="px-3" data-simplebar style="max-height: 398px;">
-                            <table class="table table-hover mb-0 table-centered">
-                                <tbody>
-                                    <tr>
-                                        <td>24 April, 2024</td>
-                                        <td>$120.55</td>
-                                        <td><span class="badge bg-success">Cr</span></td>
-                                        <td>Commisions </td>
-                                    </tr>
-                                    <tr>
-                                        <td>24 April, 2024</td>
-                                        <td>$9.68</td>
-                                        <td><span class="badge bg-success">Cr</span></td>
-                                        <td>Affiliates </td>
-                                    </tr>
-                                    <tr>
-                                        <td>20 April, 2024</td>
-                                        <td>$105.22</td>
-                                        <td><span class="badge bg-danger">Dr</span></td>
-                                        <td>Grocery </td>
-                                    </tr>
-                                    <tr>
-                                        <td>18 April, 2024</td>
-                                        <td>$80.59</td>
-                                        <td><span class="badge bg-success">Cr</span></td>
-                                        <td>Refunds </td>
-                                    </tr>
-                                    <tr>
-                                        <td>18 April, 2024</td>
-                                        <td>$750.95</td>
-                                        <td><span class="badge bg-danger">Dr</span></td>
-                                        <td>Bill Payments </td>
-                                    </tr>
-                                    <tr>
-                                        <td>17 April, 2024</td>
-                                        <td>$455.62</td>
-                                        <td><span class="badge bg-danger">Dr</span></td>
-                                        <td>Electricity </td>
-                                    </tr>
-                                    <tr>
-                                        <td>17 April, 2024</td>
-                                        <td>$102.77</td>
-                                        <td><span class="badge bg-success">Cr</span></td>
-                                        <td>Interest </td>
-                                    </tr>
-                                    <tr>
-                                        <td>16 April, 2024</td>
-                                        <td>$79.49</td>
-                                        <td><span class="badge bg-success">Cr</span></td>
-                                        <td>Refunds </td>
-                                    </tr>
-                                    <tr>
-                                        <td>05 April, 2024</td>
-                                        <td>$980.00</td>
-                                        <td><span class="badge bg-danger">Dr</span></td>
-                                        <td>Shopping</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div> <!-- end card body -->
-                </div> <!-- end card-->
-            </div> <!-- end col-->
-        </div> <!-- end row -->
-
-        
         <!-- Modal bắt buộc đổi mật khẩu -->
         <div th:if="${session.requirePasswordChange}" class="modal fade" id="forceChangePasswordModal"
             data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
@@ -219,32 +99,31 @@
                 <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header bg-warning text-dark">
                         <h5 class="modal-title">
-                            <i class="bx bx-lock-alt me-2"></i>Yêu cầu đổi mật khẩu
+                            <i class="bx bx-lock-alt me-2"></i><span th:text="#{fcp.title}">Yêu cầu đổi mật khẩu</span>
                         </h5>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-warning mb-3">
                             <i class="bx bx-info-circle me-1"></i>
-                            Tài khoản của bạn đang sử dụng mật khẩu <strong>chưa được mã hóa</strong> từ hệ thống cũ.
-                            Vì lý do bảo mật, bạn <strong>bắt buộc phải đổi mật khẩu</strong> trước khi tiếp tục sử dụng hệ thống.
+                            <span th:utext="#{fcp.alert.message}">Tài khoản của bạn đang sử dụng mật khẩu <strong>chưa được mã hóa</strong> từ hệ thống cũ. Vì lý do bảo mật, bạn <strong>bắt buộc phải đổi mật khẩu</strong> trước khi tiếp tục sử dụng hệ thống.</span>
                         </div>
                         <div class="fcp_alertBox" style="display:none;"></div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Mật khẩu mới <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold"><span th:text="#{pwd.newPassword}">Mật khẩu mới</span> <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="password" class="form-control fcp_newPassword"
-                                    placeholder="Tối thiểu 8 ký tự" autocomplete="new-password">
+                                    th:placeholder="#{fcp.newPassword.placeholder}" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password">
                                 <button class="btn btn-outline-secondary" type="button" onclick="fcpToggle(this, 'fcp_newPassword')">
                                     <i class="bx bx-hide"></i>
                                 </button>
                             </div>
-                            <div class="form-text">Ít nhất 8 ký tự, gồm: chữ hoa, chữ thường, số và ký tự đặc biệt.</div>
+                            <div class="form-text" th:text="#{fcp.requirements}">Ít nhất 8 ký tự, gồm: chữ hoa, chữ thường, số và ký tự đặc biệt.</div>
                         </div>
-                        <div class="mb-3">`
-                            <label class="form-label fw-semibold">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold"><span th:text="#{pwd.confirmPassword}">Xác nhận mật khẩu mới</span> <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input type="password" class="form-control fcp_confirmPassword"
-                                    placeholder="Nhập lại mật khẩu mới" autocomplete="new-password">
+                                    th:placeholder="#{pwd.placeholder.confirmPassword}" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password">
                                 <button class="btn btn-outline-secondary" type="button" onclick="fcpToggle(this, 'fcp_confirmPassword')">
                                     <i class="bx bx-hide"></i>
                                 </button>
@@ -253,10 +132,10 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <a href="/logout" class="btn btn-outline-secondary">
-                            <i class="bx bx-log-out me-1"></i>Đăng xuất
+                            <i class="bx bx-log-out me-1"></i><span th:text="#{home.nav.logout}">Đăng xuất</span>
                         </a>
                         <button type="button" class="btn btn-primary" onclick="fcpSubmit(this)">
-                            <i class="bx bx-save me-1"></i>Đổi mật khẩu
+                            <i class="bx bx-save me-1"></i><span th:text="#{fcp.submit}">Đổi mật khẩu</span>
                         </button>
                     </div>
                 </div>
@@ -264,16 +143,29 @@
         </div>
 
         <!-- Inline Script: Thực thi ngay khi parse để tránh innerTab.js clone HTML -->
-        <script th:if="${session.requirePasswordChange}">
+        <script th:if="${session.requirePasswordChange}" th:inline="javascript">
+            var _fcp_i18n = {
+                emptyFields : /*[[#{fcp.js.emptyFields}]]*/ 'Vui lòng nhập đủ mật khẩu mới và xác nhận.',
+                minLength   : /*[[#{fcp.js.minLength}]]*/ 'Mật khẩu phải có ít nhất 8 ký tự.',
+                noUppercase : /*[[#{fcp.js.noUppercase}]]*/ 'Mật khẩu phải chứa ít nhất 1 chữ hoa (A-Z).',
+                noLowercase : /*[[#{fcp.js.noLowercase}]]*/ 'Mật khẩu phải chứa ít nhất 1 chữ thường (a-z).',
+                noDigit     : /*[[#{fcp.js.noDigit}]]*/ 'Mật khẩu phải chứa ít nhất 1 chữ số (0-9).',
+                noSpecial   : /*[[#{fcp.js.noSpecial}]]*/ 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt (!@#$%...).',
+                notMatch    : /*[[#{fcp.js.notMatch}]]*/ 'Mật khẩu xác nhận không khớp. Vui lòng nhập lại.',
+                processing  : /*[[#{common.processing}]]*/ 'Đang thực hiện...',
+                submit      : /*[[#{fcp.submit}]]*/ 'Đổi mật khẩu',
+                success     : /*[[#{fcp.js.success}]]*/ 'Đổi mật khẩu thành công! Trang sẽ tự động tải lại...',
+                error       : /*[[#{fcp.js.error}]]*/ 'Có lỗi xảy ra.',
+                systemError : /*[[#{common.systemError}]]*/ 'Lỗi hệ thống.'
+            };
+
             (function() {
-                // Đưa modal lên body ngay lập tức (đồng bộ)
                 var modal = document.getElementById('forceChangePasswordModal');
                 if (modal) {
                     document.body.appendChild(modal);
                 }
             })();
 
-            // Khởi tạo và show modal sau khi tải xong trang
             document.addEventListener('DOMContentLoaded', function () {
                 var modalEl = document.getElementById('forceChangePasswordModal');
                 if (modalEl) {
@@ -282,7 +174,6 @@
                 }
             });
 
-            // Hàm toggle ẩn/hiện mật khẩu (dùng relative DOM tree để tránh lỗi trùng ID)
             window.fcpToggle = function(btn, targetClass) {
                 var container = btn.closest('.input-group');
                 var input = container.querySelector('.' + targetClass);
@@ -296,7 +187,6 @@
                 }
             };
 
-            // Hàm submit (dùng relative DOM tree)
             window.fcpSubmit = function(btn) {
                 var modalContent = btn.closest('.modal-content');
                 var newPwdInput = modalContent.querySelector('.fcp_newPassword');
@@ -311,37 +201,16 @@
                     alertBox.style.display = 'block';
                 }
 
-                if (!newPwd || !confirmPwd) {
-                    showAlert('Vui lòng nhập đủ mật khẩu mới và xác nhận.', 'danger');
-                    return;
-                }
-                if (newPwd.length < 8) {
-                    showAlert('Mật khẩu phải có ít nhất 8 ký tự.', 'danger');
-                    return;
-                }
-                if (!/[A-Z]/.test(newPwd)) {
-                    showAlert('Mật khẩu phải chứa ít nhất 1 chữ hoa (A-Z).', 'danger');
-                    return;
-                }
-                if (!/[a-z]/.test(newPwd)) {
-                    showAlert('Mật khẩu phải chứa ít nhất 1 chữ thường (a-z).', 'danger');
-                    return;
-                }
-                if (!/[0-9]/.test(newPwd)) {
-                    showAlert('Mật khẩu phải chứa ít nhất 1 chữ số (0-9).', 'danger');
-                    return;
-                }
-                if (!/[^A-Za-z0-9]/.test(newPwd)) {
-                    showAlert('Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt (!@#$%...).', 'danger');
-                    return;
-                }
-                if (newPwd !== confirmPwd) {
-                    showAlert('Mật khẩu xác nhận không khớp. Vui lòng nhập lại.', 'danger');
-                    return;
-                }
+                if (!newPwd || !confirmPwd) { showAlert(_fcp_i18n.emptyFields, 'danger'); return; }
+                if (newPwd.length < 8)      { showAlert(_fcp_i18n.minLength,   'danger'); return; }
+                if (!/[A-Z]/.test(newPwd))  { showAlert(_fcp_i18n.noUppercase, 'danger'); return; }
+                if (!/[a-z]/.test(newPwd))  { showAlert(_fcp_i18n.noLowercase, 'danger'); return; }
+                if (!/[0-9]/.test(newPwd))  { showAlert(_fcp_i18n.noDigit,     'danger'); return; }
+                if (!/[^A-Za-z0-9]/.test(newPwd)) { showAlert(_fcp_i18n.noSpecial, 'danger'); return; }
+                if (newPwd !== confirmPwd)   { showAlert(_fcp_i18n.notMatch,    'danger'); return; }
 
                 btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Đang xử lý...';
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + _fcp_i18n.processing;
 
                 $.ajax({
                     url: '/api/change-first-password',
@@ -349,20 +218,20 @@
                     data: { newPassword: newPwd, confirmPassword: confirmPwd },
                     success: function (data) {
                         if (data.success) {
-                            showAlert('Đổi mật khẩu thành công! Trang sẽ tự động tải lại...', 'success');
+                            showAlert(_fcp_i18n.success, 'success');
                             setTimeout(function () { window.location.reload(); }, 1500);
                         } else {
-                            showAlert(data.message || 'Có lỗi xảy ra.', 'danger');
+                            showAlert(data.message || _fcp_i18n.error, 'danger');
                             btn.disabled = false;
-                            btn.innerHTML = '<i class="bx bx-save me-1"></i>Đổi mật khẩu';
+                            btn.innerHTML = '<i class="bx bx-save me-1"></i>' + _fcp_i18n.submit;
                         }
                     },
                     error: function (xhr) {
-                        var msg = 'Lỗi hệ thống.';
+                        var msg = _fcp_i18n.systemError;
                         try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) {}
                         showAlert(msg, 'danger');
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="bx bx-save me-1"></i>Đổi mật khẩu';
+                        btn.innerHTML = '<i class="bx bx-save me-1"></i>' + _fcp_i18n.submit;
                     }
                 });
             };
@@ -371,14 +240,16 @@
     <script th:inline="javascript">
         (function() {
             var _db_i18n = {
-                registered : /*[[#{dashboard.status.registered}]]*/ 'Đã đăng ký',
-                stable     : /*[[#{dashboard.status.stable}]]*/ 'Ổn định',
-                attention  : /*[[#{dashboard.status.needAction}]]*/ 'Cần xử lý',
-                chartTitle : /*[[#{dashboard.chart.title}]]*/ 'Biểu đồ chấm công & Tăng ca',
-                attendance : /*[[#{dashboard.chart.attendance}]]*/ 'Chấm công (giờ)',
-                ot         : /*[[#{dashboard.chart.ot}]]*/ 'Tăng ca (giờ)',
-                noData     : /*[[#{dashboard.chart.noData}]]*/ 'Không có dữ liệu',
-                hours      : /*[[#{dashboard.chart.hours}]]*/ 'giờ'
+                registered      : /*[[#{dashboard.status.registered}]]*/ 'Đã đăng ký',
+                stable          : /*[[#{dashboard.status.stable}]]*/ 'Ổn định',
+                attention       : /*[[#{dashboard.status.needAction}]]*/ 'Cần xử lý',
+                chartTitle      : /*[[#{dashboard.chart.title}]]*/ 'Biểu đồ chấm công & Tăng ca',
+                attendance      : /*[[#{dashboard.chart.attendance}]]*/ 'Chấm công (giờ)',
+                attendanceTrend : /*[[#{dashboard.chart.attendanceTrend}]]*/ 'Xu hướng chấm công',
+                ot              : /*[[#{dashboard.chart.ot}]]*/ 'Tăng ca (giờ)',
+                otTrend         : /*[[#{dashboard.chart.otTrend}]]*/ 'Xu hướng tăng ca',
+                noData          : /*[[#{dashboard.chart.noData}]]*/ 'Không có dữ liệu',
+                hours           : /*[[#{dashboard.chart.hours}]]*/ 'giờ'
             };
 
             var now = new Date();
@@ -392,9 +263,6 @@
             var fromMon    = (mon === 1) ? 12 : mon - 1;
             var fromMM     = String(fromMon).padStart(2, '0');
             var initFromDMY = '25/' + fromMM + '/' + fromYear;
-
-            // Biểu đồ: ngày chuẩn mặc định = hôm nay
-            var initStdDMY = String(now.getDate()).padStart(2,'0') + '/' + toMM + '/' + year;
 
             // ── Helpers ────────────────────────────────────────────────
             function dbDmyToYmd(dmy) {
@@ -455,18 +323,6 @@
 
             // ── Biểu đồ chấm công & tăng ca ───────────────────────────
             var _dbChart = null;
-
-            function dbcCalcRange(refDMY) {
-                var ref  = dbcDmyToDate(refDMY);
-                var y    = ref.getFullYear();
-                var m    = ref.getMonth(); // 0-based
-                var fy   = m === 0 ? y - 1 : y;
-                var fm   = m === 0 ? 11    : m - 1;
-                return {
-                    from: dbcDateToDmy(new Date(fy, fm, 25)),
-                    to  : dbcDateToDmy(new Date(y,  m,  24))
-                };
-            }
 
             function dbcBuildLabels(fromDMY, toDMY) {
                 var from   = dbcDmyToDate(fromDMY);
@@ -533,26 +389,40 @@
                 });
 
                 var options = {
+                    // 4 series: cột + đường cho từng chỉ số
                     series: [
-                        { name: _db_i18n.attendance, data: attData },
-                        { name: _db_i18n.ot,         data: otData  }
+                        { name: _db_i18n.attendance,     data: attData, type: 'bar'  },
+                        { name: _db_i18n.attendanceTrend, data: attData, type: 'line' },
+                        { name: _db_i18n.ot,             data: otData,  type: 'bar'  },
+                        { name: _db_i18n.otTrend,        data: otData,  type: 'line' }
                     ],
                     chart: {
-                        type   : 'bar',
+                        type   : 'line',
                         height : 255,
                         toolbar: { show: false },
                         animations: { enabled: false }
                     },
                     plotOptions: {
-                        bar: { horizontal: false, columnWidth: '65%', borderRadius: 2 }
+                        bar: { horizontal: false, columnWidth: '55%', borderRadius: 2 }
+                    },
+                    // bar: stroke.width = 0; line: stroke.width = 2
+                    stroke: {
+                        width : [0, 2, 0, 2],
+                        curve : 'smooth'
+                    },
+                    fill: {
+                        opacity: [0.65, 1, 0.65, 1]
+                    },
+                    markers: {
+                        size: [0, 3, 0, 3]
                     },
                     dataLabels: { enabled: false },
                     xaxis: {
                         categories: displayLabels,
                         labels: {
-                            rotate    : -45,
+                            rotate      : -45,
                             rotateAlways: true,
-                            style     : { fontSize: '10px' }
+                            style       : { fontSize: '10px' }
                         },
                         tickPlacement: 'on'
                     },
@@ -562,7 +432,8 @@
                         tickAmount : 4,
                         labels     : { formatter: function(v) { return v % 1 === 0 ? v : v.toFixed(1); } }
                     },
-                    colors : ['#4e73df', '#f6a623'],
+                    // bar và line cùng màu theo từng chỉ số (blue = chấm công, orange = tăng ca)
+                    colors : ['#4e73df', '#1a3fa0', '#f6a623', '#b87200'],
                     legend : { position: 'top', horizontalAlign: 'right', fontSize: '12px' },
                     tooltip: {
                         custom: function(opts) {
@@ -599,10 +470,10 @@
                         }
                     },
                     noData : {
-                        text           : _db_i18n.noData,
-                        align          : 'center',
-                        verticalAlign  : 'middle',
-                        style          : { fontSize: '13px', color: '#aaa' }
+                        text          : _db_i18n.noData,
+                        align         : 'center',
+                        verticalAlign : 'middle',
+                        style         : { fontSize: '13px', color: '#aaa' }
                     },
                     grid: { borderColor: '#f1f1f1' }
                 };
@@ -616,10 +487,10 @@
             }
 
             function dbcLoadChart() {
-                var refDMY = $('#db_standardDate').val();
-                if (!refDMY) return;
-                var range  = dbcCalcRange(refDMY);
-                var labels = dbcBuildLabels(range.from, range.to);
+                var fromDMY = $('#db_fromDate').val();
+                var toDMY   = $('#db_toDate').val();
+                if (!fromDMY || !toDMY) return;
+                var labels = dbcBuildLabels(fromDMY, toDMY);
 
                 var attRows = null, otRows = null;
 
@@ -630,13 +501,13 @@
 
                 $.ajax({
                     url : '/ess/infoApplyAttendance/api/attendancePersonal/list', type: 'GET',
-                    data: { startDate: range.from, endDate: range.to },
+                    data: { startDate: fromDMY, endDate: toDMY },
                     success: function(r) { attRows = r || []; tryRender(); },
                     error  : function()  { attRows = [];      tryRender(); }
                 });
                 $.ajax({
                     url : '/ess/infoApply/api/personOt/list', type: 'GET',
-                    data: { startDate: range.from, endDate: range.to },
+                    data: { startDate: fromDMY, endDate: toDMY },
                     success: function(r) { otRows = r || []; tryRender(); },
                     error  : function()  { otRows = [];      tryRender(); }
                 });
@@ -646,17 +517,20 @@
             $(document).ready(function() {
                 $('#db_fromDate').val(initFromDMY);
                 $('#db_toDate').val(initToDMY);
-                $('#db_standardDate').val(initStdDMY);
                 initDateRangePickers();
-                $('#db_fromDate, #db_toDate').on('change', dbLoadStats);
-                $('#db_standardDate').on('change', dbcLoadChart);
+                $('#db_fromDate, #db_toDate').on('change', function() {
+                    dbLoadStats();
+                    dbcLoadChart();
+                });
+
                 dbLoadStats();
                 dbcLoadChart();
             });
         })();
     </script>
-        <script>
+        <script th:inline="javascript">
             function changeLanguage(language) {
+                var _langError = /*[[#{fcp.js.langError}]]*/ 'C\u00f3 l\u1ed7i x\u1ea3y ra khi thay \u0111\u1ed5i ng\u00f4n ng\u1eef';
                 fetch('/api/multilingual/set-language', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -667,7 +541,7 @@
                     window.location.href = url.toString();
                 }).catch(function (error) {
                     console.error('Error changing language:', error);
-                    alert('C\u00f3 l\u1ed7i x\u1ea3y ra khi thay \u0111\u1ed5i ng\u00f4n ng\u1eef');
+                    alert(_langError);
                 });
             }
         </script>

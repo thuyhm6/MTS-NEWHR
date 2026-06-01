@@ -40,14 +40,20 @@
                             <button type="button" class="btn btn-success" onclick="acrExportExcel()">
                                 <i class="bx bx-export"></i> <span th:text="#{common.exportExcel}">Xuất Excel</span>
                             </button>
-                            <button type="button" class="btn btn-info text-white" onclick="acrOpenAddModal()">
+                            <button type="button" class="btn btn-info text-white" th:if="${sysMode == 'hrm'}" onclick="acrOpenAddModal()">
                                 <i class="bx bx-plus"></i> <span th:text="#{acr.btn.addRecord}">Thêm bản ghi</span>
                             </button>
-                            <button type="button" class="btn btn-danger" onclick="acrDeleteSelected()">
+                            <button type="button" class="btn btn-danger" th:if="${sysMode == 'hrm'}" onclick="acrDeleteSelected()">
                                 <i class="bx bx-trash"></i> <span th:text="#{acr.btn.deleteSelected}">Xóa đã chọn</span>
                             </button>
-                            <button type="button" class="btn btn-warning text-dark" onclick="acrOpenImportModal()">
+                            <button type="button" class="btn btn-warning text-dark" th:if="${sysMode == 'hrm'}" onclick="acrOpenImportModal()">
                                 <i class="bx bx-card"></i> <span th:text="#{acr.btn.importFromDevice}">Đọc dữ liệu quẹt thẻ</span>
+                            </button>
+                            <button type="button" class="btn btn-info text-white" th:if="${sysMode == 'hrm'}" onclick="acrDownloadTemplate()">
+                                <i class="bx bx-download"></i> <span th:text="#{common.downloadTemplate}">Tải File Mẫu</span>
+                            </button>
+                            <button type="button" class="btn btn-warning" th:if="${sysMode == 'hrm'}" onclick="acrImportTemplate()">
+                                <i class="bx bx-upload"></i> <span th:text="#{common.importExcel}">Import Excel</span>
                             </button>
                         </div>
                     </form>
@@ -160,8 +166,8 @@
                             <label for="acr_f_doorType" class="form-label" th:text="#{acr.col.doorType}">Loại</label>
                             <select class="form-select" id="acr_f_doorType">
                                 <option value="">-- Chọn --</option>
-                                <option value="0" th:text="#{acr.doorType.in}">Vào</option>
-                                <option value="1" th:text="#{acr.doorType.out}">Ra</option>
+                                <option value="IN" th:text="#{acr.doorType.in}">Vào</option>
+                                <option value="OUT" th:text="#{acr.doorType.out}">Ra</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -181,6 +187,7 @@
 
 <template id="fragmentScripts">
     <script th:inline="javascript">
+        var sysMode = /*[[${sysMode}]]*/ 'hrm';
         var _acr_table = null;
         var _acr_pageBooted = false;
         var _acr_selectedDeptCodes = [];
@@ -244,6 +251,9 @@
                 dom: 'Blfrtip',
                 buttons: [
                     { extend: 'excel', title: 'lich_su_ra_vao' }
+                ],
+                columnDefs: [
+                    { visible: sysMode === 'hrm', targets: [1, 11] }
                 ],
                 ajax: {
                     url: '/ar/attendanceMintenance/api/cardRecord/list',
@@ -309,6 +319,27 @@
             });
         }
 
+        // Tải file Excel mẫu
+        window.acrDownloadTemplate = function () {
+            if (sysMode !== 'hrm') return;
+            window.location.href = '/sy/excel/api/downloadTemplate?templateName=Card_Template';
+        };
+
+        // Mở modal import Excel (dùng shared component ExcelImport)
+        window.acrImportTemplate = function () {
+            if (sysMode !== 'hrm') return;
+            ExcelImport.open('/ar/attendanceMintenance/api/macRecordTemp/uploadExcel', function (res) {
+                if (_acr_table) {
+                    _acr_table.ajax.reload(null, false);
+                }
+                if (typeof tabSystem !== 'undefined' && tabSystem && typeof tabSystem.openTab === 'function') {
+                    tabSystem.openTab('/ar/attendanceMintenance/viewImportExcelTempMacRecordsList', 'Kết quả nhập');
+                } else {
+                    window.open('/ar/attendanceMintenance/viewImportExcelTempMacRecordsList', '_blank');
+                }
+            });
+        };
+
         function acrBootPage() {
             if (_acr_pageBooted) return;
             if (!document.getElementById('acr_dataTable')) {
@@ -359,6 +390,7 @@
         };
 
         function acrOpenAddModal() {
+            if (sysMode !== 'hrm') return;
             _acr_isEdit = false;
             $('#acr_modalTitle').text(/*[[#{acr.modal.addTitle}]]*/ 'Thêm bản ghi quẹt thẻ');
             $('#acr_f_recordNo').val('');
@@ -374,6 +406,7 @@
         }
 
         function acrOpenEditModal(recordNo) {
+            if (sysMode !== 'hrm') return;
             $.ajax({
                 url: '/ar/attendanceMintenance/api/cardRecord/detail',
                 type: 'GET',
@@ -404,6 +437,7 @@
         }
 
         function acrSaveRecord() {
+            if (sysMode !== 'hrm') return;
             var personId      = $('#acr_f_personId').val().trim();
             var arDateStr     = $('#acr_f_arDateStr').val().trim();
             var swipeDateTime = $('#acr_f_swipeDateTime').val().trim();
@@ -455,6 +489,7 @@
         }
 
         function acrDeleteOne(recordNo) {
+            if (sysMode !== 'hrm') return;
             if (!confirm(/*[[#{acr.confirm.deleteRecord}]]*/ 'Bạn có chắc muốn xóa bản ghi này không?')) return;
             $.ajax({
                 url: '/ar/attendanceMintenance/api/cardRecord/delete',
@@ -475,6 +510,7 @@
         }
 
         function acrDeleteSelected() {
+            if (sysMode !== 'hrm') return;
             var checked = $('.acr-row-chk:checked');
             if (checked.length === 0) {
                 alert(/*[[#{acr.msg.selectToDelete}]]*/ 'Vui lòng chọn ít nhất một bản ghi để xóa');
@@ -522,6 +558,7 @@
         };
 
         function acrOpenImportModal() {
+            if (sysMode !== 'hrm') return;
             var fromDate = $('#acr_fromDate').val();
             var toDate   = $('#acr_toDate').val();
             $('#acr_imp_fromDate').val(fromDate);

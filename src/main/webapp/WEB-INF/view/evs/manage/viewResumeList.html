@@ -283,7 +283,7 @@
                 $.ajax({
                     url: '/evs/manage/api/resume/evsResumeList',
                     type: 'GET',
-                    data: { evsType: inst.evsType },
+                    data: { evsType: inst.evsType},
                     success: function (rows) {
                         var html = '<option value="">' + vrlEscHtml(_vrl_i18n.noCopy) + '</option>';
                         (rows || []).forEach(function (r) {

@@ -503,4 +503,29 @@ public class ExcelServiceImpl implements ExcelService {
                 || normalized.contains("loi")
                 || normalized.contains("ora-");
     }
+
+    @Override
+    public Workbook buildCardRecordTemplate() {
+        XSSFWorkbook wb = new XSSFWorkbook();
+        XSSFSheet sheet = wb.createSheet("Template");
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {
+            "Mã nhân viên", "Họ tên", "Ngày công (YYYY/MM/DD)",
+            "Ngày quẹt thẻ (YYYY/MM/DD)", "Giờ (HH:MM)", "Loại (IN/OUT)", "Ghi chú"
+        };
+        for (int i = 0; i < headers.length; i++) {
+            headerRow.createCell(i).setCellValue(headers[i]);
+            sheet.setColumnWidth(i, 6000);
+        }
+        // Dòng ví dụ
+        Row exampleRow = sheet.createRow(1);
+        exampleRow.createCell(0).setCellValue("43000001");
+        exampleRow.createCell(1).setCellValue("Nguyễn Văn A");
+        exampleRow.createCell(2).setCellValue("2026/01/01");
+        exampleRow.createCell(3).setCellValue("2026/01/01");
+        exampleRow.createCell(4).setCellValue("08:00");
+        exampleRow.createCell(5).setCellValue("OUT");
+        exampleRow.createCell(6).setCellValue("Ghi chú");
+        return wb;
+    }
 }

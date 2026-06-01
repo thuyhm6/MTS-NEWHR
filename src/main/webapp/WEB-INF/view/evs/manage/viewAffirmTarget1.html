@@ -210,6 +210,14 @@
 
         </div><!-- /#vat1_pageWrapper -->
 
+        <!-- Thông báo không có quyền đánh giá -->
+        <div id="vat1_emptyNotice" class="col-12" style="display:none; min-height:300px; align-items:center; justify-content:center;">
+            <div class="text-center text-muted p-4">
+                <i class="bi bi-exclamation-circle fs-1 d-block mb-3 text-secondary"></i>
+                <p class="alert alert-warning fs-4 fw-bold" role="alert" th:text="#{evs.viewConfirmTarget1.msg.notInEvalPeriod}">Không trong khoảng thời gian đánh giá hoặc bạn không phải là người đánh giá, xin liên hệ Phòng nhân sự!</p>
+            </div>
+        </div>
+
     </div><!-- /.row -->
 
     <!-- Modal chi tiết đánh giá lần 1 -->
@@ -433,10 +441,17 @@
                 $.ajax({
                     url: '/evs/manage/api/resume/evsResumeList',
                     type: 'GET',
-                    data: { evsType: inst.evsType },
+                    data: { evsType: inst.evsType, evsLevel: '14015070' }, //Đánh giá lần 1
                     success: function (rows) {
+                        if (!rows || rows.length === 0) {
+                            vat1$('#vat1_pageWrapper').hide();
+                            vat1$('#vat1_emptyNotice').css('display', 'flex');
+                            return;
+                        }
+                        vat1$('#vat1_emptyNotice').hide();
+                        vat1$('#vat1_pageWrapper').show();
                         var html = '<option value=""></option>';
-                        (rows || []).forEach(function (r) {
+                        rows.forEach(function (r) {
                             html += '<option value="' + vat1Esc(r.seq) + '">' + vat1Esc(r.resumeName) + '</option>';
                         });
                         vat1$('#vat1_resumeSeq').html(html);

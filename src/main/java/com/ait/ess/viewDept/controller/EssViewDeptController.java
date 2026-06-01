@@ -4,6 +4,7 @@ import com.ait.ess.viewDept.dto.ArPersonalListDetailDto;
 import com.ait.ess.viewDept.dto.ArPersonalListDto;
 import com.ait.ess.viewDept.dto.ArPersonalSelfDetailDto;
 import com.ait.ess.viewDept.dto.ArPersonalSelfDto;
+import com.ait.ess.viewDept.dto.EssEntryInfoListDto;
 import com.ait.ess.viewDept.dto.ManageEvsResultEmpDto;
 import com.ait.ess.viewDept.dto.ManageEmpPositionInfoDto;
 import com.ait.ess.viewDept.dto.ManageEmpPositionInsideDto;
@@ -13,10 +14,12 @@ import com.ait.ess.viewDept.dto.YearUseLeaveUsageDto;
 import com.ait.ess.viewDept.dto.YearUseVacationDto;
 import com.ait.ess.viewDept.service.ArPersonalListService;
 import com.ait.ess.viewDept.service.ArPersonalSelfService;
+import com.ait.ess.viewDept.service.EssEntryInfoListService;
 import com.ait.ess.viewDept.service.ManageEvsResultEmpService;
 import com.ait.ess.viewDept.service.ManageEmpPositionInfoService;
 import com.ait.ess.viewDept.service.OtApplyPersonalSelfService;
 import com.ait.ess.viewDept.service.YearUseInfoService;
+import com.ait.sy.sys.dto.DataTablesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -49,6 +52,9 @@ public class EssViewDeptController {
 
     @Autowired
     private ArPersonalListService arPersonalListService;
+
+    @Autowired
+    private EssEntryInfoListService essEntryInfoListService;
 
     @GetMapping("/viewEmpCalendar")
     public String viewEmpCalendar() {
@@ -249,6 +255,17 @@ public class EssViewDeptController {
         params.setStartDate(startDate);
         params.setEndDate(endDate);
         return ResponseEntity.ok(arPersonalListService.getDetailList(params));
+    }
+
+    @GetMapping("/viewEntryInfoList")
+    public String viewEntryInfoList() {
+        return "ess/viewDept/viewEntryInfoList";
+    }
+
+    @GetMapping("/api/entryInfoList/list")
+    @ResponseBody
+    public DataTablesResponse<EssEntryInfoListDto> getEntryInfoList(EssEntryInfoListDto dto) {
+        return essEntryInfoListService.getPageList(dto);
     }
 
     @GetMapping("/api/arPersonalList/summary")

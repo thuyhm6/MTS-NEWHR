@@ -189,6 +189,7 @@ public class HomeController {
         model.addAttribute("message", "Chào mừng " + currentHrUser.getEmployeeName() + " đến với hệ thống HR!");
         model.addAttribute("expiringContractsCount", expiringContractsCount);
         model.addAttribute("sysMode", "hrm");
+        session.setAttribute("sysMode", "hrm");
 
         return "login/hrm";
     }
@@ -212,6 +213,7 @@ public class HomeController {
         model.addAttribute("message", "Chào mừng " + currentHrUser.getEmployeeName() + " đến với hệ thống HR!");
         model.addAttribute("expiringContractsCount", expiringContractsCount);
         model.addAttribute("sysMode", "ess");
+        session.setAttribute("sysMode", "ess");
 
         return "login/dashboard";
     }

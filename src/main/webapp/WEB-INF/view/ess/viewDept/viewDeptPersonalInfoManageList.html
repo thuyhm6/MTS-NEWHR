@@ -421,6 +421,9 @@
             var managerName = row.managerEmpName || row.managerName || '';
             var costRef = row.personSupplierCompany || row.deptName || '';
             var workDuration = vdpCalcWorkingDuration(row.dateStarted);
+            var photoHtml = row.photoPath
+                ? '<img src="' + vdpEscHtml(row.photoPath) + '" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentNode.innerHTML=\'' + vdpEscHtml(initials).replace(/'/g, "\\'") + '\'">'
+                : vdpEscHtml(initials);
 
             return ''
                 + '<div class="vdp-card">'
@@ -428,7 +431,7 @@
                 + '        <tbody>'
                 + '            <tr>'
                 + '                <td class="vdp-photo-cell" rowspan="5">'
-                + '                    <div class="vdp-photo-box">' + vdpEscHtml(initials) + '</div>'
+                + '                    <div class="vdp-photo-box">' + photoHtml + '</div>'
                 + '                </td>'
                 + '                <th class="vdp-card-label">' + vdpEscHtml(_vdp_i18n.empName) + '</th>'
                 + '                <td class="vdp-card-value"><a href="javascript:void(0)" class="vdp-name-link">' + vdpEscHtml(row.localName || '') + '</a></td>'
@@ -562,6 +565,7 @@
                 pageLength: 50,
                 processing: true,
                 autoWidth: false,
+                order: [],
                 dom: "<'vdp-datatable-wrap'Blfrtip>",
                 buttons: [
                     {

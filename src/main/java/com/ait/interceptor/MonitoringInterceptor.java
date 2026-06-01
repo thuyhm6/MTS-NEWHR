@@ -92,6 +92,14 @@ public class MonitoringInterceptor implements HandlerInterceptor {
             if (statusCode >= 400) {
                 metricsService.incrementCounter("http.requests.errors", tags);
 
+                // Bỏ qua 404 cho file tĩnh (ảnh, js, css, resources...)
+                boolean isStaticResource = endpoint.startsWith("/resources/")
+                        || endpoint.startsWith("/assets/")
+                        || endpoint.contains(".");
+                if (statusCode == 404 && isStaticResource) {
+                    return;
+                }
+
                 // Log error
                 String eventType = statusCode >= 500 ? "API_ERROR" : "SYSTEM_EVENT";
 

@@ -74,6 +74,14 @@
 
         </div><!-- /#vct2_pageWrapper -->
 
+        <!-- Thông báo không có quyền đánh giá -->
+        <div id="vct2_emptyNotice" class="col-12" style="display:none; min-height:300px; align-items:center; justify-content:center;">
+            <div class="text-center text-muted p-4">
+                <i class="bi bi-exclamation-circle fs-1 d-block mb-3 text-secondary"></i>
+                <p class="alert alert-warning fs-4 fw-bold" role="alert" th:text="#{evs.viewConfirmTarget1.msg.notInEvalPeriod}">Không trong khoảng thời gian đánh giá hoặc bạn không phải là người đánh giá, xin liên hệ Phòng nhân sự!</p>
+            </div>
+        </div>
+
         <!-- Modal chi tiết xác nhận mục tiêu lần 2 -->
         <div class="modal fade" id="vct2_detailModal" tabindex="-1" aria-labelledby="vct2_detailModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -280,10 +288,17 @@
                 $.ajax({
                     url: '/evs/manage/api/resume/evsResumeList',
                     type: 'GET',
-                    data: { evsType: inst.evsType },
+                    data: { evsType: inst.evsType, evsLevel: '14015085' },
                     success: function (rows) {
+                        if (!rows || rows.length === 0) {
+                            $('#vct2_pageWrapper').hide();
+                            $('#vct2_emptyNotice').css('display', 'flex');
+                            return;
+                        }
+                        $('#vct2_emptyNotice').hide();
+                        $('#vct2_pageWrapper').show();
                         var html = '<option value=""></option>';
-                        (rows || []).forEach(function (r) {
+                        rows.forEach(function (r) {
                             html += '<option value="' + vct2Esc(r.seq) + '">' + vct2Esc(r.resumeName) + '</option>';
                         });
                         vct2$('#vct2_resumeSeq').html(html);

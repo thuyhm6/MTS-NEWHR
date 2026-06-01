@@ -1,5 +1,6 @@
 build dụ án để đưa vào JEUS 8
 deploy-jeus.bat
+mã màu: #f4731f
 
 destroy: true,
 columnDefs: [
@@ -2120,3 +2121,200 @@ thông qua cấu lệnh sql: sql =   " select P.EmployeeNo, p.FirstName,cr.Reade
 							+ " ON E.ControllerId = cr.LoopID and E.BoardNo = CR.DeviceID and E.IoIndex = CR.ReaderID "
 							+ " where DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) >= '"+ acr_fromDate +"' "
 							+ " and DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) <= '"+ acr_toDate +"' "; để lấy dữ liệu. với EmployeeNo là EMPID và CARD_NO, LocalDateTime là R_TIME, trong giá trị của ReaderName nếu có chứa "IN" thì ghi DOOR_TYPE là "IN", nếu có chứa "OUT" thì ghi DOOR_TYPE là "OUT", còn lại sẽ ghi DOOR_TYPE là "  ". sau khi lấy dữ liệu xong thì sẽ lưu vào bảng AR_MAC_RECORDS_HTSV với INSERT_BY = 'M'. khi lưu vào bảng AR_MAC_RECORDS_HTSV thì cần check trùng dữ liệu, nếu đã tồn tại dữ liệu có cùng EMPID, CARD_NO, R_TIME và DOOR_TYPE thì sẽ không lưu nữa để tránh bị trùng dữ liệu.
+
+Thêm cho tôi chức năng upload file excel (có thể tham khảo chức năng upload attNewOpenImportModal của viewApplyAttenanceManagentInfoList_new.html), khi người dùng upload file excel lên thì sẽ đọc dữ liệu từ file đó và lưu vào bảng AR_MAC_RECORDS_TEMP (cá trường tham khảo hình ảnh). file excel sẽ có định dạng như sau: cột A là EMPID, cột B là LOCAL_NAME, cột C là AR_DATE_STR, cột D là R_DATE, cột E là R_TIME, cột F là DOOR_TYPE, cột G là REMARK (tham khảo hình ảnh). sau khi lưu vào bảng AR_MAC_RECORDS_TEMP, thì tạo cho tạo luôn cho file viewImportExcelTempMacRecordsList.html ở module /ar/attendanceMintenance. giao diện này để hiển thị thông tin vừa nhập lên cho người dùng. sau khi bấm xác nhận thì sẽ đưa dữ liệu từ bảng AR_MAC_RECORDS_TEMP sang bảng AR_MAC_RECORDS_HTSV. đồng thời xóa dữ liệu ở bảng AR_MAC_RECORDS_TEMP đi. khi lưu vào bảng AR_MAC_RECORDS_HTSV thì cần check trùng dữ liệu, nếu đã tồn tại dữ liệu có cùng EMPID, CARD_NO, R_TIME và DOOR_TYPE thì sẽ không lưu nữa để tránh bị trùng dữ liệu. với những dòng dữ liệu được lưu thành công thì sẽ ghi INSERT_BY = 'A', 
+
+Giống như viewArCardRecord.html, Hãy tạo cho tôi file viewArCardRecordForSelf.html - Lịch sử ra vào công ty nằm trong module /ar/attendanceMintenance. Giao diện tham khảo hình ảnh. Dữ liệu lấy từ bảng AR_MAC_RECORDS_SST với các trường tham khảo hình ảnh, kết hợp với bảng HR_EMPLOYEE để lấy thông tin nhân viên, trường CARD_NO tương ứng với EMPID HR_EMPLOYEE, sẽ có những dữ liệu trong bảng AR_MAC_RECORDS_SST mà giá trị của trường CARD_NO không nằm trong HR_EMPLOYEE, nếu vậy thì vẫn lấy CARD_NO và LOCAL_NAME sẽ thay bằng CARD_NO.  Định dạng ngày tháng dạng YYYY/MM/DD. mặc định ban đầu lấy ngày hiện tại. có chức năng xuất excel, khi bấm vào sẽ xuất dữ liệu ra file excel.
+
+Giống như viewArCardRecord.html, Hãy tạo cho tôi file viewArCardRecordMeal.html - Tra cứu suất ăn nằm trong module /ar/attendanceMintenance. Giao diện tham khảo hình ảnh. Dữ liệu lấy từ bảng AR_MAC_RECORDS_HTSV_EAT với các trường tham khảo hình ảnh, câu lệnh lẫy dữ liệu sử dụng SQL: SELECT  A.SEQ,
+			          A.EMPID,
+			          A.EAT_DATE,
+			          A.EAT_NAME,
+					  A.EMPLOYEE_NAME,
+					  NVL(B.LOCAL_NAME, A.EMPLOYEE_NAME) LOCAL_NAME,
+					  TO_CHAR(A.R_TIME,'YYYY-MM-DD') R_DATE,
+                      TO_CHAR(A.R_TIME,'HH24:MI:SS') R_TIME,
+					  A.AMOUNT,
+					  (CASE WHEN A.EAT_DATE IN ('BREAKFAST','NIGHT') THEN TO_CHAR(A.R_TIME - 1 , 'YYYY/MM/DD')
+                             ELSE TO_CHAR(A.R_TIME,'YYYY-MM-DD') END ) AS ATTENDANCE_DATE,
+					  GET_AR_TIME_BY_CPNYID(GET_PERSON_ID(A.EMPID), CASE WHEN A.EAT_DATE IN ('BREAKFAST','NIGHT') THEN TO_CHAR(A.R_TIME - 1 , 'YYYY/MM/DD')
+                             ELSE 
+                              TO_CHAR(A.R_TIME,'YYYY-MM-DD') END , 'OUT_DATE_TIME', #CPNY_ID:VARCHAR#) OUTDOOR_TIME,
+					  CASE WHEN get_DEPT_NAME(B.DEPTNO,#{lang, jdbcType=VARCHAR}) = '' OR get_DEPT_NAME(B.DEPTNO,#{lang, jdbcType=VARCHAR}) IS NULL THEN A.DEPART_NAME
+                            ELSE get_DEPT_NAME(B.DEPTNO,#{lang, jdbcType=VARCHAR}) END DEPTNAME,
+					  A.REMARK,
+					  GET_CODE_NAME(B.POST_GRADE_NO,#{lang, jdbcType=VARCHAR}) POST_GRADE_NAME,
+					  INSERT_BY
+				 FROM AR_MAC_RECORDS_HTSV_EAT A,
+					  HR_EMPLOYEE B
+				WHERE  A.EMPID =  B.EMPID(+). 
+ trường EMPID của bảng AR_MAC_RECORDS_HTSV_EAT tương ứng với EMPID của HR_EMPLOYEE, sẽ có những dữ liệu trong bảng AR_MAC_RECORDS_HTSV_EAT mà giá trị của trường EMPID không nằm trong HR_EMPLOYEE, nếu vậy thì vẫn lấy EMPID và LOCAL_NAME sẽ thay bằng EMPLOYEE_NAME.       
+         Định dạng ngày tháng dạng YYYY/MM/DD. mặc định ban đầu lấy ngày hiện tại. có chức năng xuất excel, khi bấm vào sẽ xuất dữ liệu ra file excel.
+
+         với việc Đọc dữ liệu quẹt thẻ từ server nơi chưass dữ liệu quẹt thẻ. hãy thêm cho tôi 1 tính năng tự động chạy vào phút thứ 5 của mỗi tiếng, tức là 08:05, 09:05, ... và chỉ đọc dữ liệu trong ngày hiện tại và trươc đó 2 ngày để tránh việc đọc dữ liệu cũ quá nhiều. Việc này sẽ giúp cho dữ liệu quẹt thẻ được cập nhật liên tục mà không cần phải chờ người dùng bấm nút Đọc dữ liệu quẹt thẻ, đồng thời cũng tránh được việc dữ liệu bị trùng do người dùng bấm nút Đọc dữ liệu quẹt thẻ nhiều lần trong ngày.
+
+Giống như chức năng đọc dữ liệu quẹt thẻ - acrOpenImportModal của viewArCardRecord.html, hãy tạo cho tôi chức năng đọc dữ liệu suất ăn - avrmOpenImportModal của viewArCardRecordMeal.html, khi bấm vào sẽ kết nối với máy chủ chứa dữ liệu suất ăn để lấy dữ liệu ra và hiển thị lên giao diện, đồng thời lưu dữ liệu đó vào bảng AR_MAC_RECORDS_HTSV_EAT. máy chủ có thông tin như máy chủ chứa dữ liệu quẹt thẻ, câu lệnh lấy dữ liệu là: sql =   " select P.EmployeeNo, p.FirstName,cr.ReaderIDX as ReaderCode ,CR.ReaderName, CR.DoorID, CR.DoorName,"
+							+ " DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) AS LocalDateTime, e.OccuredDateTime as UTCDateTime,"
+							+ " P.DepartmentID, P.DepartmentID AS DeptName	"
+							+ " from ACS_CARDHOLDER_VIEW P join ACS_EVENT_ACCESS_VIEW E on P.PSNID = E.PSNId right "
+							+ " JOIN (SELECT DV.LoopID, dv.DeviceID, rd.ReaderIDX, rd.ReaderID, RD.ReaderName, DR.DoorID, DR.DoorName "
+							+ " FROM ACS_DEVICE_DR_VIEW DR join ACS_DEVICE_DR_RD_VIEW RD on DR.DoorID = RD.DoorID join ACS_DEVICE_VIEW DV on dv.DeviceIDX = rd.DeviceIDX "
+							+ " WHERE RD.DeviceIDX IN ('1033','1034')) CR "
+							+ " ON E.ControllerId = cr.LoopID and E.BoardNo = CR.DeviceID and E.IoIndex = CR.ReaderID "
+							+ " where DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) >= '"+ acrm_fromDate +"' "
+							+ " and DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) <= '"+ acrm_toDate +"' "
+							+ " order by e.OccuredDateTime desc"; EmployeeNo Tương ứng với EMPID, 
+FirstName Tương ứng với	EMPLOYEE_NAME
+ LocalDateTime Tương ứng với	CARD_TIME
+ DoorName Tương ứng với	DOOR_NAME
+ DeptName Tương ứng với	DEPART_NAME 10
+  CPNY_ID tương ứng với #{cpnyId, jdbcType=VARCHAR} khi lưu vào bảng AR_MAC_RECORDS_HTSV_EAT thì cần check trùng dữ liệu, nếu đã tồn tại dữ liệu có cùng EMPID, CARD_TIME và DOOR_NAME thì sẽ không lưu nữa để tránh bị trùng dữ liệu. có chức năng tự động chạy vào phút thứ 07:00 và 14:00 và chỉ đọc dữ liệu trong ngày hiện tại và trươc đó 2 ngày để tránh việc đọc dữ liệu cũ quá nhiều. Việc này sẽ giúp cho dữ liệu suất ăn được cập nhật liên tục mà không cần phải chờ người dùng bấm nút Đọc dữ liệu suất ăn, đồng thời cũng tránh được việc dữ liệu bị trùng do người dùng bấm nút Đọc dữ liệu suất ăn nhiều lần trong ngày.
+
+  Giống như chức năng đọc dữ liệu quẹt thẻ - acrOpenImportModal của viewArCardRecord.html, hãy tạo cho tôi chức năng đọc dữ liệu suất ăn - avrmOpenImportModal của viewArCardRecordForSelf.html, khi bấm vào sẽ kết nối với máy chủ chứa dữ liệu suất ăn để lấy dữ liệu ra và hiển thị lên giao diện, đồng thời lưu dữ liệu đó vào bảng AR_MAC_RECORDS_HTSV_EAT. máy chủ có thông tin như máy chủ chứa dữ liệu quẹt thẻ, câu lệnh lấy dữ liệu là: sql =   " select P.EmployeeNo, p.FirstName,cr.ReaderIDX as ReaderCode ,CR.ReaderName, CR.DoorID, CR.DoorName,"
+							+ " DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) AS LocalDateTime, e.OccuredDateTime as UTCDateTime,"
+							+ " P.DepartmentID, P.DepartmentID AS DeptName	"
+							+ " from ACS_CARDHOLDER_VIEW P join ACS_EVENT_ACCESS_VIEW E on P.PSNID = E.PSNId right "
+							+ " JOIN (SELECT DV.LoopID, dv.DeviceID, rd.ReaderIDX, rd.ReaderID, RD.ReaderName, DR.DoorID, DR.DoorName "
+							+ " FROM ACS_DEVICE_DR_VIEW DR join ACS_DEVICE_DR_RD_VIEW RD on DR.DoorID = RD.DoorID join ACS_DEVICE_VIEW DV on dv.DeviceIDX = rd.DeviceIDX "
+							+ " WHERE RD.DeviceIDX IN ('1033','1034')) CR "
+							+ " ON E.ControllerId = cr.LoopID and E.BoardNo = CR.DeviceID and E.IoIndex = CR.ReaderID "
+							+ " where DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) >= '"+ acrm_fromDate +"' "
+							+ " and DATEADD(mi, DATEDIFF(mi, GETUTCDATE(), GETDATE()), E.OccuredDateTime) <= '"+ acrm_toDate +"' "
+							+ " order by e.OccuredDateTime desc"; EmployeeNo Tương ứng với EMPID, 
+FirstName Tương ứng với	EMPLOYEE_NAME
+ LocalDateTime Tương ứng với	CARD_TIME
+ DoorName Tương ứng với	DOOR_NAME
+ DeptName Tương ứng với	DEPART_NAME 10
+  CPNY_ID tương ứng với #{cpnyId, jdbcType=VARCHAR} khi lưu vào bảng AR_MAC_RECORDS_HTSV_EAT thì cần check trùng dữ liệu, nếu đã tồn tại dữ liệu có cùng EMPID, CARD_TIME và DOOR_NAME thì sẽ không lưu nữa để tránh bị trùng dữ liệu. có chức năng tự động chạy vào phút thứ 07:00 và 14:00 và chỉ đọc dữ liệu trong ngày hiện tại và trươc đó 2 ngày để tránh việc đọc dữ liệu cũ quá nhiều. Việc này sẽ giúp cho dữ liệu suất ăn được cập nhật liên tục mà không cần phải chờ người dùng bấm nút Đọc dữ liệu suất ăn, đồng thời cũng tránh được việc dữ liệu bị trùng do người dùng bấm nút Đọc dữ liệu suất ăn nhiều lần trong ngày.
+
+
+Căn cứ viewArCardRecord.html, Hãy tạo cho tôi file viewArCardRecordDay.html - Dữ liệu quet thẻ - Ca làm nằm trong module /ar/attendanceMintenance. Giao diện tham khảo hình ảnh. câu lệnh lẫy dữ liệu sử dụng SQL: SELECT D.LOCAL_NAME,
+       D.EMPID EMPID,
+       D.EMPID AS EMPLOYEE_ID,
+       D.DEPTNAME,
+       D.DEPT_TEAM,
+       D.POST_GRADE_NO_NAME,
+       GET_AR_EATDEDUCT_TIMES(D.AR_DATE_STR,
+                              D.AR_DATE_STR,
+                              D.PERSON_ID,
+                              'EAT_TIME') EAT_TIMES,
+       (SELECT (GET_GLOBAL_NAME(E.LEAVE_TYPE_CODE, #{lang, jdbcType=VARCHAR}) || ' (' ||
+               TO_CHAR(E.LEAVE_FROM_TIME, 'DD/MM/YYYY HH24:MI') || ' - ' ||
+               TO_CHAR(E.LEAVE_TO_TIME, 'DD/MM/YYYY HH24:MI') || ')')
+          FROM ESS_LEAVE_APPLY_TB E
+         WHERE E.CPNY_ID = D.CPNY_ID
+           AND E.ACTIVITY = '1'
+           AND E.BATCH_YN <> '2'
+           AND E.CONFIRM_FLAG <> '2'
+           AND E.AFFIRM_FLAG NOT IN ('14014310', '14014309')
+           AND E.PERSON_ID = D.PERSON_ID
+           AND D.DDATE_STR BETWEEN TO_CHAR(E.LEAVE_FROM_TIME, 'YYYY/MM/DD') AND
+               TO_CHAR(E.LEAVE_TO_TIME - 8 / 24, 'YYYY/MM/DD')
+           AND ROWNUM = 1) LEAVE_CONTENT,
+       DECODE(D.EMP_TYPE_CODE, '10418', GET_GLOBAL_NAME(D.EMP_TYPE_CODE, #{lang, jdbcType=VARCHAR})) REMAX,
+       GET_GLOBAL_NAME(GET_AR_SHIFTNO(D.PERSON_ID, D.AR_DATE_STR, D.CPNY_ID),
+                       #{lang, jdbcType=VARCHAR}) SHIFT_NAME,
+       GET_AR_SHIFTNO_WORKTIME(GET_AR_SHIFTNO(D.PERSON_ID,
+                                              D.AR_DATE_STR,
+                                              D.CPNY_ID)) SHIFT_TIME,
+       (SELECT GET_EMP_LOCAL_NAME(ARS.CREATED_BY, #{cpnyId, jdbcType=VARCHAR}) || ' ' ||
+               TO_CHAR(ARS.CREATE_DATE, 'DD/MM/YYYY HH24:MI')
+          FROM AR_SCHEDULE_HTSV ARS
+         WHERE D.PERSON_ID = ARS.PERSON_ID
+           AND D.AR_DATE_STR = ARS.AR_DATE_STR) CHANGE_SHIFT_PERSON,
+       GET_GLOBAL_NAME(D.EMP_TYPE_CODE, #{lang, jdbcType=VARCHAR}) EMP_TYPE_NAME,
+       D.EMP_TYPE_CODE,
+       TO_CHAR(TO_DATE(D.AR_DATE_STR, 'YYYY/MM/DD'), 'DD/MM/YYYY') AR_DATE_STR,
+       D.DDATE_STR,
+       TO_CHAR(D.IN_TIME, 'DD/MM/YYYY') IN_DAY,
+       TO_CHAR(D.IN_TIME, 'HH24:MI') IN_TIME,
+       TO_CHAR(D.OUT_TIME, 'DD/MM/YYYY') OUT_DAY,
+       TO_CHAR(D.OUT_TIME, 'HH24:MI') OUT_TIME
+  FROM (SELECT HR.LOCAL_NAME,
+               HR.EMPID,
+               HR.PERSON_ID,
+               HR.CPNY_ID,
+               HR.EMP_TYPE_CODE,
+               TO_CHAR(HR.DATE_LEFT, 'YYYY/MM/DD') DATE_LEFT,
+               GET_DEPT_NAME(HR.DEPTNO, #{lang, jdbcType=VARCHAR}) DEPTNAME,
+               GET_DEPT_NAME(GET_DEPT_NO_BY_LEVEL(HR.deptno, hr.cpny_id, '2'),
+                             #{lang, jdbcType=VARCHAR}) DEPT_TEAM,
+               GET_GLOBAL_NAME(HR.POST_GRADE_NO, #{lang, jdbcType=VARCHAR}) POST_GRADE_NO_NAME,
+               AR.DDATE_STR AR_DATE_STR,
+               AR.DDATE_STR DDATE_STR,
+               (SELECT MIN(IN_TIME) IN_TIME
+                  FROM (SELECT PERSON_ID,
+                               AR_DATE_STR,
+                               DECODE(DOOR_TYPE, 'IN', MIN(R_TIME)) IN_TIME,
+                               CASE
+                                 WHEN DOOR_TYPE IS NULL OR DOOR_TYPE <> 'IN' THEN
+                                  MAX(R_TIME)
+                               END OUT_TIME
+                          FROM AR_MAC_RECORDS_HTSV
+                         WHERE 1 = 1
+                           AND R_TIME >= TO_DATE(#{fromDate, jdbcType=VARCHAR}, 'DD/MM/YYYY')
+                           AND R_TIME <= TO_DATE(#{toDate, jdbcType=VARCHAR}, 'DD/MM/YYYY') + 2
+                         GROUP BY PERSON_ID, AR_DATE_STR, DOOR_TYPE) C
+                 WHERE C.PERSON_ID = HR.PERSON_ID
+                   AND C.AR_DATE_STR = AR.DDATE_STR
+                 GROUP BY PERSON_ID, AR_DATE_STR) IN_TIME,
+               (SELECT MAX(OUT_TIME) OUT_TIME
+                  FROM (SELECT PERSON_ID,
+                               AR_DATE_STR,
+                               DECODE(DOOR_TYPE, 'IN', MIN(R_TIME)) IN_TIME,
+                               CASE
+                                 WHEN DOOR_TYPE IS NULL OR DOOR_TYPE <> 'IN' THEN
+                                  MAX(R_TIME)
+                               END OUT_TIME
+                          FROM AR_MAC_RECORDS_HTSV
+                         WHERE 1 = 1
+                           AND R_TIME >= TO_DATE(#{fromDate, jdbcType=VARCHAR}, 'DD/MM/YYYY')
+                           AND R_TIME <= TO_DATE(#{toDate, jdbcType=VARCHAR}, 'DD/MM/YYYY') + 2
+                         GROUP BY PERSON_ID, AR_DATE_STR, DOOR_TYPE) C
+                 WHERE C.PERSON_ID = HR.PERSON_ID
+                   AND C.AR_DATE_STR = AR.DDATE_STR
+                 GROUP BY PERSON_ID, AR_DATE_STR) OUT_TIME
+          FROM AR_CALENDER AR, HR_EMPLOYEE HR
+         WHERE AR.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+           AND HR.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+           AND HR.EMPID NOT LIKE '111111%'
+           AND HR.EMP_TYPE_CODE <> '10418'
+           AND AR.DDATE_STR >=
+               TO_CHAR(TO_DATE(#{fromDate, jdbcType=VARCHAR}, 'DD/MM/YYYY'), 'YYYY/MM/DD')
+           AND AR.DDATE_STR <=
+               TO_CHAR(TO_DATE(#{toDate, jdbcType=VARCHAR}, 'DD/MM/YYYY'), 'YYYY/MM/DD')
+           AND EXISTS (SELECT AR_SUPERVISOR_INFO.DEPTNO
+                  FROM AR_SUPERVISOR_INFO
+                 WHERE AR_SUPERVISOR_INFO.DEPTNO = HR.DEPTNO
+                   AND AR_SUPERVISOR_INFO.PERSON_ID = #{adminID, jdbcType=VARCHAR})) D
+ WHERE (DATE_LEFT IS NULL OR DATE_LEFT >= DDATE_STR)
+ ORDER BY DDATE_STR DESC, IN_TIME. Câu lệnh SQL này đáp ứng được việc lấy ra dữ liệu nhưng chưa được tối ưu về mặt hiệu suất, tôi muốn bạn tối ưu lại câu lệnh SQL này để nó chạy nhanh hơn.
+
+Giống như viewArCardRecordDay.html hãy tạo cho tôi file viewEntryInfoList - Dữ liệu quẹt thẻ nằm trong module /ess/viewDept. chỉ thay đổi prefix và tên file, còn lại giữ nguyên về giao diện và câu lệnh SQL. với việc này sẽ giúp cho người quản lý có thể xem được dữ liệu quẹt thẻ của nhân viên trong phòng ban mình quản lý mà không cần phải vào module /ar/attendanceMintenance để xem, đồng thời cũng có thể xuất dữ liệu đó ra file excel nếu cần thiết.
+
+ở viewArCardRecord.html Thêm cho tôi điều kiện, nếu sysMode === 'ess' (không phải hrm) thì không hiển thị nút Đọc dữ liệu quẹt thẻ Thêm bản ghi, Tải file mẫu, Import Excel, Sửa và Xóa. Chặn cả frontend và backend để tránh việc người dùng có thể truy cập vào các chức năng đó thông qua đường dẫn trực tiếp hoặc các công cụ hỗ trợ khác. chỉ những người dùng có quyền hạn nhất định mới có thể thấy và sử dụng các chức năng đó, còn lại sẽ bị ẩn đi hoàn toàn.
+
+ở đây nếu /evs/manage/api/resume/evsResumeList không lấy ra được dữ liệu thì giao diện sẽ là màu trắng, với dòng thông báo ở giữa màn hình: "Không trong khoảng thời gian đánh giá hoặc bạn không phải là người đánh giá, xin liên hệ Phòng nhân sự!". tham khảo giao diện của viewConfirmTarget1.html để hiển thị thông báo này. Còn nếu có dữ liệu thì vẫn hiển thị giao diện như bình thường để người dùng có thể xem và thao tác với dữ liệu đó. Việc này sẽ giúp cho người dùng hiểu được lý do tại sao không có dữ liệu hiển thị trên giao diện thay vì chỉ nhìn thấy một màn hình trắng mà không biết nguyên nhân. Đồng thời cũng giúp giảm bớt sự nhầm lẫn và thắc mắc của người dùng khi không thấy dữ liệu nào hiển thị trên giao diện.
+
+Tạo cho tôi file photoImport.html - Import ảnh đại diện nằm trong module /hrm/empinfo. chức năng của file này là cho phép người quản trị upload ảnh đại diện của nhân viên lên hệ thống, sau đó lưu ảnh đó vào thư mục chứa ảnh (/assets/images/users/), đồng thời lưu đường dẫn của ảnh đó vào bảng hr_personal_info trong trường PHOTO_PATH để phục vụ cho việc hiển thị ảnh đại diện của nhân viên trên các giao diện khác nhau trong hệ thống. Khi upload ảnh thì cần check định dạng của file ảnh, chỉ cho phép upload các định dạng ảnh phổ biến như .jpg, .jpeg, .png và kích thước của file ảnh không được vượt quá 2MB để đảm bảo chất lượng ảnh và tránh việc lưu trữ những file ảnh có kích thuớc quá lớn. Trong tên file ảnh phải chứa mã nhân viên (viết hoa hay thường đều được), lấy tên file ảnh để lấy ra PERSON_ID của EMPID của nhân viên đó. sau đó lư vào bảng hr_personal_info. có thể upload nhiều file cùng lúc. khi upload xong thì sẽ hiện lên giao diện những trường hợp thành công và thất bại. khi bấm xác nhận thì lưu những file ảnh upload thành công vào thư mục chứa ảnh và lưu đường dẫn của ảnh đó vào bảng hr_personal_info, còn những file ảnh upload thất bại thì sẽ hiển thị thông báo lỗi tương ứng để người quản trị có thể biết được nguyên nhân và khắc phục lỗi đó.
+
+tham khảo cấu trúc của viewEvsParamPanel.html. tạo cho tôi file viewRecruitList.html - Quyết định nhận việc nằm trong module hrm/recruitManage. chức năng của file này để người quản lý nhập liệu về quyết định nhận việc của nhân viên mới vào hệ thống. giao diện sẽ để bên trái là danh sách các nhân viên mới được nhận việc, khi bấm vào từng nhân viên thì sẽ hiển thị thông tin chi tiết về quyết định nhận việc của nhân viên đó ở bên phải với các tab tương ứng với từng phần thông tin như Thông tin chung, Thông tin bổ sung, Thông tin Giáo dục, Quá trình làm việc và Thông tin gia đình. Dữ liệu sẽ được lấy từ bảng HR_EMPLOYEE_RECRUIT với các trường tham khảo hình ảnh (Khi thêm mới thì trường PERSON_ID căn cứ vào HR_PERSON_ID_SEQ.NEXTVAL, và ACTIVITY = 0).
+Thông tin cơ bản và Thông tin bổ sung lưu vào bảng HR_EMPLOYEE_RECRUIT,
+Thông tin giáo dục lưu vào bảng HR_EDUCATION_RECRUIT, với các trường tham khảo hình ảnh, trong đó có trường PERSON_ID để liên kết với bảng HR_EMPLOYEE_RECRUIT để lấy ra tên nhân viên và mã nhân viên (Khi thêm mới thì trường SEQ căn cứ vào HR_EDU_SEQ.NEXTVAL).
+Quá trình làm việc lưu vào bảng HR_WORK_EXPERIENCE_RECRUIT, với các trường tham khảo hình ảnh, trong đó có trường PERSON_ID để liên kết với bảng HR_EMPLOYEE_RECRUIT để lấy ra tên nhân viên và mã nhân viên (Khi thêm mới thì trường SEQ căn cứ vào HR_W_EXP_SEQ.NEXTVAL).
+Thông tin gia đình lưu vào bảng HR_FAMILY_RECRUIT, với các trường tham khảo hình ảnh, trong đó có trường PERSON_ID để liên kết với bảng HR_EMPLOYEE_RECRUIT để lấy ra tên nhân viên và mã nhân viên (Khi thêm mới thì trường SEQ căn cứ vào HR_FAMILY_SEQ.NEXTVAL).
+
+Có điều kiện tìm kiếm theo Tạng thái, Đang thực hiện - ACTIVITY = 0, Hoàn thành - ACTIVITY = 1, mặc định ban đầu khi bấm vào tab thì để điều kiện là Đang thực hiện - ACTIVITY = 0 để hiển thị những nhân viên mới đang trong quá trình nhận việc, khi bấm vào tab Hoàn thành thì sẽ hiển thị những nhân viên mới đã hoàn thành việc nhận việc. Sau khi lưu thoogn tin nhận việc, tick chọn vào từng nhân viên rồi bấm Xác nhận (nút Xác nhận chỉ hiển thị khi tick chọn vào nhân viên và dữ liệu dang trong quá trình thực hiện) thì sẽ gọi package PKG_RECRUIT_MANAGE.PR_RECRUIT_EXECUTE(
+						#adminID:VARCHAR#,
+						#adminIP:VARCHAR#,
+						#cpnyId:VARCHAR#,
+						#personIds:VARCHAR#,
+						#type:VARCHAR#,
+						#message,jdbcType=VARCHAR,mode=OUT#) với nút Xác nhận thì type sẽ là 'CONFIRM'. 
+Khi ta cứu ra những nhân viên đã Hoàn thành nhận việc Hoàn thành - ACTIVITY = 1 thì sẽ có nút Hủy xác nhận, khi bấm vào sẽ gọi lại package PKG_RECRUIT_MANAGE.PR_RECRUIT_EXECUTE(
+            #adminID:VARCHAR#,
+            #adminIP:VARCHAR#,
+            #cpnyId:VARCHAR#,
+            #personIds:VARCHAR#,
+            #type:VARCHAR#,
+            #message,jdbcType=VARCHAR,mode=OUT#) với nút Hủy xác nhận thì type sẽ là 'CANCEL'.

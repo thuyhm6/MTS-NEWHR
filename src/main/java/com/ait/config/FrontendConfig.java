@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 
+import java.io.File;
 import java.time.Duration;
 
 /**
@@ -15,13 +16,23 @@ import java.time.Duration;
 @Configuration
 public class FrontendConfig implements WebMvcConfigurer {
 
-        // Cấu hình CORS từ properties — đặt trong application.properties:
-        // cors.allowed-origins=https://yourdomain.com,https://www.yourdomain.com
         @Value("${cors.allowed-origins:http://localhost:8080,http://localhost:3000}")
         private String[] allowedOrigins;
 
+        @Value("${app.photo.upload.path:./assets/images/users}")
+        private String photoUploadPath;
+
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                // Serve ảnh đại diện nhân viên từ thư mục upload ngoài classpath
+                // Đăng ký trước /assets/** để Spring ưu tiên path cụ thể hơn
+                File uploadDir = new File(photoUploadPath);
+                String uploadDirPath = uploadDir.getAbsolutePath().replace("\\", "/");
+                if (!uploadDirPath.endsWith("/")) uploadDirPath += "/";
+                registry.addResourceHandler("/assets/images/users/**")
+                                .addResourceLocations("file:" + uploadDirPath)
+                                .setCacheControl(CacheControl.maxAge(Duration.ofHours(1)));
+
                 // Static resources với cache optimization
                 registry.addResourceHandler("/assets/**")
                                 .addResourceLocations("classpath:/static/assets/")

@@ -147,9 +147,12 @@ public class EvsManageController {
     @GetMapping("/api/resume/evsResumeList")
     @ResponseBody
     public ResponseEntity<List<EvsResumeDto>> getEvsResumeList(
-            @RequestParam(required = false) String evsType) {
+            @RequestParam(required = false) String evsType,
+            @RequestParam(required = false) String evsLevel
+        ) {
         EvsResumeDto params = new EvsResumeDto();
         params.setEvsType(evsType);
+        params.setEvsLevel(evsLevel);
         return ResponseEntity.ok(evsResumeService.getEvsResumeList(params));
     }
 

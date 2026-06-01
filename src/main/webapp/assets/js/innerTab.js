@@ -332,7 +332,16 @@
         doc.querySelector('.container-fluid') ||
         doc.body;
 
-        // Extract scripts from template
+        // Inject content into DOM FIRST so scripts can find DOM elements via getElementById
+        tab.content = content.innerHTML;
+        tab.loaded = true;
+
+        const contentPane = document.getElementById(tab.id);
+        if (contentPane) {
+        contentPane.innerHTML = tab.content;
+    }
+
+        // Extract scripts from template AFTER content is in DOM
         const fragmentScripts = doc.querySelector('#fragmentScripts');
         // console.log('fragmentScripts found:', fragmentScripts);
 
@@ -387,15 +396,6 @@
     });
 
         // console.log('Scripts moved to dynamic-scripts:', scripts.length);
-    }
-
-        tab.content = content.innerHTML;
-        tab.loaded = true;
-
-        // Update tab content
-        const contentPane = document.getElementById(tab.id);
-        if (contentPane) {
-        contentPane.innerHTML = tab.content;
     }
     })
         .catch(error => {

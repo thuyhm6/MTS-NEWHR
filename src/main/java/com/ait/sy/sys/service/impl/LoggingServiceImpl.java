@@ -159,11 +159,15 @@ public class LoggingServiceImpl implements LoggingService {
             Map<String, Object> requestContext) {
 
         boolean isGet = "GET".equalsIgnoreCase(method);
-        boolean isStatic = endpoint.startsWith("/assets") || endpoint.contains(".");
+        boolean isStatic = endpoint.startsWith("/assets") || endpoint.startsWith("/resources/") || endpoint.contains(".");
         boolean isAuth = endpoint.contains("/login") || endpoint.contains("/logout");
 
         // Chỉ ghi log những thao tác tác động đến CSDL (POST, PUT, DELETE) hoặc có lỗi
         if (statusCode < 400 && (isGet || isStatic || isAuth)) {
+            return;
+        }
+        // Bỏ qua 404 cho các file tĩnh (ảnh, js, css...) — file không tồn tại là chuyện bình thường
+        if (statusCode == 404 && isStatic) {
             return;
         }
 

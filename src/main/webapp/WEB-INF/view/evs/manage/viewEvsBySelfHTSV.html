@@ -195,6 +195,15 @@
             </div>
 
         </div><!-- /#vebsh_pageWrapper -->
+
+        <!-- Thông báo không trong khoảng thời gian đánh giá -->
+        <div id="vebsh_emptyNotice" class="col-12" style="display:none; min-height:300px; align-items:center; justify-content:center;">
+            <div class="text-center text-muted p-4">
+                <i class="bi bi-exclamation-circle fs-1 d-block mb-3 text-secondary"></i>
+                <p class="alert alert-warning fs-4 fw-bold" role="alert" th:text="#{evs.viewConfirmTarget1.msg.notInEvalPeriod}">Không trong khoảng thời gian đánh giá hoặc bạn không phải là người đánh giá, xin liên hệ Phòng nhân sự!</p>
+            </div>
+        </div>
+
     </div><!-- /.row -->
 </div><!-- th:fragment="content" -->
 
@@ -270,10 +279,17 @@
                 $.ajax({
                     url: '/evs/manage/api/resume/evsResumeList',
                     type: 'GET',
-                    data: { evsType: inst.evsType },
+                    data: { evsType: inst.evsType, evsLevel: '14015069' }, // Đánh giá bản thân
                     success: function (rows) {
+                        if (!rows || rows.length === 0) {
+                            $('#vebsh_pageWrapper').hide();
+                            $('#vebsh_emptyNotice').css('display', 'flex');
+                            return;
+                        }
+                        $('#vebsh_emptyNotice').hide();
+                        $('#vebsh_pageWrapper').show();
                         var html = '<option value=""></option>';
-                        (rows || []).forEach(function (r) {
+                        rows.forEach(function (r) {
                             html += '<option value="' + vebshEsc(r.seq) + '">' + vebshEsc(r.resumeName) + '</option>';
                         });
                         vebsh$('#vebsh_resumeSeq').html(html);
@@ -282,6 +298,10 @@
                             vebsh$('#vebsh_resumeSeq').val(first.val());
                             vebshSearch();
                         }
+                    },
+                    error: function () {
+                        $('#vebsh_pageWrapper').hide();
+                        $('#vebsh_emptyNotice').css('display', 'flex');
                     }
                 });
             }

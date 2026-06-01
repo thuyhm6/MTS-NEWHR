@@ -1,6 +1,7 @@
 package com.ait.hrm.empinfo.controller;
 
 import com.ait.hrm.empinfo.dto.EmployeeSearchResponse;
+import com.ait.hrm.empinfo.dto.PhotoImportResultDto;
 import com.ait.hrm.empinfo.model.HrAddressMatters;
 import com.ait.hrm.empinfo.model.HrEducation;
 import com.ait.hrm.empinfo.model.HrEmergencyAddress;
@@ -15,6 +16,7 @@ import com.ait.hrm.empinfo.service.HrEmergencyAddressService;
 import com.ait.hrm.empinfo.service.HrEmployeeService;
 import com.ait.hrm.empinfo.service.HrFamilyService;
 import com.ait.hrm.empinfo.service.HrPersonalInfoService;
+import com.ait.hrm.empinfo.service.HrPhotoImportService;
 import com.ait.hrm.empinfo.service.HrPunishmentService;
 import com.ait.hrm.empinfo.service.HrRewardService;
 import com.ait.hrm.empinfo.service.HrSpecialMatterService;
@@ -36,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
 
 import jakarta.servlet.http.HttpSession;
@@ -78,6 +82,9 @@ public class HrEmpinfoController {
 
     @Autowired
     private com.ait.hrm.empinfo.service.HrQualificationService hrQualificationService;
+
+    @Autowired
+    private HrPhotoImportService hrPhotoImportService;
 
     /**
      * Trang xem thông tin cá nhân nhân viên
@@ -1004,6 +1011,49 @@ public class HrEmpinfoController {
         } catch (Exception e) {
             
             return ResponseEntity.status(500).body("Loi he thong. Vui long thu lai.");
+        }
+    }
+
+    /**
+     * Trang import ảnh đại diện nhân viên
+     */
+    @GetMapping("/photoImport")
+    public String photoImport(Model model, HttpSession session) {
+        HrUserInfo currentHrUser = (HrUserInfo) session.getAttribute("currentHrUser");
+        model.addAttribute("currentHrUser", currentHrUser);
+        model.addAttribute("title", "Import ảnh đại diện");
+        return "hrm/empinfo/photoImport";
+    }
+
+    /**
+     * API kiểm tra danh sách ảnh trước khi lưu (không lưu file, không cập nhật DB)
+     */
+    @PostMapping("/api/photo/preview")
+    @ResponseBody
+    public ResponseEntity<List<PhotoImportResultDto>> previewPhotos(
+            @RequestParam("files") MultipartFile[] files) {
+        try {
+            List<PhotoImportResultDto> results = hrPhotoImportService.validatePhotos(files);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            log.error("Lỗi khi kiểm tra ảnh: ", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    /**
+     * API lưu ảnh vào thư mục upload và cập nhật PHOTO_PATH trong DB
+     */
+    @PostMapping("/api/photo/save")
+    @ResponseBody
+    public ResponseEntity<List<PhotoImportResultDto>> savePhotos(
+            @RequestParam("files") MultipartFile[] files) {
+        try {
+            List<PhotoImportResultDto> results = hrPhotoImportService.savePhotos(files);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            log.error("Lỗi khi lưu ảnh: ", e);
+            return ResponseEntity.status(500).body(null);
         }
     }
 

@@ -11,5 +11,7 @@ public interface ExcelService {
     Workbook buildTemplate(List<Map<String, Object>> shiftList, List<Map<String, Object>> typeList,
             String templateName);
 
+    Workbook buildCardRecordTemplate();
+
     List<String> importTemplate(String templateName, MultipartFile file) throws IOException;
 }
