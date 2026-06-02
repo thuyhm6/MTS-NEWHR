@@ -98,7 +98,7 @@
             AND he.POSITION LIKE '%' || #{position} || '%'
         </if>
         <if test="createDateFrom != null and createDateFrom != ''">
-            AND TRUNC(hsm.CREATE_DATE) >= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hsm.CREATE_DATE) &gt;= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="createDateTo != null and createDateTo != ''">
             AND TRUNC(hsm.CREATE_DATE) &lt;= TO_DATE(#{createDateTo}, 'YYYY-MM-DD')

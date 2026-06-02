@@ -14,13 +14,15 @@ var DeptTree = (function ($) {
         selectedCodes: [],
         currentInput: null,
         onSelectCallback: null,
-        cascadeChildren: true
+        cascadeChildren: true,
+        singleSelect: false
     };
 
     function init(inputSelector, callback, options) {
         state.currentInput = $(inputSelector);
         state.onSelectCallback = callback;
         state.cascadeChildren = !(options && options.cascadeChildren === false);
+        state.singleSelect = !!(options && options.singleSelect);
         if (options && options.api) {
             config.api = options.api;
             state.authDeptList = []; // reset cache khi đổi API
@@ -134,7 +136,9 @@ var DeptTree = (function ($) {
             var isChecked = $(this).is(':checked');
             var id = $(this).data('id');
 
-            if (state.cascadeChildren) {
+            if (state.singleSelect && isChecked) {
+                $('.auth-dept-chk-global').not(this).prop('checked', false);
+            } else if (state.cascadeChildren) {
                 checkChildren(id, isChecked);
             }
 
@@ -160,6 +164,8 @@ var DeptTree = (function ($) {
         var val = '';
         if (state.selectedCodes.length === 0) {
             val = '';
+        } else if (state.singleSelect) {
+            val = selectedTexts[0];
         } else if (state.selectedCodes.length === 1) {
             val = selectedTexts[0] + ' (' + state.selectedCodes[0] + ')';
         } else {
@@ -183,15 +189,34 @@ var DeptTree = (function ($) {
             container.css({
                 top: (offset.top + height) + 'px',
                 left: offset.left + 'px',
-                width: state.currentInput.outerWidth() + 'px'
+                width: Math.max(250, state.currentInput.outerWidth()) + 'px'
             }).removeClass('d-none');
         } else {
             container.addClass('d-none');
         }
     }
 
+    // Mở tree cho một input cụ thể mà không cần gọi lại init()
+    function openFor(inputSelector, callback) {
+        state.currentInput = $(inputSelector);
+        state.onSelectCallback = callback;
+        if (state.singleSelect) {
+            $('.auth-dept-chk-global').prop('checked', false);
+        }
+        var container = $('#' + config.containerId);
+        var offset = state.currentInput.offset();
+        var height = state.currentInput.outerHeight();
+        container.css({
+            top: (offset.top + height) + 'px',
+            left: offset.left + 'px',
+            width: Math.max(250, state.currentInput.outerWidth()) + 'px'
+        }).removeClass('d-none');
+    }
+
     return {
         init: init,
-        getSelectedCodes: function () { return state.selectedCodes; }
+        getSelectedCodes: function () { return state.selectedCodes; },
+        getAuthDeptList: function () { return state.authDeptList; },
+        openFor: openFor
     };
 })(jQuery);

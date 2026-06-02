@@ -13,5 +13,11 @@ public interface ExcelService {
 
     Workbook buildCardRecordTemplate();
 
+    List<Map<String, Object>> getDeptList();
+
+    Workbook buildStartPointTemplate(List<List<String[]>> groups, String templateName);
+
+    Workbook buildNewEmpTemplate(List<List<String[]>> groups, String templateName);
+
     List<String> importTemplate(String templateName, MultipartFile file) throws IOException;
 }

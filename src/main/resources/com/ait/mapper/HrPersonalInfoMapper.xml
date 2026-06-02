@@ -249,19 +249,19 @@
                 AND hp.ACTIVITY = #{searchParams.activity}
             </if>
             <if test="searchParams.dobFrom != null and searchParams.dobFrom != ''">
-                AND TRUNC(hp.DOB) >= TO_DATE(#{searchParams.dobFrom}, 'YYYY-MM-DD')
+                AND TRUNC(hp.DOB) &gt;= TO_DATE(#{searchParams.dobFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.dobTo != null and searchParams.dobTo != ''">
                 AND TRUNC(hp.DOB) &lt;= TO_DATE(#{searchParams.dobTo}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.weddingDateFrom != null and searchParams.weddingDateFrom != ''">
-                AND TRUNC(hp.WEDDING_DATE) >= TO_DATE(#{searchParams.weddingDateFrom}, 'YYYY-MM-DD')
+                AND TRUNC(hp.WEDDING_DATE) &gt;= TO_DATE(#{searchParams.weddingDateFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.weddingDateTo != null and searchParams.weddingDateTo != ''">
                 AND TRUNC(hp.WEDDING_DATE) &lt;= TO_DATE(#{searchParams.weddingDateTo}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.createDateFrom != null and searchParams.createDateFrom != ''">
-                AND TRUNC(hp.CREATE_DATE) >= TO_DATE(#{searchParams.createDateFrom}, 'YYYY-MM-DD')
+                AND TRUNC(hp.CREATE_DATE) &gt;= TO_DATE(#{searchParams.createDateFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.createDateTo != null and searchParams.createDateTo != ''">
                 AND TRUNC(hp.CREATE_DATE) &lt;= TO_DATE(#{searchParams.createDateTo}, 'YYYY-MM-DD')
@@ -299,19 +299,19 @@
             AND hp.ACTIVITY = #{activity}
         </if>
         <if test="dobFrom != null and dobFrom != ''">
-            AND TRUNC(hp.DOB) >= TO_DATE(#{dobFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hp.DOB) &gt;= TO_DATE(#{dobFrom}, 'YYYY-MM-DD')
         </if>
         <if test="dobTo != null and dobTo != ''">
             AND TRUNC(hp.DOB) &lt;= TO_DATE(#{dobTo}, 'YYYY-MM-DD')
         </if>
         <if test="weddingDateFrom != null and weddingDateFrom != ''">
-            AND TRUNC(hp.WEDDING_DATE) >= TO_DATE(#{weddingDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hp.WEDDING_DATE) &gt;= TO_DATE(#{weddingDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="weddingDateTo != null and weddingDateTo != ''">
             AND TRUNC(hp.WEDDING_DATE) &lt;= TO_DATE(#{weddingDateTo}, 'YYYY-MM-DD')
         </if>
         <if test="createDateFrom != null and createDateFrom != ''">
-            AND TRUNC(hp.CREATE_DATE) >= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hp.CREATE_DATE) &gt;= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="createDateTo != null and createDateTo != ''">
             AND TRUNC(hp.CREATE_DATE) &lt;= TO_DATE(#{createDateTo}, 'YYYY-MM-DD')

@@ -5,6 +5,8 @@ import com.ait.hrm.recruitManage.dto.HrEducationRecruitDto;
 import com.ait.hrm.recruitManage.dto.HrWorkExperienceRecruitDto;
 import com.ait.hrm.recruitManage.dto.HrFamilyRecruitDto;
 import com.ait.hrm.recruitManage.dto.HrRecruitExecuteDto;
+import com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto;
+import com.ait.hrm.recruitManage.dto.HrRecruitBatchDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -64,4 +66,36 @@ public interface HrRecruitManageMapper {
     // ── Stored procedure ─────────────────────────────────────────────────────
 
     void callRecruitExecute(HrRecruitExecuteDto dto);
+
+    // ── HR_RECRUIT_REGISTER_INFO (REGISTER_TYPE='80000057') ──────────────────
+    List<HrExpInsideBatchDto> selectRegisterList(HrExpInsideBatchDto dto);
+    void insertRegister(HrExpInsideBatchDto dto);
+
+    // ── HR_EXPERIENCE_INSIDE_BATCH ───────────────────────────────────────────
+    int countBatchList(HrExpInsideBatchDto dto);
+    int countUnprocessedBatch(HrExpInsideBatchDto dto);
+    List<HrExpInsideBatchDto> selectBatchListPage(HrExpInsideBatchDto dto);
+    void insertBatchItem(HrExpInsideBatchDto dto);
+    void updateBatchItem(HrExpInsideBatchDto dto);
+    void deleteBatchItem(@Param("seq") String seq);
+    String selectPersonIdByEmpId(@Param("empId") String empId);
+
+    HrExpInsideBatchDto selectCurrentEmpByEmpId(@Param("empId") String empId);
+
+    // ── HR_RECRUIT_REGISTER_INFO (REGISTER_TYPE='14014410') ──────────────────
+    List<HrRecruitBatchDto> selectRblRegisterList(HrRecruitBatchDto dto);
+    void insertRblRegister(HrRecruitBatchDto dto);
+
+    // ── HR_EMPLOYEE_RECRUIT_BATCH ────────────────────────────────────────────
+    int countRblBatchList(HrRecruitBatchDto dto);
+    int countUnprocessedRblBatch(HrRecruitBatchDto dto);
+    List<HrRecruitBatchDto> selectRblBatchListPage(HrRecruitBatchDto dto);
+    void insertRblBatchItem(HrRecruitBatchDto dto);
+    void updateRblBatchItem(HrRecruitBatchDto dto);
+    void deleteRblBatchItem(@Param("seq") String seq);
+
+    // ── Check EMPID tồn tại trước khi Xác nhận ───────────────────────────────
+    List<String> selectEmpIdsByPersonIds(@Param("personIds") List<String> personIds);
+    List<String> selectEmpIdsByRegisterSeq(@Param("registerSeq") String registerSeq);
+    List<String> selectExistingEmpIds(@Param("empIds") List<String> empIds);
 }

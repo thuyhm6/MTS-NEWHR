@@ -50,7 +50,7 @@
             AND pea.ACCOUNT_TYPE = #{bankSearch, jdbcType=VARCHAR}
         </if>
         <if test="fromDateStarted != null and fromDateStarted != ''">
-            AND he.DATE_STARTED >= TO_DATE(#{fromDateStarted, jdbcType=VARCHAR}, 'YYYY-MM-DD')
+            AND he.DATE_STARTED &gt;= TO_DATE(#{fromDateStarted, jdbcType=VARCHAR}, 'YYYY-MM-DD')
         </if>
         <if test="toDateStarted != null and toDateStarted != ''">
             AND he.DATE_STARTED &lt;= TO_DATE(#{toDateStarted, jdbcType=VARCHAR}, 'YYYY-MM-DD')

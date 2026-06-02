@@ -23,6 +23,9 @@ public class DataTablesResponse<T> {
     @JsonProperty("error")
     private String error;
 
+    @JsonProperty("allProcessed")
+    private boolean allProcessed;
+
     // Constructors
     public DataTablesResponse() {
     }
@@ -78,5 +81,13 @@ public class DataTablesResponse<T> {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public boolean isAllProcessed() {
+        return allProcessed;
+    }
+
+    public void setAllProcessed(boolean allProcessed) {
+        this.allProcessed = allProcessed;
     }
 }

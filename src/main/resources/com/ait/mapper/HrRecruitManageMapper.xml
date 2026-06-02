@@ -224,7 +224,6 @@
                     T.SEXCODE,
                     GET_GLOBAL_NAME(T.SEXCODE, #{lang, jdbcType=VARCHAR}) AS SEX_NAME,
                     T.DOB, T.DEPTNO,
-                    D.ORG_NAME_LOCAL AS DEPT_NAME,
                     T.STANDARD_POSITION, T.POST_FAMILY, T.POST_GRADE_NO, T.POSITION_NO,
                     T.EMP_TYPE_CODE,
                     GET_GLOBAL_NAME(T.EMP_TYPE_CODE, #{lang, jdbcType=VARCHAR}) AS EMP_TYPE_NAME,
@@ -236,8 +235,6 @@
                     TO_CHAR(T.UPDATE_DATE, 'YYYY/MM/DD HH24:MI') AS UPDATE_DATE,
                     T.UPDATED_BY
                 FROM HR_EMPLOYEE_RECRUIT T
-                LEFT JOIN HR_ORGANIZATION D
-                    ON D.ORG_CODE = T.DEPTNO AND D.CPNY_ID = T.CPNY_ID AND D.ACTIVITY = '1'
                 WHERE T.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
                   AND T.ACTIVITY = #{activity, jdbcType=VARCHAR}
                 <if test="searchName != null and searchName != ''">
@@ -254,15 +251,12 @@
     <select id="selectEmployeeById" resultMap="EmployeeRecruitResultMap">
         SELECT
             T.*,
-            D.ORG_NAME_LOCAL AS DEPT_NAME,
             GET_GLOBAL_NAME(T.SEXCODE,            #{lang, jdbcType=VARCHAR}) AS SEX_NAME,
             GET_GLOBAL_NAME(T.NATIONALITY_CODE,   #{lang, jdbcType=VARCHAR}) AS NATIONALITY_NAME,
             GET_GLOBAL_NAME(T.MARITAL_STATUS_CODE,#{lang, jdbcType=VARCHAR}) AS MARITAL_STATUS_NAME,
             GET_GLOBAL_NAME(T.EMP_TYPE_CODE,      #{lang, jdbcType=VARCHAR}) AS EMP_TYPE_NAME,
             GET_GLOBAL_NAME(T.JOIN_TYPE,          #{lang, jdbcType=VARCHAR}) AS JOIN_TYPE_NAME
         FROM HR_EMPLOYEE_RECRUIT T
-        LEFT JOIN HR_ORGANIZATION D
-            ON D.ORG_CODE = T.DEPTNO AND D.CPNY_ID = T.CPNY_ID AND D.ACTIVITY = '1'
         WHERE T.PERSON_ID = #{personId, jdbcType=VARCHAR}
     </select>
 
@@ -624,5 +618,555 @@
             #{message,    mode=OUT, jdbcType=VARCHAR}
         )}
     </update>
+
+    <!-- ═══════════════════ HR_RECRUIT_REGISTER_INFO (REGISTER_TYPE=80000057) ═══════════════════ -->
+
+    <resultMap id="RegisterInfoResultMap" type="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto">
+        <result column="SEQ"           property="registerSeq"      jdbcType="VARCHAR"/>
+        <result column="REGISTER_DATE" property="registerDate"     jdbcType="VARCHAR"/>
+        <result column="REMARK"        property="registerRemark"   jdbcType="VARCHAR"/>
+        <result column="REGISTER_INFO" property="registerInfo"     jdbcType="VARCHAR"/>
+        <result column="REGISTER_CODE" property="registerCode"     jdbcType="VARCHAR"/>
+        <result column="ACTIVITY"      property="registerActivity" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="ExpInsideBatchResultMap" type="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto">
+        <id     column="SEQ"                property="seq"              jdbcType="VARCHAR"/>
+        <result column="REGISTER_SEQ"       property="registerSeq"      jdbcType="VARCHAR"/>
+        <result column="EMPID"              property="empId"            jdbcType="VARCHAR"/>
+        <result column="LOCAL_NAME"         property="localName"        jdbcType="VARCHAR"/>
+        <result column="START_DATE"         property="startDate"        jdbcType="VARCHAR"/>
+        <result column="TRANS_CODE"         property="transCode"        jdbcType="VARCHAR"/>
+        <result column="TRANS_CODE_NAME"    property="transCodeName"    jdbcType="VARCHAR"/>
+        <result column="TRANS_REASON"       property="transReason"      jdbcType="VARCHAR"/>
+        <result column="TRANS_REASON_NAME"  property="transReasonName"  jdbcType="VARCHAR"/>
+        <result column="DEPTNO"             property="deptno"           jdbcType="VARCHAR"/>
+        <result column="DEPT_NAME"          property="deptName"         jdbcType="VARCHAR"/>
+        <result column="POST_FAMILY"        property="postFamily"       jdbcType="VARCHAR"/>
+        <result column="POST_FAMILY_NAME"   property="postFamilyName"   jdbcType="VARCHAR"/>
+        <result column="NEW_POST_GRADE_NO"  property="newPostGradeNo"   jdbcType="VARCHAR"/>
+        <result column="POST_GRADE_NAME"    property="postGradeName"    jdbcType="VARCHAR"/>
+        <result column="POSITION_NO"        property="positionNo"       jdbcType="VARCHAR"/>
+        <result column="POSITION_NO_NAME"   property="positionNoName"   jdbcType="VARCHAR"/>
+        <result column="EMP_TYPE_CODE"      property="empTypeCode"      jdbcType="VARCHAR"/>
+        <result column="EMP_TYPE_NAME"      property="empTypeName"      jdbcType="VARCHAR"/>
+        <result column="MAIN_BUSINESS"      property="mainBusiness"     jdbcType="VARCHAR"/>
+        <result column="MAIN_BUSINESS_NAME" property="mainBusinessName" jdbcType="VARCHAR"/>
+        <result column="COST_CENTER"        property="costCenter"       jdbcType="VARCHAR"/>
+        <result column="REMARKS"            property="remarks"          jdbcType="VARCHAR"/>
+        <result column="ACTIVITY"           property="activity"         jdbcType="VARCHAR"/>
+        <result column="LINE_ID"            property="lineId"           jdbcType="VARCHAR"/>
+        <result column="PERSON_ID"          property="personId"         jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectRegisterList"
+            parameterType="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto"
+            resultMap="RegisterInfoResultMap">
+        SELECT SEQ,
+               REGISTER_DATE,
+               REMARK, REGISTER_INFO, REGISTER_CODE, ACTIVITY
+        FROM HR_RECRUIT_REGISTER_INFO
+        WHERE REGISTER_TYPE = '80000057'
+          AND CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND (ACTIVITY IS NULL OR ACTIVITY != '2')
+        ORDER BY TO_NUMBER(SEQ) DESC
+    </select>
+
+    <insert id="insertRegister"
+            parameterType="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto">
+        <selectKey keyProperty="registerSeq" resultType="String" order="BEFORE">
+            SELECT TO_CHAR(HR_RECRUIT_REGISTER_INFO_SEQ.NEXTVAL) FROM DUAL
+        </selectKey>
+        INSERT INTO HR_RECRUIT_REGISTER_INFO (
+            SEQ, REGISTER_TYPE, REGISTER_DATE, CPNY_ID,
+            CREATE_DATE, CREATED_BY, CREATED_IP,
+            UPDATE_DATE, UPDATED_BY, UPDATED_IP,
+            ACTIVITY, REMARK
+        ) VALUES (
+            #{registerSeq,  jdbcType=VARCHAR},
+            '80000057',
+            #{registerDate, jdbcType=DATE},
+            #{cpnyId,        jdbcType=VARCHAR},
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR},
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR},
+            '0',
+            #{registerRemark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- ═══════════════════ HR_EXPERIENCE_INSIDE_BATCH ═══════════════════ -->
+
+    <select id="countBatchList"
+            parameterType="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto"
+            resultType="int">
+        SELECT COUNT(1)
+        FROM HR_EXPERIENCE_INSIDE_BATCH
+        WHERE REGISTER_SEQ = #{registerSeq, jdbcType=VARCHAR}
+          AND CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND (ACTIVITY IS NULL OR ACTIVITY != 2)
+    </select>
+
+    <select id="countUnprocessedBatch"
+            parameterType="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto"
+            resultType="int">
+        SELECT COUNT(1)
+        FROM HR_EXPERIENCE_INSIDE_BATCH
+        WHERE REGISTER_SEQ = #{registerSeq, jdbcType=VARCHAR}
+          AND CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND (ACTIVITY IS NULL OR ACTIVITY != 2)
+          AND (ACTIVITY IS NULL OR ACTIVITY != '1')
+    </select>
+
+    <select id="selectBatchListPage"
+            parameterType="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto"
+            resultMap="ExpInsideBatchResultMap">
+        SELECT * FROM (
+            SELECT ROWNUM AS RN, A.* FROM (
+                SELECT
+                    T.SEQ,
+                    T.REGISTER_SEQ,
+                    T.EMPID,
+                    T.LOCAL_NAME,
+                    T.START_DATE,
+                    T.TRANS_CODE,
+                    GET_GLOBAL_NAME(T.TRANS_CODE,       #{lang, jdbcType=VARCHAR}) AS TRANS_CODE_NAME,
+                    T.TRANS_REASON,
+                    GET_GLOBAL_NAME(T.TRANS_REASON,     #{lang, jdbcType=VARCHAR}) AS TRANS_REASON_NAME,
+                    T.DEPTNO,
+                    GET_DEPT_NAME(T.DEPTNO,             #{lang, jdbcType=VARCHAR}) AS DEPT_NAME,
+                    T.POST_FAMILY,
+                    GET_GLOBAL_NAME(T.POST_FAMILY,      #{lang, jdbcType=VARCHAR}) AS POST_FAMILY_NAME,
+                    T.NEW_POST_GRADE_NO,
+                    GET_GLOBAL_NAME(T.NEW_POST_GRADE_NO,#{lang, jdbcType=VARCHAR}) AS POST_GRADE_NAME,
+                    T.POSITION_NO,
+                    GET_GLOBAL_NAME(T.POSITION_NO,      #{lang, jdbcType=VARCHAR}) AS POSITION_NO_NAME,
+                    T.EMP_TYPE_CODE,
+                    GET_GLOBAL_NAME(T.EMP_TYPE_CODE,    #{lang, jdbcType=VARCHAR}) AS EMP_TYPE_NAME,
+                    T.MAIN_BUSINESS,
+                    GET_GLOBAL_NAME(T.MAIN_BUSINESS,    #{lang, jdbcType=VARCHAR}) AS MAIN_BUSINESS_NAME,
+                    T.COST_CENTER,
+                    T.REMARKS,
+                    T.ACTIVITY,
+                    T.LINE_ID
+                FROM HR_EXPERIENCE_INSIDE_BATCH T
+                WHERE T.REGISTER_SEQ = #{registerSeq, jdbcType=VARCHAR}
+                  AND T.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+                  AND (T.ACTIVITY IS NULL OR T.ACTIVITY != 2)
+                ORDER BY T.LINE_ID ASC NULLS LAST, T.SEQ ASC
+            ) A WHERE ROWNUM &lt;= #{start, jdbcType=NUMERIC} + #{length, jdbcType=NUMERIC}
+        ) WHERE RN &gt; #{start, jdbcType=NUMERIC}
+    </select>
+
+    <insert id="insertBatchItem"
+            parameterType="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto">
+        <selectKey keyProperty="seq" resultType="String" order="BEFORE">
+            SELECT TO_CHAR(HR_EXPERIENCE_INSIDE_BATCH_SEQ.NEXTVAL) FROM DUAL
+        </selectKey>
+        INSERT INTO HR_EXPERIENCE_INSIDE_BATCH (
+            SEQ, REGISTER_SEQ, CPNY_ID, EMPID, LOCAL_NAME, START_DATE,
+            TRANS_CODE, TRANS_REASON, DEPTNO, POST_FAMILY, NEW_POST_GRADE_NO,
+            POSITION_NO, EMP_TYPE_CODE, MAIN_BUSINESS, COST_CENTER, REMARKS,
+            LINE_ID, ACTIVITY,
+            CREATE_DATE, CREATED_BY, CREATED_IP,
+            UPDATE_DATE, UPDATED_BY, UPDATED_IP
+        ) VALUES (
+            #{seq,             jdbcType=VARCHAR},
+            #{registerSeq,     jdbcType=VARCHAR},
+            #{cpnyId,          jdbcType=VARCHAR},
+            #{empId,           jdbcType=VARCHAR},
+            #{localName,       jdbcType=VARCHAR},
+            #{startDate,       jdbcType=VARCHAR},
+            #{transCode,       jdbcType=VARCHAR},
+            #{transReason,     jdbcType=VARCHAR},
+            #{deptno,          jdbcType=VARCHAR},
+            #{postFamily,      jdbcType=VARCHAR},
+            #{newPostGradeNo,  jdbcType=VARCHAR},
+            #{positionNo,      jdbcType=VARCHAR},
+            #{empTypeCode,     jdbcType=VARCHAR},
+            #{mainBusiness,    jdbcType=VARCHAR},
+            #{costCenter,      jdbcType=VARCHAR},
+            #{remarks,         jdbcType=VARCHAR},
+            #{lineId,          jdbcType=VARCHAR},
+            0,
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR},
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateBatchItem"
+            parameterType="com.ait.hrm.recruitManage.dto.HrExpInsideBatchDto">
+        UPDATE HR_EXPERIENCE_INSIDE_BATCH SET
+            START_DATE        = #{startDate,      jdbcType=VARCHAR},
+            TRANS_CODE        = #{transCode,      jdbcType=VARCHAR},
+            TRANS_REASON      = #{transReason,    jdbcType=VARCHAR},
+            DEPTNO            = #{deptno,         jdbcType=VARCHAR},
+            POST_FAMILY       = #{postFamily,     jdbcType=VARCHAR},
+            NEW_POST_GRADE_NO = #{newPostGradeNo, jdbcType=VARCHAR},
+            POSITION_NO       = #{positionNo,     jdbcType=VARCHAR},
+            EMP_TYPE_CODE     = #{empTypeCode,    jdbcType=VARCHAR},
+            MAIN_BUSINESS     = #{mainBusiness,   jdbcType=VARCHAR},
+            COST_CENTER       = #{costCenter,     jdbcType=VARCHAR},
+            REMARKS           = #{remarks,        jdbcType=VARCHAR},
+            UPDATE_DATE       = SYSDATE,
+            UPDATED_BY        = #{adminID,        jdbcType=VARCHAR},
+            UPDATED_IP        = #{adminIP,        jdbcType=VARCHAR}
+        WHERE SEQ = #{seq, jdbcType=VARCHAR}
+    </update>
+
+    <update id="deleteBatchItem">
+        UPDATE HR_EXPERIENCE_INSIDE_BATCH SET
+            ACTIVITY    = 2,
+            UPDATE_DATE = SYSDATE,
+            UPDATED_BY  = #{adminID, jdbcType=VARCHAR},
+            UPDATED_IP  = #{adminIP, jdbcType=VARCHAR}
+        WHERE SEQ = #{seq, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectPersonIdByEmpId" resultType="String">
+        SELECT PERSON_ID
+        FROM HR_EMPLOYEE
+        WHERE EMPID    = #{empId,   jdbcType=VARCHAR}
+          AND CPNY_ID  = #{cpnyId,  jdbcType=VARCHAR}
+          AND ROWNUM   = 1
+    </select>
+
+    <!-- ═══════════════════ HR_RECRUIT_REGISTER_INFO (REGISTER_TYPE=14014410) ═══════════════════ -->
+
+    <resultMap id="RblRegisterInfoResultMap" type="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto">
+        <result column="SEQ"           property="registerSeq"      jdbcType="VARCHAR"/>
+        <result column="REGISTER_DATE" property="registerDate"     jdbcType="VARCHAR"/>
+        <result column="REMARK"        property="registerRemark"   jdbcType="VARCHAR"/>
+        <result column="ACTIVITY"      property="registerActivity" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="RecruitBatchResultMap" type="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto">
+        <id     column="SEQ"                property="seq"              jdbcType="VARCHAR"/>
+        <result column="REGISTER_SEQ"       property="registerSeq"      jdbcType="VARCHAR"/>
+        <result column="EMPID"              property="empId"            jdbcType="VARCHAR"/>
+        <result column="VIETNAM_NAME"       property="vietnamName"      jdbcType="VARCHAR"/>
+        <result column="ENGLISH_NAME"       property="englishName"      jdbcType="VARCHAR"/>
+        <result column="DOB"                property="dob"              jdbcType="VARCHAR"/>
+        <result column="DATE_STARTED"       property="dateStarted"      jdbcType="VARCHAR"/>
+        <result column="END_PROBATION_DATE" property="endProbationDate" jdbcType="VARCHAR"/>
+        <result column="JOIN_TYPE"          property="joinType"         jdbcType="VARCHAR"/>
+        <result column="JOIN_TYPE_NAME"     property="joinTypeName"     jdbcType="VARCHAR"/>
+        <result column="JOIN_DETAIL_TYPE"   property="joinDetailType"   jdbcType="VARCHAR"/>
+        <result column="JOIN_DETAIL_NAME"   property="joinDetailTypeName" jdbcType="VARCHAR"/>
+        <result column="DEPTNO"             property="deptno"           jdbcType="VARCHAR"/>
+        <result column="DEPT_NAME"          property="deptName"         jdbcType="VARCHAR"/>
+        <result column="POST_GRADE_NO"      property="postGradeNo"      jdbcType="VARCHAR"/>
+        <result column="POST_GRADE_NAME"    property="postGradeName"    jdbcType="VARCHAR"/>
+        <result column="MAIN_BUSINESS"      property="mainBusiness"     jdbcType="VARCHAR"/>
+        <result column="MAIN_BUSINESS_NAME" property="mainBusinessName" jdbcType="VARCHAR"/>
+        <result column="POST_FAMILY"        property="postFamily"       jdbcType="VARCHAR"/>
+        <result column="POST_FAMILY_NAME"   property="postFamilyName"   jdbcType="VARCHAR"/>
+        <result column="EMP_TYPE_CODE"      property="empTypeCode"      jdbcType="VARCHAR"/>
+        <result column="EMP_TYPE_NAME"      property="empTypeName"      jdbcType="VARCHAR"/>
+        <result column="POSITION_NO"        property="positionNo"       jdbcType="VARCHAR"/>
+        <result column="POSITION_NO_NAME"   property="positionNoName"   jdbcType="VARCHAR"/>
+        <result column="COST_CENTER"        property="costCenter"       jdbcType="VARCHAR"/>
+        <result column="FINAL_DEGREE_CODE"  property="finalDegreeCode"  jdbcType="VARCHAR"/>
+        <result column="FINAL_DEGREE_NAME"  property="finalDegreeName"  jdbcType="VARCHAR"/>
+        <result column="END_DATE"           property="endDate"          jdbcType="VARCHAR"/>
+        <result column="INSTITUTION_NAME"   property="institutionName"  jdbcType="VARCHAR"/>
+        <result column="SUBJECT_NAME"       property="subjectName"      jdbcType="VARCHAR"/>
+        <result column="IDCARD_NO"          property="idcardNo"         jdbcType="VARCHAR"/>
+        <result column="IDCARD_S_DATE"      property="idcardSDate"      jdbcType="VARCHAR"/>
+        <result column="ISSUING_AUTHORITY"  property="issuingAuthority" jdbcType="VARCHAR"/>
+        <result column="SEXCODE"            property="sexcode"          jdbcType="VARCHAR"/>
+        <result column="SEX_NAME"           property="sexName"          jdbcType="VARCHAR"/>
+        <result column="NATIONALITY_CODE"   property="nationalityCode"  jdbcType="VARCHAR"/>
+        <result column="NATIONALITY_NAME"   property="nationalityName"  jdbcType="VARCHAR"/>
+        <result column="NATION_CODE"        property="nationCode"       jdbcType="VARCHAR"/>
+        <result column="NATION_NAME"        property="nationName"       jdbcType="VARCHAR"/>
+        <result column="MARITAL_STATUS_CODE" property="maritalStatusCode" jdbcType="VARCHAR"/>
+        <result column="MARITAL_STATUS_NAME" property="maritalStatusName" jdbcType="VARCHAR"/>
+        <result column="EMAIL_SECOND"       property="emailSecond"      jdbcType="VARCHAR"/>
+        <result column="HOME_PHONE"         property="homePhone"        jdbcType="VARCHAR"/>
+        <result column="TELEPHONE"          property="telephone"        jdbcType="VARCHAR"/>
+        <result column="ADDRESS_CONTENT"    property="addressContent"   jdbcType="VARCHAR"/>
+        <result column="REG_PLACE"          property="regPlace"         jdbcType="VARCHAR"/>
+        <result column="ACTIVITY"           property="activity"         jdbcType="VARCHAR"/>
+        <result column="LINE_ID"            property="lineId"           jdbcType="VARCHAR"/>
+        <result column="PERSON_ID"          property="personId"         jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectRblRegisterList"
+            parameterType="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto"
+            resultMap="RblRegisterInfoResultMap">
+        SELECT SEQ, REGISTER_DATE, REMARK, ACTIVITY
+        FROM HR_RECRUIT_REGISTER_INFO
+        WHERE REGISTER_TYPE = '14014410'
+          AND CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND (ACTIVITY IS NULL OR ACTIVITY != '2')
+        ORDER BY TO_NUMBER(SEQ) DESC
+    </select>
+
+    <insert id="insertRblRegister"
+            parameterType="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto">
+        <selectKey keyProperty="registerSeq" resultType="String" order="BEFORE">
+            SELECT TO_CHAR(HR_RECRUIT_REGISTER_INFO_SEQ.NEXTVAL) FROM DUAL
+        </selectKey>
+        INSERT INTO HR_RECRUIT_REGISTER_INFO (
+            SEQ, REGISTER_TYPE, REGISTER_DATE, CPNY_ID,
+            CREATE_DATE, CREATED_BY, CREATED_IP,
+            UPDATE_DATE, UPDATED_BY, UPDATED_IP,
+            ACTIVITY, REMARK
+        ) VALUES (
+            #{registerSeq,    jdbcType=VARCHAR},
+            '14014410',
+            #{registerDate,   jdbcType=DATE},
+            #{cpnyId,         jdbcType=VARCHAR},
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR},
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR},
+            '0',
+            #{registerRemark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- ═══════════════════ HR_EMPLOYEE_RECRUIT_BATCH ═══════════════════ -->
+
+    <select id="countRblBatchList"
+            parameterType="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto"
+            resultType="int">
+        SELECT COUNT(1)
+        FROM HR_EMPLOYEE_RECRUIT_BATCH
+        WHERE REGISTER_SEQ = #{registerSeq, jdbcType=VARCHAR}
+          AND CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND (ACTIVITY IS NULL OR ACTIVITY != 2)
+    </select>
+
+    <select id="countUnprocessedRblBatch"
+            parameterType="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto"
+            resultType="int">
+        SELECT COUNT(1)
+        FROM HR_EMPLOYEE_RECRUIT_BATCH
+        WHERE REGISTER_SEQ = #{registerSeq, jdbcType=VARCHAR}
+          AND CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND (ACTIVITY IS NULL OR ACTIVITY != 2)
+          AND (ACTIVITY IS NULL OR ACTIVITY != '1')
+    </select>
+
+    <select id="selectRblBatchListPage"
+            parameterType="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto"
+            resultMap="RecruitBatchResultMap">
+        SELECT * FROM (
+            SELECT ROWNUM AS RN, A.* FROM (
+                SELECT
+                    T.SEQ,
+                    T.REGISTER_SEQ,
+                    T.EMPID,
+                    T.VIETNAM_NAME,
+                    T.ENGLISH_NAME,
+                    T.DOB,
+                    T.DATE_STARTED,
+                    T.END_PROBATION_DATE,
+                    T.JOIN_TYPE,
+                    GET_GLOBAL_NAME(T.JOIN_TYPE,         #{lang, jdbcType=VARCHAR}) AS JOIN_TYPE_NAME,
+                    T.JOIN_DETAIL_TYPE,
+                    GET_GLOBAL_NAME(T.JOIN_DETAIL_TYPE,  #{lang, jdbcType=VARCHAR}) AS JOIN_DETAIL_NAME,
+                    T.DEPTNO,
+                    GET_DEPT_NAME(T.DEPTNO,              #{lang, jdbcType=VARCHAR}) AS DEPT_NAME,
+                    T.POST_GRADE_NO,
+                    GET_GLOBAL_NAME(T.POST_GRADE_NO,     #{lang, jdbcType=VARCHAR}) AS POST_GRADE_NAME,
+                    T.MAIN_BUSINESS,
+                    GET_GLOBAL_NAME(T.MAIN_BUSINESS,     #{lang, jdbcType=VARCHAR}) AS MAIN_BUSINESS_NAME,
+                    T.POST_FAMILY,
+                    GET_GLOBAL_NAME(T.POST_FAMILY,       #{lang, jdbcType=VARCHAR}) AS POST_FAMILY_NAME,
+                    T.EMP_TYPE_CODE,
+                    GET_GLOBAL_NAME(T.EMP_TYPE_CODE,     #{lang, jdbcType=VARCHAR}) AS EMP_TYPE_NAME,
+                    T.POSITION_NO,
+                    GET_GLOBAL_NAME(T.POSITION_NO,       #{lang, jdbcType=VARCHAR}) AS POSITION_NO_NAME,
+                    T.COST_CENTER,
+                    T.FINAL_DEGREE_CODE,
+                    GET_GLOBAL_NAME(T.FINAL_DEGREE_CODE, #{lang, jdbcType=VARCHAR}) AS FINAL_DEGREE_NAME,
+                    T.SEXCODE,
+                    GET_GLOBAL_NAME(T.SEXCODE,           #{lang, jdbcType=VARCHAR}) AS SEX_NAME,
+                    T.END_DATE,
+                    T.INSTITUTION_NAME,
+                    T.SUBJECT_NAME,
+                    T.IDCARD_NO,
+                    T.IDCARD_S_DATE,
+                    T.ISSUING_AUTHORITY,
+                    T.NATIONALITY_CODE,
+                    GET_GLOBAL_NAME(T.NATIONALITY_CODE, #{lang, jdbcType=VARCHAR}) AS NATIONALITY_NAME,
+                    T.NATION_CODE,
+                    GET_GLOBAL_NAME(T.NATION_CODE, #{lang, jdbcType=VARCHAR}) AS NATION_NAME,
+                    T.MARITAL_STATUS_CODE,
+                    GET_GLOBAL_NAME(T.MARITAL_STATUS_CODE, #{lang, jdbcType=VARCHAR}) AS MARITAL_STATUS_NAME,
+                    T.EMAIL_SECOND,
+                    T.HOME_PHONE,
+                    T.TELEPHONE,
+                    T.ADDRESS_CONTENT,
+                    T.REG_PLACE,
+                    T.ACTIVITY,
+                    T.LINE_ID,
+                    T.PERSON_ID
+                FROM HR_EMPLOYEE_RECRUIT_BATCH T
+                WHERE T.REGISTER_SEQ = #{registerSeq, jdbcType=VARCHAR}
+                  AND T.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+                  AND (T.ACTIVITY IS NULL OR T.ACTIVITY != 2)
+                ORDER BY T.LINE_ID ASC NULLS LAST, T.SEQ ASC
+            ) A WHERE ROWNUM &lt;= #{start, jdbcType=NUMERIC} + #{length, jdbcType=NUMERIC}
+        ) WHERE RN &gt; #{start, jdbcType=NUMERIC}
+    </select>
+
+    <insert id="insertRblBatchItem"
+            parameterType="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto">
+        <selectKey keyProperty="seq" resultType="String" order="BEFORE">
+            SELECT TO_CHAR(HR_EMPLOYEE_RECRUIT_BATCH_SEQ.NEXTVAL) FROM DUAL
+        </selectKey>
+        INSERT INTO HR_EMPLOYEE_RECRUIT_BATCH (
+            SEQ, PERSON_ID, REGISTER_SEQ, CPNY_ID, EMPID,
+            VIETNAM_NAME, ENGLISH_NAME, DOB, DATE_STARTED, END_PROBATION_DATE,
+            JOIN_TYPE, JOIN_DETAIL_TYPE, DEPTNO, POST_GRADE_NO, MAIN_BUSINESS,
+            POST_FAMILY, EMP_TYPE_CODE, POSITION_NO, COST_CENTER, FINAL_DEGREE_CODE,
+            END_DATE, INSTITUTION_NAME, SUBJECT_NAME,
+            IDCARD_NO, IDCARD_S_DATE, ISSUING_AUTHORITY,
+            SEXCODE, NATIONALITY_CODE, NATION_CODE, MARITAL_STATUS_CODE,
+            EMAIL_SECOND, HOME_PHONE, TELEPHONE, ADDRESS_CONTENT, REG_PLACE,
+            LINE_ID, ACTIVITY,
+            CREATE_DATE, CREATED_BY, CREATED_IP,
+            UPDATE_DATE, UPDATED_BY, UPDATED_IP
+        ) VALUES (
+            #{seq,              jdbcType=VARCHAR},
+            HR_PERSON_ID_SEQ.NEXTVAL,
+            #{registerSeq,      jdbcType=VARCHAR},
+            #{cpnyId,           jdbcType=VARCHAR},
+            #{empId,            jdbcType=VARCHAR},
+            #{vietnamName,      jdbcType=VARCHAR},
+            #{englishName,      jdbcType=VARCHAR},
+            #{dob,              jdbcType=VARCHAR},
+            #{dateStarted,      jdbcType=VARCHAR},
+            #{endProbationDate, jdbcType=VARCHAR},
+            #{joinType,         jdbcType=VARCHAR},
+            #{joinDetailType,   jdbcType=VARCHAR},
+            #{deptno,           jdbcType=VARCHAR},
+            #{postGradeNo,      jdbcType=VARCHAR},
+            #{mainBusiness,     jdbcType=VARCHAR},
+            #{postFamily,       jdbcType=VARCHAR},
+            #{empTypeCode,      jdbcType=VARCHAR},
+            #{positionNo,       jdbcType=VARCHAR},
+            #{costCenter,       jdbcType=VARCHAR},
+            #{finalDegreeCode,  jdbcType=VARCHAR},
+            #{endDate,          jdbcType=VARCHAR},
+            #{institutionName,  jdbcType=VARCHAR},
+            #{subjectName,      jdbcType=VARCHAR},
+            #{idcardNo,         jdbcType=VARCHAR},
+            #{idcardSDate,      jdbcType=VARCHAR},
+            #{issuingAuthority, jdbcType=VARCHAR},
+            #{sexcode,          jdbcType=VARCHAR},
+            #{nationalityCode,  jdbcType=VARCHAR},
+            #{nationCode,       jdbcType=VARCHAR},
+            #{maritalStatusCode,jdbcType=VARCHAR},
+            #{emailSecond,      jdbcType=VARCHAR},
+            #{homePhone,        jdbcType=VARCHAR},
+            #{telephone,        jdbcType=VARCHAR},
+            #{addressContent,   jdbcType=VARCHAR},
+            #{regPlace,         jdbcType=VARCHAR},
+            #{lineId,           jdbcType=VARCHAR},
+            0,
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR},
+            SYSDATE, #{adminID, jdbcType=VARCHAR}, #{adminIP, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateRblBatchItem"
+            parameterType="com.ait.hrm.recruitManage.dto.HrRecruitBatchDto">
+        UPDATE HR_EMPLOYEE_RECRUIT_BATCH SET
+            VIETNAM_NAME       = #{vietnamName,       jdbcType=VARCHAR},
+            ENGLISH_NAME       = #{englishName,       jdbcType=VARCHAR},
+            DOB                = #{dob,               jdbcType=VARCHAR},
+            DATE_STARTED       = #{dateStarted,       jdbcType=VARCHAR},
+            END_PROBATION_DATE = #{endProbationDate,  jdbcType=VARCHAR},
+            JOIN_TYPE          = #{joinType,          jdbcType=VARCHAR},
+            JOIN_DETAIL_TYPE   = #{joinDetailType,    jdbcType=VARCHAR},
+            DEPTNO             = #{deptno,            jdbcType=VARCHAR},
+            POST_GRADE_NO      = #{postGradeNo,       jdbcType=VARCHAR},
+            MAIN_BUSINESS      = #{mainBusiness,      jdbcType=VARCHAR},
+            POST_FAMILY        = #{postFamily,        jdbcType=VARCHAR},
+            EMP_TYPE_CODE      = #{empTypeCode,       jdbcType=VARCHAR},
+            POSITION_NO        = #{positionNo,        jdbcType=VARCHAR},
+            COST_CENTER        = #{costCenter,        jdbcType=VARCHAR},
+            SEXCODE            = #{sexcode,           jdbcType=VARCHAR},
+            NATIONALITY_CODE   = #{nationalityCode,   jdbcType=VARCHAR},
+            NATION_CODE        = #{nationCode,        jdbcType=VARCHAR},
+            MARITAL_STATUS_CODE= #{maritalStatusCode, jdbcType=VARCHAR},
+            FINAL_DEGREE_CODE  = #{finalDegreeCode,   jdbcType=VARCHAR},
+            END_DATE           = #{endDate,           jdbcType=VARCHAR},
+            INSTITUTION_NAME   = #{institutionName,   jdbcType=VARCHAR},
+            SUBJECT_NAME       = #{subjectName,       jdbcType=VARCHAR},
+            IDCARD_NO          = #{idcardNo,          jdbcType=VARCHAR},
+            IDCARD_S_DATE      = #{idcardSDate,       jdbcType=VARCHAR},
+            ISSUING_AUTHORITY  = #{issuingAuthority,  jdbcType=VARCHAR},
+            EMAIL_SECOND       = #{emailSecond,       jdbcType=VARCHAR},
+            HOME_PHONE         = #{homePhone,         jdbcType=VARCHAR},
+            TELEPHONE          = #{telephone,         jdbcType=VARCHAR},
+            ADDRESS_CONTENT    = #{addressContent,    jdbcType=VARCHAR},
+            REG_PLACE          = #{regPlace,          jdbcType=VARCHAR},
+            UPDATE_DATE        = SYSDATE,
+            UPDATED_BY         = #{adminID,           jdbcType=VARCHAR},
+            UPDATED_IP         = #{adminIP,           jdbcType=VARCHAR}
+        WHERE SEQ = #{seq, jdbcType=VARCHAR}
+    </update>
+
+    <update id="deleteRblBatchItem">
+        UPDATE HR_EMPLOYEE_RECRUIT_BATCH SET
+            ACTIVITY    = 2,
+            UPDATE_DATE = SYSDATE,
+            UPDATED_BY  = #{adminID, jdbcType=VARCHAR},
+            UPDATED_IP  = #{adminIP, jdbcType=VARCHAR}
+        WHERE SEQ = #{seq, jdbcType=VARCHAR}
+    </update>
+
+    <!-- ═══════════════════ Check EMPID tồn tại trước khi Xác nhận ═══════════════════ -->
+
+    <select id="selectEmpIdsByPersonIds" resultType="String">
+        SELECT EMPID
+        FROM HR_EMPLOYEE_RECRUIT
+        WHERE CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND EMPID IS NOT NULL AND EMPID != ' '
+          AND PERSON_ID IN
+        <foreach item="id" collection="personIds" open="(" separator="," close=")">
+            #{id, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+    <select id="selectEmpIdsByRegisterSeq" resultType="String">
+        SELECT EMPID
+        FROM HR_EMPLOYEE_RECRUIT_BATCH
+        WHERE CPNY_ID      = #{cpnyId,      jdbcType=VARCHAR}
+          AND REGISTER_SEQ = #{registerSeq, jdbcType=VARCHAR}
+          AND (ACTIVITY IS NULL OR ACTIVITY != 2)
+          AND EMPID IS NOT NULL AND EMPID != ' '
+    </select>
+
+    <select id="selectExistingEmpIds" resultType="String">
+        SELECT EMPID
+        FROM HR_EMPLOYEE
+        WHERE CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND EMPID IN
+        <foreach item="id" collection="empIds" open="(" separator="," close=")">
+            #{id, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+    <!-- Lấy giá trị hiện tại của nhân viên từ HR_EMPLOYEE để fill vào ô trống khi import Excel -->
+    <select id="selectCurrentEmpByEmpId" resultMap="ExpInsideBatchResultMap">
+        SELECT
+            EMPID,
+            LOCAL_NAME,
+            DEPTNO,
+            POST_FAMILY,
+            POST_GRADE_NO   AS NEW_POST_GRADE_NO,
+            POSITION_NO,
+            EMP_TYPE_CODE,
+            MAIN_BUSINESS,
+            COST_CENTER
+        FROM HR_EMPLOYEE
+        WHERE EMPID   = #{empId,  jdbcType=VARCHAR}
+          AND CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND ROWNUM  = 1
+    </select>
 
 </mapper>

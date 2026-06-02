@@ -159,13 +159,13 @@
                 AND hd.IS_PART_TIME = #{searchParams.isPartTime}
             </if>
             <if test="searchParams.createDateFrom != null and searchParams.createDateFrom != ''">
-                AND TRUNC(hd.CREATE_DATE) >= TO_DATE(#{searchParams.createDateFrom}, 'YYYY-MM-DD')
+                AND TRUNC(hd.CREATE_DATE) &gt;= TO_DATE(#{searchParams.createDateFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.createDateTo != null and searchParams.createDateTo != ''">
                 AND TRUNC(hd.CREATE_DATE) &lt;= TO_DATE(#{searchParams.createDateTo}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.updateDateFrom != null and searchParams.updateDateFrom != ''">
-                AND TRUNC(hd.UPDATE_DATE) >= TO_DATE(#{searchParams.updateDateFrom}, 'YYYY-MM-DD')
+                AND TRUNC(hd.UPDATE_DATE) &gt;= TO_DATE(#{searchParams.updateDateFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.updateDateTo != null and searchParams.updateDateTo != ''">
                 AND TRUNC(hd.UPDATE_DATE) &lt;= TO_DATE(#{searchParams.updateDateTo}, 'YYYY-MM-DD')
@@ -212,13 +212,13 @@
             AND hd.IS_PART_TIME = #{isPartTime}
         </if>
         <if test="createDateFrom != null and createDateFrom != ''">
-            AND TRUNC(hd.CREATE_DATE) >= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hd.CREATE_DATE) &gt;= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="createDateTo != null and createDateTo != ''">
             AND TRUNC(hd.CREATE_DATE) &lt;= TO_DATE(#{createDateTo}, 'YYYY-MM-DD')
         </if>
         <if test="updateDateFrom != null and updateDateFrom != ''">
-            AND TRUNC(hd.UPDATE_DATE) >= TO_DATE(#{updateDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hd.UPDATE_DATE) &gt;= TO_DATE(#{updateDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="updateDateTo != null and updateDateTo != ''">
             AND TRUNC(hd.UPDATE_DATE) &lt;= TO_DATE(#{updateDateTo}, 'YYYY-MM-DD')

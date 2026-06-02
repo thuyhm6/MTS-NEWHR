@@ -14,6 +14,11 @@ CONVERTTOUNSIGN(UPPER(t2.LOCAL_NAME)) LIKE '%' || CONVERTTOUNSIGN(UPPER(#{localN
 </select>
 Nhóm nhân viên - POST_FAMILY (dữ liệu lấy lấy thông qua data-parent-code="14015812")
 Trạng thái làm việc - EMP_OFFICE (dữ liệu lấy lấy thông qua data-parent-code="15118" không có data-default-text)
+Học vị - vrl_edu_deg_ (dữ liệu lấy lấy thông qua data-parent-code="13769")
+Quan hệ - vrl_f_type_ (dữ liệu lấy lấy thông qua data-parent-code="950")
+Giới tính - vrl_f_gen_ (dữ liệu lấy lấy thông qua data-parent-code="13768")
+
+vrl_postFamily là Nhóm nhân viên -POST_FAMILY (dữ liệu lấy lấy thông qua data-parent-code="14015812" không có data-default-text). khi chọn value của Nhóm nhân viên thì đồng thời load lại cấp bậc - vrl_postGradeNo với data-parent-code chính là value vừa chọn của Nhóm nhân viên
 
 <input type="text" class="form-control js-daterangepicker" data-drp-format="YYYY-MM-DD">
 
@@ -32,6 +37,8 @@ sử dụng vppoOpenEmpSearch như của viewPaPayObj.html để tìm 1 nhân vi
 sử dụng veas_deptSearch như của viewEvsAffirmorSetup.html để lấy ra cây phòng ban để làm điều kiện tìm kiếm phòng ban.
 
 sử dụng vpid_deptSearch như của viewPaInputItemData.html để lấy ra cây phòng ban để làm điều kiện tìm kiếm phòng ban.
+
+phần vrl_deptNo lựa chọn phòng ban, tham khảo veas_deptSearch của viewEvsAffirmorSetup.html để lấy ra cây phòng ban để làm điều kiện tìm kiếm phòng ban (chỉ được phép chọn 1 phòng ban). khi hiện ra thì hiện Tên phòng ban, khi chọn xong thì lưu giá trị vào trường DEPTNO. vrl_costCenter cũng làm tương tự nhưng lưu giá trị vào trường COST_CENTER. khi chọn được phòng ban thì vrl_costCenter cũng được tuwej động chọn đúng mã đó.
 
 bạn là người hiểu rất rõ về dự án này. căn cứ vào file viewNOContractInfo.html - ký kết hợp đồng,  hãy tạo cho tôi một file viewContractInfoForSearch.html - Tra cứu hợp đồng, dữ liệu lấy ra là tất cả các hợp đồng trong bảng HR_CONTRACT
 
@@ -2318,3 +2325,65 @@ Khi ta cứu ra những nhân viên đã Hoàn thành nhận việc Hoàn thành
             #personIds:VARCHAR#,
             #type:VARCHAR#,
             #message,jdbcType=VARCHAR,mode=OUT#) với nút Hủy xác nhận thì type sẽ là 'CANCEL'.
+
+            phần vrl_deptNo lựa chọn phòng ban, tham khảo veas_deptSearch của viewEvsAffirmorSetup.html để lấy ra cây phòng ban để làm điều kiện tìm kiếm phòng ban (chỉ được phép chọn 1 phòng ban). khi hiện ra thì hiện Tên phòng ban, khi chọn xong thì lưu giá trị vào trường DEPTNO. vrl_costCenter cũng làm tương tự nhưng lưu giá trị vào trường COST_CENTER. khi chọn được phòng ban thì vrl_costCenter cũng được tuwej động chọn đúng mã đó.
+
+Tương tự như viewRecruitList.html, hãy tạo cho tôi file viewStartPoint.html - Quyết định nhân sự nằm trong module hrm/empinfo. chức năng của file này để người quản lý nhập liệu về các quyết định của nhân viên vào hệ thống. giao diện sẽ để bên trái là danh sách các quyết định của nhân viên, khi bấm vào từng quyết định thì sẽ hiển thị thông tin chi tiết về quyết định của nhân viên đó ở bên phải. Dữ liệu sẽ được lấy từ bảng HR_EXPERIENCE_INSIDE, kết hợp cùng HR_EMPLOYEE với các trường của bảng HR_EXPERIENCE_INSIDE tham khảo hình ảnh (Khi thêm mới thì trường SEQ căn cứ vào HR_EXP_INSID_SEQ.NEXTVAL, và ACTIVITY = 0). với TRANS_CODE - Tên quyết định (dữ liệu lấy lấy thông qua data-parent-code="1359"), START_DATE - Ngày quyết định (định dạng ngày tháng là DD/MM/YYYY). Mặc định ban đầu khi bấm vào tab thì lấy ra những quyết định của người dùng đang đăng nhập vào hệ thống. Điều kiện tìm kiếm theo Mã/tên nhân viên và chỉ tìm ra  duy nhất 1 người đó để hiển thị ra những quyết định của người đó. có đầy đủ Thêm mới, Sửa, Xóa và xuất excel.
+
+vsp_position - Vị trí, dữ liệu lấy thông qua data-parent-code="14014049"
+vsp_mainBusiness - Công việc, dữ liệu lấy thông qua data-parent-code="400098"
+khi chọn value của Loại quyết định - vsp_transCode thì đồng thời load lại 
+Lý do quyết định - vsp_transResource với data-parent-code chính là value vừa chọn của Loại quyết định.
+
+Tương tự như vrl_deptNo của viewRecruitList.html, phần vsp_deptNo lựa chọn phòng ban, lấy ra cây phòng ban để làm điều kiện tìm kiếm phòng ban (chỉ được phép chọn 1 phòng ban). khi hiện ra thì hiện Tên phòng ban, khi chọn xong thì lưu giá trị vào trường DEPTNO. vsp_costCenter cũng làm tương tự nhưng lưu giá trị vào trường COST_CENTER. khi chọn được phòng ban thì vsp_costCenter cũng được tự động chọn đúng mã đó.
+
+Ngày quyết định - hãy để dạng js-daterangepicker để lựa chọn (ĐỊnh dang DD/MM/YYYY), Khi bấm Thêm mới thì Ngày quyết định sẽ mặc định là ngày hiện tại, người dùng có thể thay đổi nếu cần thiết. Loại quyết định để trống, còn những trường khác thì lấy giá trị  từu quyết định mới nhất.
+
+Chức năng giống như viewStartPoint.html, hãy tạo cho tôi file viewExperienceBatchList.html - Quyết định hàng loạt nằm trong module hrm/recruitManage. chức năng của file này để người quản lý nhập liệu bằng excel về các quyết định của nhân viên vào hệ thống. Giao diện tham khảo hình ảnh. ở đây có selectbox Ngày đăng ký được lấy từ bảng HR_RECRUIT_REGISTER_INFO với với điều kiện REGISTER_TYPE = '80000057', các trường tham khảo hình ảnh. khi bấm vào tab thì dữ liệu được lấy ra từ bảng HR_EXPERIENCE_INSIDE_BATCH sẽ căn cứ vào giá trị của selectbox Ngày đăng ký để hiển thị những quyết định hàng loạt đã được nhập vào hệ thống tương ứng với ngày đăng ký đó (SEQ của HR_RECRUIT_REGISTER_INFO tương ứng với REGISTER_SEQ của HR_EXPERIENCE_INSIDE_BATCH). Khi bấm vào Đăng ký  sẽ mở modal để nhập REGISTER_DATE và REMARK, sau đó bấm Lưu thì sẽ lưu vào bảng HR_RECRUIT_REGISTER_INFO với REGISTER_TYPE = '80000057'
+file excel sẽ có định dạng như sau: cột A là EMPID, cột B là LOCAL_NAME, cột C là START_DATE, cột E là TRANS_CODE, cột G là DEPTNO, cột I là POST_FAMILY, cột K là POST_GRADE_NO, cột M là POSITION_NO, cột O là EMP_TYPE_CODE, cột Q là MAIN_BUSINESS, cột S là COST_CENTER, cột T là REMARK. sau khi người quản lý upload file excel lên thì sẽ đọc dữ liệu từ file đó và lưu vào bảng HR_EXPERIENCE_INSIDE_BATCH với các trường tham khảo hình ảnh, trong đó có trường PERSON_ID để liên kết với bảng HR_EMPLOYEE để lấy ra tên nhân viên và mã nhân viên (Khi thêm mới thì trường SEQ căn cứ vào HR_EXPERIENCE_INSIDE_BATCH_SEQ.NEXTVAL). chức năng tải bản mẫu và upload excel tham khảo attNewDownloadTemplate và attNewOpenImportModal của viewApplyAttenanceManagentInfoList_new.html. file mẫu của viewExperienceBatchList.html là StartPoint_add_Template.xlsx 
+sau khi tải lên thành công thì load lại dữ liệu từ bảng HR_EXPERIENCE_INSIDE_BATCH ra giao diện để người quản lý có thể xem lại thông tin vừa nhập, nếu có sai sót thì có thể chỉnh sửa trực tiếp trên giao diện, sau đó bấm Xác nhận thì gọi package PKG_RECRUIT_MANAGE.PR_RECRUIT_EXECUTE(
+						#adminID:VARCHAR#,
+						#adminIP:VARCHAR#,
+						#cpnyId:VARCHAR#,
+						#personIds:VARCHAR#,
+						#type:VARCHAR#,
+						#message,jdbcType=VARCHAR,mode=OUT#) với nút Xác nhận thì type sẽ là 'EXP_BATCH'
+
+Khi tải file mẫu thì tôi cần lấy dữ liệu để đưa vào file mẫu, chứ không phải là file mẫu trống, sẽ lấy dữ liệu để đưa vào sheet "TemplateCode". 
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14014049'. với name đưa vào cột A, code đưa vào cột B. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14014049'. với name đưa vào cột A, code đưa vào cột B. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14014049'. với name đưa vào cột A, code đưa vào cột B. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14014049'. với name đưa vào cột A, code đưa vào cột B. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14014049'. với name đưa vào cột A, code đưa vào cột B. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14014049'. với name đưa vào cột A, code đưa vào cột B. bắt đầu từ dòng thứ 2.
+
+1. tôi thấy groups.add(deptPairs); có lấy được dữ liệu, nhưng lại không đưa vào fiel excel mẫu được. 
+2. 
+
+Giống như viewExperienceBatchList.html, hãy tạo cho tôi file viewRecruitBatchList.html - Nhận việc hàng loạt nằm trong module hrm/recruitManage. chức năng của file này để người quản lý nhập liệu bằng excel về các quyết định nhận việc của nhân viên vào hệ thống. Giao diện tham khảo hình ảnh. ở đây có selectbox Ngày đăng ký được lấy từ bảng HR_RECRUIT_REGISTER_INFO với với điều kiện REGISTER_TYPE = '14014410'. khi bấm vào tab thì dữ liệu được lấy ra từ bảng HR_EMPLOYEE_RECRUIT_BATCH sẽ căn cứ vào giá trị của selectbox Ngày đăng ký để hiển thị những quyết định hàng loạt đã được nhập vào hệ thống tương ứng với ngày đăng ký đó (SEQ của HR_RECRUIT_REGISTER_INFO tương ứng với REGISTER_SEQ của HR_EMPLOYEE_RECRUIT_BATCH). Khi bấm vào Đăng ký  sẽ mở modal để nhập REGISTER_DATE và REMARK, sau đó bấm Lưu thì sẽ lưu vào bảng HR_RECRUIT_REGISTER_INFO với REGISTER_TYPE = '14014410'
+file excel sẽ có định dạng như sau: cột A là EMPID, cột B là VIETNAM_NAME, cột C là ENGLISH_NAME, cột D là DOB, cột E là DATE_STARTED, cột F là END_PROBATION_DATE,  cột H là JOIN_TYPE, cột J là JOIN_DETAIL_TYPE, cột L là DEPTNO, cột N là POST_GRADE_NO, cột P là MAIN_BUSINESS, cột R là POST_FAMILY, cột T là EMP_TYPE_CODE, cột V là POSITION_NO, cột X là COST_CENTER, cột Z là FINAL_DEGREE_CODE, cột AA là END_DATE, cột AB là INSTITUTION_NAME, cột AC là SUBJECT_NAME, cột AD là IDCARD_NO, cột AE là IDCARD_S_DATE, cột AF là ISSUING_AUTHORITY, cột AH là SEXCODE, cột Ạ là NATIONALITY_CODE, cột AL là NATION_CODE, cột AN là MARITAL_STATUS_CODE, cột AO là EMAIL_SECOND, cột AP là HOME_PHONE, cột AQ là TELEPHONE, cột AR là ADDRESS_CONTENT, cột AS là  REG_PLACE. sau khi người quản lý upload file excel lên thì sẽ đọc dữ liệu từ file đó và lưu vào bảng HR_EMPLOYEE_RECRUIT_BATCH với các trường tham khảo hình ảnh(Khi thêm mới thì trường SEQ căn cứ vào HR_EMPLOYEE_RECRUIT_BATCH_SEQ.NEXTVAL). chức năng tải bản mẫu và upload excel tham khảo eblDownloadTemplate và eblOpenImportModal của viewExperienceBatchList.html. file mẫu của viewRecruitBatchList.html là NewEmp_add_Template.xlsx 
+sau khi tải lên thành công thì load lại dữ liệu từ bảng HR_EMPLOYEE_RECRUIT_BATCH ra giao diện để người quản lý có thể xem lại thông tin vừa nhập, nếu có sai sót thì có thể chỉnh sửa trực tiếp trên giao diện, sau đó bấm Xác nhận thì gọi package PKG_RECRUIT_MANAGE.PR_RECRUIT_EXECUTE(
+						#adminID:VARCHAR#,
+						#adminIP:VARCHAR#,
+						#cpnyId:VARCHAR#,
+						#personIds:VARCHAR#,
+						#type:VARCHAR#,
+						#message,jdbcType=VARCHAR,mode=OUT#) với nút Xác nhận thì type sẽ là 'CONFIRM_BATCH'.
+
+Khi tải file mẫu thì tôi cần lấy dữ liệu để đưa vào file mẫu, chứ không phải là file mẫu trống, sẽ lấy dữ liệu để đưa vào sheet "TemplateCode". 
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '1359'. với name đưa vào cột A, code đưa vào cột B. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '400414','400435','400429'. với name đưa vào cột C, code đưa vào cột D. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ HR_DEPARTMENT. với ORG_NAME_LOCAL đưa vào cột O VÀ Q, DEPTNO đưa vào cột P VÀ R. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14015812'. với name đưa vào cột E, code đưa vào cột F. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '400001'. với name đưa vào cột G, code đưa vào cột H. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '14014036'. với name đưa vào cột I, code đưa vào cột J. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '13864'. với name đưa vào cột K, code đưa vào cột L. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '400098'. với name đưa vào cột M, code đưa vào cột N. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '13769'. với name đưa vào cột S, code đưa vào cột T. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '1324'. với name đưa vào cột U, code đưa vào cột V. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '870'. với name đưa vào cột W, code đưa vào cột X. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '210942'. với name đưa vào cột Y, code đưa vào cột Z. bắt đầu từ dòng thứ 2.
+cụ thể là lấy dữ liệu từ syCodeParamService.getList(parentCode, null) với parentCode là '1709'. với name đưa vào cột AA, code đưa vào cột AB. bắt đầu từ dòng thứ 2.
+
+
+EMPID, VIETNAM_NAME, ENGLISH_NAME, DOB, DATE_STARTED, END_PROBATION_DATE,  JOIN_TYPE, JOIN_DETAIL_TYPE, DEPTNO, POST_GRADE_NO, MAIN_BUSINESS, POST_FAMILY, EMP_TYPE_CODE, POSITION_NO, COST_CENTER, FINAL_DEGREE_CODE, END_DATE, INSTITUTION_NAME, SUBJECT_NAME, IDCARD_NO, IDCARD_S_DATE, ISSUING_AUTHORITY, SEXCODE, NATIONALITY_CODE, NATION_CODE, MARITAL_STATUS_CODE, EMAIL_SECOND, HOME_PHONE, TELEPHONE, ADDRESS_CONTENT, REG_PLACE.

@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ait.sy.excel.mapper.ExcelMapper">
 
+    <select id="getDeptList" parameterType="map" resultType="map">
+        SELECT DEPTNO AS "deptno", ORG_NAME_LOCAL AS "orgNameLocal"
+        FROM HR_DEPARTMENT
+        WHERE CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
+          AND ACTIVITY = 1
+        ORDER BY DEPTNO ASC
+    </select>
+
     <select id="getPersonIdByEmpId" resultType="String">
         SELECT PERSON_ID FROM HR_EMPLOYEE WHERE EMPID = #{empId, jdbcType=VARCHAR} AND ROWNUM = 1
     </select>

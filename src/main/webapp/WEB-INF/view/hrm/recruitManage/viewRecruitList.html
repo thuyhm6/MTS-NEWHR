@@ -15,19 +15,15 @@
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
-                <!-- Tabs trạng thái -->
-                <ul class="nav nav-tabs nav-fill nav-sm" id="vrl_statusTabs">
-                    <li class="nav-item">
-                        <a class="nav-link active py-1 px-2 small" href="#" id="vrl_tabInProgress"
-                            onclick="vrlSwitchStatus('0'); return false;"
-                            th:text="#{recruit.list.tab.inProgress}">Đang thực hiện</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link py-1 px-2 small" href="#" id="vrl_tabCompleted"
-                            onclick="vrlSwitchStatus('1'); return false;"
-                            th:text="#{recruit.list.tab.completed}">Hoàn thành</a>
-                    </li>
-                </ul>
+                <!-- Lọc trạng thái -->
+                <div class="d-flex align-items-center gap-2 mt-1">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="checkbox" id="vrl_chkCompleted"
+                               onchange="vrlSearchList()">
+                        <label class="form-check-label small fw-semibold" for="vrl_chkCompleted"
+                               th:text="#{recruit.list.tab.completed}">Hoàn thành</label>
+                    </div>
+                </div>
             </div>
 
             <!-- Toolbar -->
@@ -140,7 +136,7 @@
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.sexcode}">Giới tính</label>
-                            <select class="form-select form-select-sm" id="vrl_sexcode" data-parent-code="10000001"></select>
+                            <select class="form-select form-select-sm" id="vrl_sexcode" data-parent-code="1324"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.dob}">Ngày sinh</label>
@@ -148,27 +144,26 @@
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.nationalityCode}">Quốc tịch</label>
-                            <select class="form-select form-select-sm" id="vrl_nationalityCode" data-parent-code="10000007"></select>
+                            <select class="form-select form-select-sm" id="vrl_nationalityCode" data-parent-code="870"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.nationCode}">Dân tộc</label>
-                            <select class="form-select form-select-sm" id="vrl_nationCode" data-parent-code="10000035"></select>
+                            <select class="form-select form-select-sm" id="vrl_nationCode" data-parent-code="210942"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.maritalStatusCode}">Tình trạng hôn nhân</label>
-                            <select class="form-select form-select-sm" id="vrl_maritalStatusCode" data-parent-code="10000003"></select>
+                            <select class="form-select form-select-sm" id="vrl_maritalStatusCode" data-parent-code="1709"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.deptNo}">Phòng ban</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_deptNo" maxlength="20">
+                            <input type="text" class="form-control form-control-sm" id="vrl_deptNo_display"
+                                   th:placeholder="#{recruit.list.placeholder.selectDept}" placeholder="-- Chọn phòng ban --"
+                                   readonly style="background-color:#fff;cursor:pointer;">
+                            <input type="hidden" id="vrl_deptNo">
                         </div>
                         <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.standardPosition}">Chức vụ tiêu chuẩn</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_standardPosition" maxlength="30">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.postFamily}">Chức danh</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_postFamily" maxlength="20">
+                            <label class="form-label small mb-0" th:text="#{recruit.list.field.postFamily}">Nhóm nhân viên</label>
+                            <select class="form-select form-select-sm" id="vrl_postFamily" data-parent-code="14015812" onchange="vrlOnPostFamilyChange()"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.postGradeNo}">Cấp bậc</label>
@@ -176,34 +171,26 @@
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.positionNo}">Vị trí</label>
-                            <select class="form-select form-select-sm" id="vrl_positionNo" data-parent-code="13813"></select>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.workArea}">Khu vực làm việc</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_workArea" maxlength="30">
+                            <select class="form-select form-select-sm" id="vrl_positionNo" data-parent-code="14014036"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.empTypeCode}">Loại nhân viên</label>
-                            <select class="form-select form-select-sm" id="vrl_empTypeCode" data-parent-code="10000031"></select>
+                            <select class="form-select form-select-sm" id="vrl_empTypeCode" data-parent-code="13864"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.joinType}">Loại tuyển dụng</label>
-                            <select class="form-select form-select-sm" id="vrl_joinType" data-parent-code="10000012"></select>
+                            <select class="form-select form-select-sm" id="vrl_joinType" data-parent-code="1359" onchange="vrlOnJoinTypeChange()"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.joinDetailType}">Chi tiết loại vào</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_joinDetailType" maxlength="20">
+                            <select class="form-select form-select-sm" id="vrl_joinDetailType"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.dateStarted}">Ngày vào công ty</label>
                             <input type="text" class="form-control form-control-sm vrl-date" id="vrl_dateStarted" maxlength="20">
                         </div>
                         <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.confirmWorkDate}">Ngày xác nhận làm việc</label>
-                            <input type="text" class="form-control form-control-sm vrl-date" id="vrl_confirmWorkDate" maxlength="20">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.isProbation}">Thử việc</label>
+                            <label class="form-label small mb-0" th:text="#{recruit.list.field.fullTimeEmployee}">Hưởng lương chính thức</label>
                             <select class="form-select form-select-sm" id="vrl_isProbation">
                                 <option value="">--</option>
                                 <option value="1" th:text="#{common.yes}">Có</option>
@@ -219,20 +206,11 @@
                             <input type="text" class="form-control form-control-sm vrl-date" id="vrl_contractStartDate" maxlength="20">
                         </div>
                         <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.contractEndDate}">Ngày kết thúc HĐ</label>
-                            <input type="text" class="form-control form-control-sm vrl-date" id="vrl_contractEndDate" maxlength="20">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.timeStarted}">Ngày vào đầu tiên</label>
-                            <input type="text" class="form-control form-control-sm vrl-date" id="vrl_timeStarted" maxlength="20">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.costCenter}">Trung tâm chi phí</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_costCenter" maxlength="30">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.coinCode}">Tiền tệ</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_coinCode" maxlength="30">
+                            <input type="text" class="form-control form-control-sm" id="vrl_costCenter_display"
+                                   th:placeholder="#{recruit.list.placeholder.selectDept}" placeholder="-- Chọn phòng ban --"
+                                   readonly style="background-color:#fff;cursor:pointer;">
+                            <input type="hidden" id="vrl_costCenter">
                         </div>
                     </div>
                     <div class="d-flex justify-content-end mt-3">
@@ -287,30 +265,7 @@
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.nationality}">Quốc gia</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_nationality" maxlength="20">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.insuranceType}">Loại bảo hiểm</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_insuranceType" maxlength="30">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.insuranceArea}">KV đóng bảo hiểm</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_insuranceArea" maxlength="50">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.insuranceDistinguish}">Phân biệt BH</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_insuranceDistinguish" maxlength="50">
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.jingshebao}">Đóng BHXH</label>
-                            <select class="form-select form-select-sm" id="vrl_jingshebao">
-                                <option value="N" th:text="#{common.no}">Không</option>
-                                <option value="Y" th:text="#{common.yes}">Có</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <label class="form-label small mb-0" th:text="#{recruit.list.field.wageType}">Loại lương</label>
-                            <input type="text" class="form-control form-control-sm" id="vrl_wageType" maxlength="50">
+                            <select class="form-select form-select-sm" id="vrl_nationality" data-parent-code="870"></select>
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <label class="form-label small mb-0" th:text="#{recruit.list.field.accountNo}">Số TK ngân hàng</label>
@@ -460,7 +415,6 @@
         </div><!-- /#vrl_rightPanel -->
 
     </div><!-- /#vrl_pageWrapper -->
-</div><!-- th:fragment="content" -->
 
 <template id="fragmentScripts">
 <style>
@@ -478,7 +432,7 @@
     .vrl-row-edit td input.form-control,
     .vrl-row-edit td select.form-select { height:24px; padding:1px 4px; font-size:.78rem; }
 </style>
-<script th:inline="javascript">
+<script th:inline="none">
 (function () {
     var _vrl_tabId = window._currentTabId || 'default-content';
     window._vrl_inst = window._vrl_inst || {};
@@ -509,6 +463,57 @@
     function vrlInp(id, val, extra) {
         return '<input type="text" class="form-control form-control-sm" id="' + id + '" value="' + vrlEsc(val) + '"' + (extra||'') + '>';
     }
+    function vrlSel(id, val, parentCode) {
+        var safeVal = (val == null ? '' : String(val));
+        return '<select class="form-select form-select-sm" id="' + id + '" data-parent-code="' + parentCode + '" data-default-value="' + vrlEsc(safeVal) + '"></select>';
+    }
+
+    // ── DeptTree cho vrl_deptNo và vrl_costCenter ────────────────────────────
+
+    function vrlGetDeptName(code) {
+        if (!code) return '';
+        if (typeof DeptTree === 'undefined') return code;
+        var list = DeptTree.getAuthDeptList();
+        var item = list && list.find(function (d) { return d.id === code; });
+        return item ? item.text : code;
+    }
+
+    function vrlInitDeptTree() {
+        if (typeof DeptTree === 'undefined') return;
+        var sc = '#' + _vrl_tabId + ' ';
+
+        // Khởi tạo lần đầu: load data, tạo container, singleSelect mode
+        DeptTree.init(sc + '#vrl_deptNo_display', function () {}, { singleSelect: true });
+
+        // Ghi đè click handler của vrl_deptNo_display
+        vrl$('#vrl_deptNo_display').off('click').on('click', function (e) {
+            e.stopPropagation();
+            DeptTree.openFor(sc + '#vrl_deptNo_display', function (codes) {
+                if (codes && codes.length > 0) {
+                    var code = codes[0];
+                    var name = vrl$('#vrl_deptNo_display').val();
+                    vrl$('#vrl_deptNo').val(code);
+                    // Tự động set costCenter về cùng mã phòng ban
+                    vrl$('#vrl_costCenter_display').val(name);
+                    vrl$('#vrl_costCenter').val(code);
+                } else {
+                    vrl$('#vrl_deptNo').val('');
+                }
+            });
+        });
+
+        // vrl_costCenter_display: mở tree riêng, chỉ cập nhật costCenter
+        vrl$('#vrl_costCenter_display').off('click').on('click', function (e) {
+            e.stopPropagation();
+            DeptTree.openFor(sc + '#vrl_costCenter_display', function (codes) {
+                if (codes && codes.length > 0) {
+                    vrl$('#vrl_costCenter').val(codes[0]);
+                } else {
+                    vrl$('#vrl_costCenter').val('');
+                }
+            });
+        });
+    }
 
     // ── Tải danh sách ────────────────────────────────────────────────────────
 
@@ -517,22 +522,14 @@
         vrlLoadList();
     };
 
-    window.vrlSwitchStatus = function (act) {
-        inst.currentActivity = act;
-        inst.currentPage = 1;
-        vrl$('#vrl_tabInProgress').toggleClass('active', act === '0');
-        vrl$('#vrl_tabCompleted').toggleClass('active', act === '1');
-        vrl$('#vrl_btnConfirm').toggleClass('d-none', act !== '0');
-        vrl$('#vrl_btnCancel').toggleClass('d-none', act !== '1');
-        vrlLoadList();
-    };
-
     function vrlLoadList() {
+        var activity = vrl$('#vrl_chkCompleted').prop('checked') ? '1' : '0';
+        inst.currentActivity = activity;
         var payload = {
             draw: inst.currentPage,
             start: (inst.currentPage - 1) * inst.pageSize,
             length: inst.pageSize,
-            activity: inst.currentActivity,
+            activity: activity,
             searchName: vrl$('#vrl_searchName').val(),
             searchEmpId: vrl$('#vrl_searchEmpId').val()
         };
@@ -586,9 +583,9 @@
 
     function vrlUpdateActionButtons() {
         var cnt = vrl$('.vrl-list-chk:checked').length;
-        if (inst.currentActivity === '0') {
-            vrl$('#vrl_btnConfirm').toggleClass('d-none', cnt === 0);
-        }
+        var activity = vrl$('#vrl_chkCompleted').prop('checked') ? '1' : '0';
+        vrl$('#vrl_btnConfirm').toggleClass('d-none', activity !== '0' || cnt === 0);
+        vrl$('#vrl_btnCancel').toggleClass('d-none', activity !== '1' || cnt === 0);
     }
 
     // ── Chọn nhân viên ───────────────────────────────────────────────────────
@@ -618,10 +615,11 @@
                 vrl$('#vrl_koreanName').val(d.koreanName || '');
                 vrl$('#vrl_dob').val(d.dob || '');
                 vrl$('#vrl_deptNo').val(d.deptNo || '');
+                vrl$('#vrl_deptNo_display').val(vrlGetDeptName(d.deptNo));
+                vrl$('#vrl_costCenter').val(d.costCenter || '');
+                vrl$('#vrl_costCenter_display').val(vrlGetDeptName(d.costCenter));
                 vrl$('#vrl_standardPosition').val(d.standardPosition || '');
-                vrl$('#vrl_postFamily').val(d.postFamily || '');
                 vrl$('#vrl_workArea').val(d.workArea || '');
-                vrl$('#vrl_joinDetailType').val(d.joinDetailType || '');
                 vrl$('#vrl_dateStarted').val(d.dateStarted || '');
                 vrl$('#vrl_confirmWorkDate').val(d.confirmWorkDate || '');
                 vrl$('#vrl_isProbation').val(d.isProbation || '');
@@ -629,7 +627,6 @@
                 vrl$('#vrl_contractStartDate').val(d.contractStartDate || '');
                 vrl$('#vrl_contractEndDate').val(d.contractEndDate || '');
                 vrl$('#vrl_timeStarted').val(d.timeStarted || '');
-                vrl$('#vrl_costCenter').val(d.costCenter || '');
                 vrl$('#vrl_coinCode').val(d.coinCode || '');
                 // Tab bổ sung
                 vrl$('#vrl_homePhone').val(d.homePhone || '');
@@ -657,18 +654,38 @@
                 // Dropdowns với reloadCodeSelect
                 if (typeof reloadCodeSelect === 'function') {
                     var sc = '#' + _vrl_tabId + ' ';
-                    reloadCodeSelect(sc + '#vrl_sexcode', '10000001', '', d.sexcode || '');
-                    reloadCodeSelect(sc + '#vrl_nationalityCode', '10000007', '', d.nationalityCode || '');
-                    reloadCodeSelect(sc + '#vrl_nationCode', '10000035', '', d.nationCode || '');
-                    reloadCodeSelect(sc + '#vrl_maritalStatusCode', '10000003', '', d.maritalStatusCode || '');
-                    reloadCodeSelect(sc + '#vrl_empTypeCode', '10000031', '', d.empTypeCode || '');
-                    reloadCodeSelect(sc + '#vrl_joinType', '10000012', '', d.joinType || '');
-                    reloadCodeSelect(sc + '#vrl_postGradeNo', '400001', '', d.postGradeNo || '');
-                    reloadCodeSelect(sc + '#vrl_positionNo', '13813', '', d.positionNo || '');
+                    reloadCodeSelect(sc + '#vrl_sexcode', '1324', '', d.sexcode || '');
+                    reloadCodeSelect(sc + '#vrl_nationalityCode', '870', '', d.nationalityCode || '');
+                    reloadCodeSelect(sc + '#vrl_nationCode', '210942', '', d.nationCode || '');
+                    reloadCodeSelect(sc + '#vrl_maritalStatusCode', '1709', '', d.maritalStatusCode || '');
+                    reloadCodeSelect(sc + '#vrl_empTypeCode', '13864', '', d.empTypeCode || '');
+                    reloadCodeSelect(sc + '#vrl_joinType', '1359', '', d.joinType || '');
+                    reloadCodeSelect(sc + '#vrl_joinDetailType', d.joinType || '', '', d.joinDetailType || '');
+                    reloadCodeSelect(sc + '#vrl_postFamily', '14015812', '', d.postFamily || '');
+                    reloadCodeSelect(sc + '#vrl_postGradeNo', d.postFamily || '', '', d.postGradeNo || '');
+                    reloadCodeSelect(sc + '#vrl_positionNo', '14014036', '', d.positionNo || '');
                 }
             }
         });
     }
+
+    // ── Reload cấp bậc khi đổi nhóm nhân viên ───────────────────────────────
+
+    window.vrlOnJoinTypeChange = function () {
+        var joinTypeVal = vrl$('#vrl_joinType').val();
+        if (typeof reloadCodeSelect === 'function') {
+            var sc = '#' + _vrl_tabId + ' ';
+            reloadCodeSelect(sc + '#vrl_joinDetailType', joinTypeVal || '', '', '');
+        }
+    };
+
+    window.vrlOnPostFamilyChange = function () {
+        var postFamilyVal = vrl$('#vrl_postFamily').val();
+        if (typeof reloadCodeSelect === 'function') {
+            var sc = '#' + _vrl_tabId + ' ';
+            reloadCodeSelect(sc + '#vrl_postGradeNo', postFamilyVal || '', '', '');
+        }
+    };
 
     // ── Thêm mới nhân viên ───────────────────────────────────────────────────
 
@@ -679,9 +696,10 @@
         vrl$('#vrl_selectedEmpId').text('');
         // Reset form
         vrl$('#vrl_personId,#vrl_localName,#vrl_empId,#vrl_englishName,#vrl_koreanName').val('');
-        vrl$('#vrl_dob,#vrl_deptNo,#vrl_standardPosition,#vrl_postFamily,#vrl_workArea').val('');
+        vrl$('#vrl_dob,#vrl_deptNo,#vrl_deptNo_display,#vrl_standardPosition,#vrl_postFamily,#vrl_workArea').val('');
+        vrl$('#vrl_costCenter,#vrl_costCenter_display').val('');
         vrl$('#vrl_joinDetailType,#vrl_dateStarted,#vrl_confirmWorkDate,#vrl_endProbationDate').val('');
-        vrl$('#vrl_contractStartDate,#vrl_contractEndDate,#vrl_timeStarted,#vrl_costCenter,#vrl_coinCode').val('');
+        vrl$('#vrl_contractStartDate,#vrl_contractEndDate,#vrl_timeStarted,#vrl_coinCode').val('');
         vrl$('#vrl_homePhone,#vrl_companyPhone,#vrl_officePhone,#vrl_email,#vrl_idcardNo').val('');
         vrl$('#vrl_documentType,#vrl_idcardStartDate,#vrl_issuingAuthority,#vrl_addressContent').val('');
         vrl$('#vrl_hujiaddressContent,#vrl_nationality,#vrl_insuranceType,#vrl_insuranceArea').val('');
@@ -790,7 +808,7 @@
             if (r._editing) {
                 html += '<tr class="vrl-row-edit">';
                 html += '<td class="text-center">' + chk + '</td><td class="text-center">' + (idx+1) + '</td>';
-                html += '<td>' + vrlInp('vrl_edu_deg_' + r._rowId, r.degreeCode) + '</td>';
+                html += '<td>' + vrlSel('vrl_edu_deg_' + r._rowId, r.degreeCode, '13769') + '</td>';
                 html += '<td>' + vrlInp('vrl_edu_degs_' + r._rowId, r.degreesCode) + '</td>';
                 html += '<td>' + vrlInp('vrl_edu_inst_' + r._rowId, r.institutionName) + '</td>';
                 html += '<td>' + vrlInp('vrl_edu_subj_' + r._rowId, r.subject) + '</td>';
@@ -1008,8 +1026,8 @@
                 html += '<tr class="vrl-row-edit">';
                 html += '<td class="text-center">' + chk + '</td><td class="text-center">' + (idx+1) + '</td>';
                 html += '<td>' + vrlInp('vrl_f_name_' + r._rowId, r.famName) + '</td>';
-                html += '<td>' + vrlInp('vrl_f_type_' + r._rowId, r.famTypeCode) + '</td>';
-                html += '<td>' + vrlInp('vrl_f_gen_' + r._rowId, r.gender, ' maxlength="10"') + '</td>';
+                html += '<td>' + vrlSel('vrl_f_type_' + r._rowId, r.famTypeCode, '950') + '</td>';
+                html += '<td>' + vrlSel('vrl_f_gen_' + r._rowId, r.gender, '1324') + '</td>';
                 html += '<td>' + vrlInp('vrl_f_born_' + r._rowId, r.famBorndate, ' maxlength="20"') + '</td>';
                 html += '<td>' + vrlInp('vrl_f_phone_' + r._rowId, r.famPhone) + '</td>';
                 html += '<td class="text-center"><input type="checkbox" class="form-check-input" id="vrl_f_emg_' + r._rowId + '"' + (r.emergencyContactYn==='Y'?' checked':'') + '></td>';
@@ -1117,9 +1135,8 @@
     // ── Khởi động ────────────────────────────────────────────────────────────
 
     $(document).ready(function () {
-        vrl$('#vrl_btnConfirm').removeClass('d-none');
-        vrl$('#vrl_btnCancel').addClass('d-none');
         vrlLoadList();
+        vrlInitDeptTree();
         if (typeof initDateRangePickers === 'function') {
             initDateRangePickers('#' + _vrl_tabId + ' .vrl-date');
         }
@@ -1127,3 +1144,4 @@
 })();
 </script>
 </template>
+</div><!-- th:fragment="content" -->

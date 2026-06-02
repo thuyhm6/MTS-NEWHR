@@ -505,6 +505,100 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
+    public List<Map<String, Object>> getDeptList() {
+        try {
+            List<Map<String, Object>> list = mapper.getDeptList(new HashMap<>());
+            return list == null ? new ArrayList<>() : list;
+        } catch (Exception e) {
+            log.error("Failed to load department list for template", e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public Workbook buildStartPointTemplate(List<List<String[]>> groups, String templateName) {
+        try {
+            ClassPathResource resource = new ClassPathResource("templates/" + templateName + ".xlsx");
+            XSSFWorkbook wb = new XSSFWorkbook(resource.getInputStream());
+            XSSFSheet codeSheet = wb.getSheet("TemplateCode");
+            if (codeSheet != null) {
+                for (int i = codeSheet.getLastRowNum(); i >= 1; i--) {
+                    Row row = codeSheet.getRow(i);
+                    if (row != null) codeSheet.removeRow(row);
+                }
+                int maxRows = groups.stream().mapToInt(List::size).max().orElse(0);
+                for (int i = 0; i < maxRows; i++) {
+                    Row row = codeSheet.createRow(i + 1);
+                    for (int g = 0; g < groups.size(); g++) {
+                        List<String[]> group = groups.get(g);
+                        if (i < group.size()) {
+                            int startCol = g * 2;
+                            row.createCell(startCol).setCellValue(group.get(i)[0]);
+                            row.createCell(startCol + 1).setCellValue(group.get(i)[1]);
+                        }
+                    }
+                }
+            }
+            return wb;
+        } catch (IOException e) {
+            log.error("Failed to load template from classpath templateName={}", templateName, e);
+            throw new RuntimeException("Khong the doc file mau " + templateName + ".xlsx.", e);
+        }
+    }
+
+    @Override
+    public Workbook buildNewEmpTemplate(List<List<String[]>> groups, String templateName) {
+        // groups chứa các cặp (name, code) theo thứ tự:
+        // index 0  → cols A,B   (0,1)
+        // index 1  → cols C,D   (2,3)
+        // index 2  → cols E,F   (4,5)
+        // index 3  → cols G,H   (6,7)
+        // index 4  → cols I,J   (8,9)
+        // index 5  → cols K,L   (10,11)
+        // index 6  → cols M,N   (12,13)
+        // index 7  → cols O,P   (14,15)  AND Q,R (16,17) – phòng ban (lặp 2 lần)
+        // index 8  → cols S,T   (18,19)
+        // index 9  → cols U,V   (20,21)
+        // index 10 → cols W,X   (22,23)
+        // index 11 → cols Y,Z   (24,25)
+        // index 12 → cols AA,AB (26,27)
+        int[] startCols = { 0, 2, 4, 6, 8, 10, 12, 14, 18, 20, 22, 24, 26 };
+        try {
+            ClassPathResource resource = new ClassPathResource("templates/" + templateName + ".xlsx");
+            XSSFWorkbook wb = new XSSFWorkbook(resource.getInputStream());
+            XSSFSheet codeSheet = wb.getSheet("TemplateCode");
+            if (codeSheet != null) {
+                for (int i = codeSheet.getLastRowNum(); i >= 1; i--) {
+                    Row row = codeSheet.getRow(i);
+                    if (row != null) codeSheet.removeRow(row);
+                }
+                int maxRows = groups.stream().mapToInt(List::size).max().orElse(0);
+                for (int i = 0; i < maxRows; i++) {
+                    Row row = codeSheet.getRow(i + 1);
+                    if (row == null) row = codeSheet.createRow(i + 1);
+                    for (int g = 0; g < groups.size() && g < startCols.length; g++) {
+                        List<String[]> group = groups.get(g);
+                        if (i < group.size()) {
+                            int col = startCols[g];
+                            row.createCell(col).setCellValue(group.get(i)[0]);
+                            row.createCell(col + 1).setCellValue(group.get(i)[1]);
+                            // Phòng ban lặp lại ở cột Q,R (index 7)
+                            if (g == 7) {
+                                row.createCell(16).setCellValue(group.get(i)[0]);
+                                row.createCell(17).setCellValue(group.get(i)[1]);
+                            }
+                        }
+                    }
+                }
+            }
+            return wb;
+        } catch (IOException e) {
+            log.error("Failed to load template from classpath templateName={}", templateName, e);
+            throw new RuntimeException("Không thể đọc file mẫu " + templateName + ".xlsx.", e);
+        }
+    }
+
+    @Override
     public Workbook buildCardRecordTemplate() {
         XSSFWorkbook wb = new XSSFWorkbook();
         XSSFSheet sheet = wb.createSheet("Template");

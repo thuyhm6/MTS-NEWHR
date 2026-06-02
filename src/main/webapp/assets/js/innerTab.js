@@ -8,14 +8,21 @@
     }
 
         init() {
-        // Bind click events for menu links
         this.bindMenuLinks();
-
-        // Initialize dashboard as first tab
         this.initializeDashboardTab();
-
-        // Initialize context menu
         this.initializeContextMenu();
+        this.bindTabSwitchEvents();
+    }
+
+        bindTabSwitchEvents() {
+        // Bootstrap tab switch: re-inject scripts cho tab được kích hoạt
+        document.addEventListener('shown.bs.tab', (event) => {
+        const tabId = event.target.id ? event.target.id.replace('-tab', '') : null;
+        if (tabId && this.tabs.has(tabId)) {
+        this.activeTabId = tabId;
+        this.handleTabScripts(tabId);
+    }
+    });
     }
 
         initializeDashboardTab() {
@@ -325,77 +332,29 @@
         return response.text();
     })
         .then(html => {
-        // Extract content from response
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const content = doc.querySelector('[th\\:fragment="content"]') ||
         doc.querySelector('.container-fluid') ||
         doc.body;
 
-        // Inject content into DOM FIRST so scripts can find DOM elements via getElementById
         tab.content = content.innerHTML;
         tab.loaded = true;
+
+        // Lưu nội dung fragment scripts từ doc gốc để inject đáng tin cậy
+        const docFragmentScripts = doc.querySelector('#fragmentScripts');
+        if (docFragmentScripts) {
+        tab.fragmentScriptsHTML = docFragmentScripts.innerHTML;
+    }
 
         const contentPane = document.getElementById(tab.id);
         if (contentPane) {
         contentPane.innerHTML = tab.content;
     }
 
-        // Extract scripts from template AFTER content is in DOM
-        const fragmentScripts = doc.querySelector('#fragmentScripts');
-        // console.log('fragmentScripts found:', fragmentScripts);
-
-        if (fragmentScripts) {
-        // Clear previous dynamic scripts
-        const dynamicScripts = document.getElementById('dynamic-scripts');
-        if (dynamicScripts) {
-        dynamicScripts.innerHTML = '';
-    }
-
-        // Get template content (innerHTML)
-        const templateContent = fragmentScripts.innerHTML;
-        // console.log('Template content:', templateContent);
-
-        // Parse template content separately
-        const templateParser = new DOMParser();
-        const templateDoc = templateParser.parseFromString(templateContent, 'text/html');
-        const scripts = templateDoc.querySelectorAll('script');
-        const styles  = templateDoc.querySelectorAll('style');
-        // console.log('Scripts found:', scripts.length);
-
-        // Inject tab URL so fragment scripts can read query params
-        const urlVarScript = document.createElement('script');
-        urlVarScript.textContent = 'window._currentTabUrl = ' + JSON.stringify(tab.url) + '; window._currentTabId = ' + JSON.stringify(tab.id) + ';';
-        if (dynamicScripts) {
-        dynamicScripts.appendChild(urlVarScript);
-    }
-
-        styles.forEach(style => {
-        const newStyle = document.createElement('style');
-        newStyle.textContent = style.textContent;
-        if (dynamicScripts) {
-        dynamicScripts.appendChild(newStyle);
-    }
-    });
-
-        scripts.forEach(script => {
-        const newScript = document.createElement('script');
-
-        // Copy all attributes
-        Array.from(script.attributes).forEach(attr => {
-        newScript.setAttribute(attr.name, attr.value);
-    });
-
-        // Copy script content
-        newScript.textContent = script.textContent;
-
-        // Append to dynamic-scripts
-        if (dynamicScripts) {
-        dynamicScripts.appendChild(newScript);
-    }
-    });
-
-        // console.log('Scripts moved to dynamic-scripts:', scripts.length);
+        // Chỉ inject scripts nếu tab này đang được hiển thị
+        if (this.activeTabId === tab.id) {
+        this.handleTabScripts(tab.id);
     }
     })
         .catch(error => {
@@ -421,10 +380,14 @@
         activeLink.classList.add('active');
     }
 
-        // Update tab content
-        document.querySelectorAll('.tab-pane').forEach(pane => {
+        // Chỉ xóa active của các outer tab pane (direct children của #tab-content-area)
+        // để tránh xóa nhầm inner tab pane bên trong mỗi trang
+        const contentArea = document.getElementById('tab-content-area');
+        if (contentArea) {
+        Array.from(contentArea.children).forEach(pane => {
         pane.classList.remove('active');
     });
+    }
 
         const activePane = document.getElementById(tabId);
         if (activePane) {
@@ -445,19 +408,30 @@
         dynamicScripts.innerHTML = '';
     }
 
-        // Check if current tab content has fragmentScripts
+        // Tìm scripts: ưu tiên HTML đã lưu từ doc gốc (đáng tin nhất), fallback live DOM
+        let scripts = [];
+        let styles  = [];
+
+        if (tab.fragmentScriptsHTML) {
+        const tempDoc = new DOMParser().parseFromString(tab.fragmentScriptsHTML, 'text/html');
+        scripts = Array.from(tempDoc.querySelectorAll('script'));
+        styles  = Array.from(tempDoc.querySelectorAll('style'));
+    }
+
+        // Fallback: thử lấy từ live DOM
+        if (scripts.length === 0) {
         const activePane = document.getElementById(tabId);
         if (activePane) {
         const fragmentScripts = activePane.querySelector('#fragmentScripts');
-        if (fragmentScripts) {
-        // Get template content (innerHTML)
-        const templateContent = fragmentScripts.innerHTML;
+        if (fragmentScripts && fragmentScripts.innerHTML) {
+        const tempDoc = new DOMParser().parseFromString(fragmentScripts.innerHTML, 'text/html');
+        scripts = Array.from(tempDoc.querySelectorAll('script'));
+        styles  = Array.from(tempDoc.querySelectorAll('style'));
+    }
+    }
+    }
 
-        // Parse template content separately
-        const templateParser = new DOMParser();
-        const templateDoc = templateParser.parseFromString(templateContent, 'text/html');
-        const scripts = templateDoc.querySelectorAll('script');
-        const styles  = templateDoc.querySelectorAll('style');
+        if (scripts.length === 0) return;
 
         // Inject tab URL so fragment scripts can read query params
         const urlVarScript = document.createElement('script');
@@ -492,8 +466,6 @@
     });
 
         console.log('Scripts activated for tab:', tabId, 'Count:', scripts.length);
-    }
-    }
     }
 
         closeTab(tabId) {
@@ -553,12 +525,15 @@
         defaultContent.classList.add('active');
     }
 
-        // Hide all tab panes
-        document.querySelectorAll('.tab-pane').forEach(pane => {
+        // Chỉ ẩn các outer tab pane (direct children của #tab-content-area)
+        const contentArea = document.getElementById('tab-content-area');
+        if (contentArea) {
+        Array.from(contentArea.children).forEach(pane => {
         if (pane.id !== 'default-content') {
         pane.classList.remove('active');
     }
     });
+    }
     }
 }
 

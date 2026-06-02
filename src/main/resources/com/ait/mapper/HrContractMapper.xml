@@ -128,13 +128,13 @@
             AND hc.WORK_POSITION LIKE '%' || #{searchParams.workPosition} || '%'
         </if>
         <if test="searchParams.startDateFrom != null and searchParams.startDateFrom != ''">
-            AND TRUNC(hc.START_CONTRACT_DATE) >= TO_DATE(#{searchParams.startDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hc.START_CONTRACT_DATE) &gt;= TO_DATE(#{searchParams.startDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="searchParams.startDateTo != null and searchParams.startDateTo != ''">
             AND TRUNC(hc.START_CONTRACT_DATE) &lt;= TO_DATE(#{searchParams.startDateTo}, 'YYYY-MM-DD')
         </if>
         <if test="searchParams.endDateFrom != null and searchParams.endDateFrom != ''">
-            AND TRUNC(hc.END_CONTRACT_DATE) >= TO_DATE(#{searchParams.endDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hc.END_CONTRACT_DATE) &gt;= TO_DATE(#{searchParams.endDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="searchParams.endDateTo != null and searchParams.endDateTo != ''">
             AND TRUNC(hc.END_CONTRACT_DATE) &lt;= TO_DATE(#{searchParams.endDateTo}, 'YYYY-MM-DD')
@@ -143,7 +143,7 @@
             AND hc.ACTIVITY = #{searchParams.activity}
         </if>
         <if test="searchParams.salaryFrom != null and searchParams.salaryFrom != ''">
-            AND hc.SALARY >= #{searchParams.salaryFrom}
+            AND hc.SALARY &gt;= #{searchParams.salaryFrom}
         </if>
         <if test="searchParams.salaryTo != null and searchParams.salaryTo != ''">
             AND hc.SALARY &lt;= #{searchParams.salaryTo}
@@ -171,13 +171,13 @@
             AND hc.WORK_POSITION LIKE '%' || #{searchParams.workPosition} || '%'
         </if>
         <if test="searchParams.startDateFrom != null and searchParams.startDateFrom != ''">
-            AND TRUNC(hc.START_CONTRACT_DATE) >= TO_DATE(#{searchParams.startDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hc.START_CONTRACT_DATE) &gt;= TO_DATE(#{searchParams.startDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="searchParams.startDateTo != null and searchParams.startDateTo != ''">
             AND TRUNC(hc.START_CONTRACT_DATE) &lt;= TO_DATE(#{searchParams.startDateTo}, 'YYYY-MM-DD')
         </if>
         <if test="searchParams.endDateFrom != null and searchParams.endDateFrom != ''">
-            AND TRUNC(hc.END_CONTRACT_DATE) >= TO_DATE(#{searchParams.endDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(hc.END_CONTRACT_DATE) &gt;= TO_DATE(#{searchParams.endDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="searchParams.endDateTo != null and searchParams.endDateTo != ''">
             AND TRUNC(hc.END_CONTRACT_DATE) &lt;= TO_DATE(#{searchParams.endDateTo}, 'YYYY-MM-DD')
@@ -186,7 +186,7 @@
             AND hc.ACTIVITY = #{searchParams.activity}
         </if>
         <if test="searchParams.salaryFrom != null and searchParams.salaryFrom != ''">
-            AND hc.SALARY >= #{searchParams.salaryFrom}
+            AND hc.SALARY &gt;= #{searchParams.salaryFrom}
         </if>
         <if test="searchParams.salaryTo != null and searchParams.salaryTo != ''">
             AND hc.SALARY &lt;= #{searchParams.salaryTo}

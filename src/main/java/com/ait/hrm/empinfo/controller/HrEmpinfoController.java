@@ -1,6 +1,7 @@
 package com.ait.hrm.empinfo.controller;
 
 import com.ait.hrm.empinfo.dto.EmployeeSearchResponse;
+import com.ait.hrm.empinfo.dto.HrExpInsideDto;
 import com.ait.hrm.empinfo.dto.PhotoImportResultDto;
 import com.ait.hrm.empinfo.model.HrAddressMatters;
 import com.ait.hrm.empinfo.model.HrEducation;
@@ -16,12 +17,16 @@ import com.ait.hrm.empinfo.service.HrEmergencyAddressService;
 import com.ait.hrm.empinfo.service.HrEmployeeService;
 import com.ait.hrm.empinfo.service.HrFamilyService;
 import com.ait.hrm.empinfo.service.HrPersonalInfoService;
+import com.ait.hrm.empinfo.service.HrExpInsideService;
 import com.ait.hrm.empinfo.service.HrPhotoImportService;
 import com.ait.hrm.empinfo.service.HrPunishmentService;
 import com.ait.hrm.empinfo.service.HrRewardService;
 import com.ait.hrm.empinfo.service.HrSpecialMatterService;
 import com.ait.sy.sys.dto.DataTablesRequest;
 import com.ait.sy.sys.dto.DataTablesResponse;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import jakarta.servlet.http.HttpServletResponse;
 import com.ait.sy.sys.service.PermissionService;
 import com.ait.sy.sys.service.HrAuthenticationService.HrUserInfo;
 
@@ -85,6 +90,9 @@ public class HrEmpinfoController {
 
     @Autowired
     private HrPhotoImportService hrPhotoImportService;
+
+    @Autowired
+    private HrExpInsideService hrExpInsideService;
 
     /**
      * Trang xem thông tin cá nhân nhân viên
@@ -1054,6 +1062,158 @@ public class HrEmpinfoController {
         } catch (Exception e) {
             log.error("Lỗi khi lưu ảnh: ", e);
             return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    // ── Quyết định nhân sự (HR_EXPERIENCE_INSIDE) ─────────────────────────────
+
+    @GetMapping("/viewStartPoint")
+    public String viewStartPoint(Model model, HttpSession session) {
+        HrUserInfo currentHrUser = (HrUserInfo) session.getAttribute("currentHrUser");
+        model.addAttribute("currentHrUser", currentHrUser);
+        model.addAttribute("title", "Quyết định nhân sự");
+        return "hrm/empinfo/viewStartPoint";
+    }
+
+    @GetMapping("/api/startpoint/employee/search")
+    @ResponseBody
+    public ResponseEntity<?> searchEmployeeForStartPoint(
+            @RequestParam(required = false) String keyword,
+            HttpSession session) {
+        try {
+            HrUserInfo currentHrUser = (HrUserInfo) session.getAttribute("currentHrUser");
+            HrExpInsideDto dto = new HrExpInsideDto();
+            dto.setSearchKeyword(keyword);
+            HrExpInsideDto emp = hrExpInsideService.searchEmployee(dto);
+            if (emp == null) {
+                return ResponseEntity.status(404).body("Không tìm thấy nhân viên");
+            }
+            return ResponseEntity.ok(emp);
+        } catch (Exception e) {
+            log.error("Lỗi tìm kiếm nhân viên startpoint: ", e);
+            return ResponseEntity.status(500).body("Lỗi hệ thống");
+        }
+    }
+
+    @PostMapping("/api/startpoint/decisions/list")
+    @ResponseBody
+    public DataTablesResponse<HrExpInsideDto> getDecisionList(
+            @RequestBody HrExpInsideDto dto) {
+        return hrExpInsideService.getDecisionList(dto);
+    }
+
+    @GetMapping("/api/startpoint/decisions/detail")
+    @ResponseBody
+    public ResponseEntity<?> getDecisionDetail(@RequestParam("seq") Long seq) {
+        try {
+            HrExpInsideDto dto = hrExpInsideService.getDecisionBySeq(seq);
+            if (dto == null) {
+                return ResponseEntity.status(404).body("Không tìm thấy quyết định");
+            }
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            log.error("Lỗi lấy chi tiết quyết định seq={}: ", seq, e);
+            return ResponseEntity.status(500).body("Lỗi hệ thống");
+        }
+    }
+
+    @PostMapping("/api/startpoint/decisions/save")
+    @ResponseBody
+    public ResponseEntity<?> saveDecision(@RequestBody HrExpInsideDto dto) {
+        try {
+            java.util.Map<String, Object> result = hrExpInsideService.saveDecision(dto);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            log.error("Lỗi lưu quyết định: ", e);
+            return ResponseEntity.status(500).body(java.util.Collections.singletonMap("success", false));
+        }
+    }
+
+    @PostMapping("/api/startpoint/decisions/delete")
+    @ResponseBody
+    public ResponseEntity<?> deleteDecision(@RequestParam("seq") Long seq) {
+        try {
+            java.util.Map<String, Object> result = hrExpInsideService.deleteDecision(seq);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            log.error("Lỗi xóa quyết định seq={}: ", seq, e);
+            return ResponseEntity.status(500).body(java.util.Collections.singletonMap("success", false));
+        }
+    }
+
+    @GetMapping("/api/startpoint/decisions/export")
+    public void exportDecisionsExcel(
+            @RequestParam("personId") String personId,
+            @RequestParam(value = "localName", required = false, defaultValue = "") String localName,
+            HttpSession session,
+            HttpServletResponse response) {
+        try {
+            java.util.List<HrExpInsideDto> list = hrExpInsideService.getAllDecisionsByPersonId(personId);
+
+            Workbook wb = new XSSFWorkbook();
+            Sheet sheet = wb.createSheet("Quyết định nhân sự");
+
+            CellStyle headerStyle = wb.createCellStyle();
+            Font headerFont = wb.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+            headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+            String[] headers = {
+                "STT", "Tên quyết định", "Ngày quyết định", "Phòng ban",
+                "Loại nhân viên", "Nhóm NV", "Cấp bậc", "Chức vụ",
+                "Loại giờ làm", "Loại lương", "Lý do QĐ", "Ghi chú"
+            };
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            CellStyle dataStyle = wb.createCellStyle();
+            dataStyle.setBorderBottom(BorderStyle.THIN);
+            dataStyle.setBorderTop(BorderStyle.THIN);
+            dataStyle.setBorderLeft(BorderStyle.THIN);
+            dataStyle.setBorderRight(BorderStyle.THIN);
+
+            for (int i = 0; i < list.size(); i++) {
+                HrExpInsideDto d = list.get(i);
+                Row row = sheet.createRow(i + 1);
+                row.createCell(0).setCellValue(i + 1);
+                row.createCell(1).setCellValue(d.getTransCodeName() != null ? d.getTransCodeName() : "");
+                row.createCell(2).setCellValue(d.getStartDate() != null ? d.getStartDate() : "");
+                row.createCell(3).setCellValue(d.getDeptno() != null ? d.getDeptno() : "");
+                row.createCell(4).setCellValue(d.getEmpTypeName() != null ? d.getEmpTypeName() : "");
+                row.createCell(5).setCellValue(d.getPostFamilyName() != null ? d.getPostFamilyName() : "");
+                row.createCell(6).setCellValue(d.getPostGradeName() != null ? d.getPostGradeName() : "");
+                row.createCell(7).setCellValue(d.getPositionNo() != null ? d.getPositionNo() : "");
+                row.createCell(8).setCellValue(d.getWorkHourType() != null ? d.getWorkHourType() : "");
+                row.createCell(9).setCellValue(d.getWageType() != null ? d.getWageType() : "");
+                row.createCell(10).setCellValue(d.getTransResource() != null ? d.getTransResource() : "");
+                row.createCell(11).setCellValue(d.getRemark() != null ? d.getRemark() : "");
+                for (int j = 0; j < headers.length; j++) {
+                    if (row.getCell(j) != null) row.getCell(j).setCellStyle(dataStyle);
+                }
+            }
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            String filename = "QuyetDinhNhanSu_" + localName.replace(" ", "_") + ".xlsx";
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" +
+                    java.net.URLEncoder.encode(filename, "UTF-8") + "\"");
+            wb.write(response.getOutputStream());
+            wb.close();
+        } catch (Exception e) {
+            log.error("Lỗi xuất Excel quyết định nhân sự personId={}: ", personId, e);
         }
     }
 

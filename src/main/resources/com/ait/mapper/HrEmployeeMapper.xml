@@ -210,19 +210,19 @@
                 AND he.INCUMBENCY = #{searchParams.incumbency}
             </if>
             <if test="searchParams.dateStartedFrom != null and searchParams.dateStartedFrom != ''">
-                AND TRUNC(he.DATE_STARTED) >= TO_DATE(#{searchParams.dateStartedFrom}, 'YYYY-MM-DD')
+                AND TRUNC(he.DATE_STARTED) &gt;= TO_DATE(#{searchParams.dateStartedFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.dateStartedTo != null and searchParams.dateStartedTo != ''">
                 AND TRUNC(he.DATE_STARTED) &lt;= TO_DATE(#{searchParams.dateStartedTo}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.dateLeftFrom != null and searchParams.dateLeftFrom != ''">
-                AND TRUNC(he.DATE_LEFT) >= TO_DATE(#{searchParams.dateLeftFrom}, 'YYYY-MM-DD')
+                AND TRUNC(he.DATE_LEFT) &gt;= TO_DATE(#{searchParams.dateLeftFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.dateLeftTo != null and searchParams.dateLeftTo != ''">
                 AND TRUNC(he.DATE_LEFT) &lt;= TO_DATE(#{searchParams.dateLeftTo}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.createDateFrom != null and searchParams.createDateFrom != ''">
-                AND TRUNC(he.CREATE_DATE) >= TO_DATE(#{searchParams.createDateFrom}, 'YYYY-MM-DD')
+                AND TRUNC(he.CREATE_DATE) &gt;= TO_DATE(#{searchParams.createDateFrom}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.createDateTo != null and searchParams.createDateTo != ''">
                 AND TRUNC(he.CREATE_DATE) &lt;= TO_DATE(#{searchParams.createDateTo}, 'YYYY-MM-DD')
@@ -269,19 +269,19 @@
             AND he.INCUMBENCY = #{incumbency}
         </if>
         <if test="dateStartedFrom != null and dateStartedFrom != ''">
-            AND TRUNC(he.DATE_STARTED) >= TO_DATE(#{dateStartedFrom}, 'YYYY-MM-DD')
+            AND TRUNC(he.DATE_STARTED) &gt;= TO_DATE(#{dateStartedFrom}, 'YYYY-MM-DD')
         </if>
         <if test="dateStartedTo != null and dateStartedTo != ''">
             AND TRUNC(he.DATE_STARTED) &lt;= TO_DATE(#{dateStartedTo}, 'YYYY-MM-DD')
         </if>
         <if test="dateLeftFrom != null and dateLeftFrom != ''">
-            AND TRUNC(he.DATE_LEFT) >= TO_DATE(#{dateLeftFrom}, 'YYYY-MM-DD')
+            AND TRUNC(he.DATE_LEFT) &gt;= TO_DATE(#{dateLeftFrom}, 'YYYY-MM-DD')
         </if>
         <if test="dateLeftTo != null and dateLeftTo != ''">
             AND TRUNC(he.DATE_LEFT) &lt;= TO_DATE(#{dateLeftTo}, 'YYYY-MM-DD')
         </if>
         <if test="createDateFrom != null and createDateFrom != ''">
-            AND TRUNC(he.CREATE_DATE) >= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
+            AND TRUNC(he.CREATE_DATE) &gt;= TO_DATE(#{createDateFrom}, 'YYYY-MM-DD')
         </if>
         <if test="createDateTo != null and createDateTo != ''">
             AND TRUNC(he.CREATE_DATE) &lt;= TO_DATE(#{createDateTo}, 'YYYY-MM-DD')
@@ -494,7 +494,7 @@
             AND he.DEPTNO LIKE '%' || #{deptNo} || '%'
         </if>
         ORDER BY he.EMPID
-        <![CDATA[ AND ROWNUM <= 20 ]]>
+        <![CDATA[ AND ROWNUM &lt;= 20 ]]>
     </select>
 
     <!-- DataTables server-side processing - Get employees with search and sort -->

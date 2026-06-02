@@ -217,7 +217,7 @@
                   FROM ESS_APPLY_OT OT
                  WHERE OT.APPLY_NO = EM.APPLY_NO
                    AND OT.BATCH_YN = 2)
-           AND CREATE_DATE >= TO_DATE(TO_CHAR(SYSDATE, 'YYYY.MM') || '.01', 'YYYY.MM.DD')
+           AND CREATE_DATE &gt;= TO_DATE(TO_CHAR(SYSDATE, 'YYYY.MM') || '.01', 'YYYY.MM.DD')
         <if test="titleSearch != null and titleSearch != ''">
            AND UPPER(TITLE) LIKE '%' || UPPER(#{titleSearch, jdbcType=VARCHAR}) || '%'
         </if>

@@ -187,9 +187,83 @@ public class ExcelController {
             return excelService.buildTemplate(null, null, templateName);
         } else if ("Card_Template".equalsIgnoreCase(templateName)) {
             return excelService.buildCardRecordTemplate();
+        } else if ("StartPoint_add_Template".equalsIgnoreCase(templateName)) {
+            return excelService.buildStartPointTemplate(loadStartPointGroups(), templateName);
+        } else if ("NewEmp_add_Template".equalsIgnoreCase(templateName)) {
+            return excelService.buildNewEmpTemplate(loadNewEmpGroups(), templateName);
         } else {
             return excelService.buildTemplate(null, null, templateName);
         }
+    }
+
+    private List<List<String[]>> loadStartPointGroups() {
+        List<List<String[]>> groups = new ArrayList<>();
+        List<String[]> deptPairs = deptToStringPairs(loadDeptList());
+        groups.add(codeToStringPairs(loadCodeList("14013956"))); // A,B: transCode
+        groups.add(deptPairs);                                    // C,D: department
+        groups.add(codeToStringPairs(loadCodeList("14015812"))); // E,F: postFamily
+        groups.add(combinedCodeToStringPairs("14015815", "14015813")); // G,H: postGradeNo
+        groups.add(codeToStringPairs(loadCodeList("14014036"))); // I,J: positionNo
+        groups.add(codeToStringPairs(loadCodeList("13864")));    // K,L: empType
+        groups.add(codeToStringPairs(loadCodeList("400098")));   // M,N: mainBusiness
+        groups.add(deptPairs);                                    // O,P: department (lặp lại)
+        return groups;
+    }
+
+    private List<List<String[]>> loadNewEmpGroups() {
+        List<List<String[]>> groups = new ArrayList<>();
+        List<String[]> deptPairs = deptToStringPairs(loadDeptList());
+        groups.add(codeToStringPairs(loadCodeList("1359")));                              // A,B
+        groups.add(combinedCodeToStringPairs("400414", "400435", "400429"));              // C,D
+        groups.add(codeToStringPairs(loadCodeList("14015812")));                          // E,F
+        groups.add(combinedCodeToStringPairs("14015815", "14015813"));                // G,H
+        groups.add(codeToStringPairs(loadCodeList("14014036")));                          // I,J
+        groups.add(codeToStringPairs(loadCodeList("13864")));                             // K,L
+        groups.add(codeToStringPairs(loadCodeList("400098")));                            // M,N
+        groups.add(deptPairs);                                                             // O,P (và Q,R lặp lại)
+        groups.add(codeToStringPairs(loadCodeList("13769")));                             // S,T
+        groups.add(codeToStringPairs(loadCodeList("1324")));                              // U,V
+        groups.add(codeToStringPairs(loadCodeList("870")));                               // W,X
+        groups.add(codeToStringPairs(loadCodeList("210942")));                            // Y,Z
+        groups.add(codeToStringPairs(loadCodeList("1709")));                              // AA,AB
+        return groups;
+    }
+
+    private List<Map<String, Object>> loadDeptList() {
+        try {
+            return excelService.getDeptList();
+        } catch (Exception ignored) {
+            return new ArrayList<>();
+        }
+    }
+
+    private List<String[]> combinedCodeToStringPairs(String... parentCodes) {
+        List<String[]> combined = new ArrayList<>();
+        for (String parentCode : parentCodes) {
+            combined.addAll(codeToStringPairs(loadCodeList(parentCode)));
+        }
+        return combined;
+    }
+
+    private List<String[]> codeToStringPairs(List<Map<String, Object>> codeList) {
+        List<String[]> pairs = new ArrayList<>();
+        for (Map<String, Object> item : codeList) {
+            pairs.add(new String[]{str(item.get("name")), str(item.get("code"))});
+        }
+        return pairs;
+    }
+
+    private List<String[]> deptToStringPairs(List<Map<String, Object>> deptList) {
+        List<String[]> pairs = new ArrayList<>();
+        for (Map<String, Object> item : deptList) {
+            // mapUnderscoreToCamelCase=true: DEPTNO → deptno, ORG_NAME_LOCAL → orgNameLocal
+            pairs.add(new String[]{str(item.get("orgNameLocal")), str(item.get("deptno"))});
+        }
+        return pairs;
+    }
+
+    private String str(Object o) {
+        return o == null ? "" : o.toString();
     }
 
     private List<Map<String, Object>> loadShiftList() {
