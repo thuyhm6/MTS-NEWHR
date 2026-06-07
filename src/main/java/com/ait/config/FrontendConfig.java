@@ -33,31 +33,20 @@ public class FrontendConfig implements WebMvcConfigurer {
                                 .addResourceLocations("file:" + uploadDirPath)
                                 .setCacheControl(CacheControl.maxAge(Duration.ofHours(1)));
 
-                // Static resources với cache optimization
+                // Assets nằm trong webapp root (src/main/webapp/assets/)
+                // Dùng "/" prefix để Spring MVC resolve từ ServletContext (webapp root)
                 registry.addResourceHandler("/assets/**")
-                                .addResourceLocations("classpath:/static/assets/")
-                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365))); // 1 year cache
+                                .addResourceLocations("/assets/")
+                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)));
 
+                // CSS/JS từ classpath (src/main/resources/static/)
                 registry.addResourceHandler("/css/**")
                                 .addResourceLocations("classpath:/static/css/")
-                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(30))); // 30 days cache
+                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(30)));
 
                 registry.addResourceHandler("/js/**")
                                 .addResourceLocations("classpath:/static/js/")
-                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(7))); // 7 days cache
-
-                registry.addResourceHandler("/images/**")
-                                .addResourceLocations("classpath:/static/images/")
-                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(90))); // 90 days cache
-
-                registry.addResourceHandler("/fonts/**")
-                                .addResourceLocations("classpath:/static/fonts/")
-                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(365))); // 1 year cache
-
-                // WebApp resources
-                registry.addResourceHandler("/webapp/**")
-                                .addResourceLocations("classpath:/webapp/")
-                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(7))); // 7 days cache
+                                .setCacheControl(CacheControl.maxAge(Duration.ofDays(7)));
         }
 
         @Override
