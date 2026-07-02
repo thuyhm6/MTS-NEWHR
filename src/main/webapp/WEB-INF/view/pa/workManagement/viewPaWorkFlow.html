@@ -158,7 +158,7 @@
                             </div>
                             <div class="step-item">
                                 <div class="step-btn active-step" onclick="vpwfOpenMenu('reconcileDetail')"
-                                    th:text="#{pa.workFlow.step.reconcile.detail}">Lương chi tiết</div>
+                                    th:text="#{pa.workFlow.step.reconcile.detail}">Chi tiết lương</div>
                             </div>
                             <div class="step-item">
                                 <div class="step-btn active-step" onclick="vpwfOpenMenu('reconcilePersonal')"
@@ -311,6 +311,8 @@
             var vpwf_msgRecordsNoData = /*[[#{pa.workFlow.records.noData}]]*/ 'Không có dữ liệu lịch sử';
             var vpwf_msgExecuting = /*[[#{pa.workFlow.msgExecuting}]]*/ 'Đang thực hiện...';
             var vpwf_msgExecuteSuccess = /*[[#{pa.workFlow.msgExecuteSuccess}]]*/ 'Tất cả các bước đã hoàn thành thành công!';
+            var vpwf_msgObjCreateAlreadyExist = /*[[#{pa.workFlow.msgObjCreateAlreadyExist}]]*/ 'Đã tạo đối tượng nhận lương, không thể tạo lại!';
+            var vpwf_msgPayrollConfirmed = /*[[#{pa.workFlow.msgPayrollConfirmed}]]*/ 'Lương tháng này đã chốt, không thể tính công!';
             var vpwf_msgExecuteLabel = /*[[#{pa.workFlow.execute}]]*/ 'Thực hiện';
             var vpwf_stepNames = {
                 1: /*[[#{pa.workFlow.records.step.1}]]*/ 'Tạo đối tượng',
@@ -335,6 +337,8 @@
                 paConfirm:   4,
                 paOpen:      5
             };
+
+            var vpwf_currentData = null;
 
             $(document).ready(function () {
                 if ($.fn.select2) {
@@ -394,6 +398,7 @@
             };
 
             function vpwfRender(data) {
+                vpwf_currentData = data;
                 $('#vpwf_hrPeriod').text(data.hrStartDate || '--');
                 $('#vpwf_hrPeriodEnd').text(data.hrEndDate || '--');
                 $('#vpwf_arPeriod').text(data.arStartDate || '--');
@@ -439,6 +444,14 @@
                 }
                 if (tasks.length === 0) {
                     toastr ? toastr.warning(vpwf_msgSelectStep) : alert(vpwf_msgSelectStep);
+                    return;
+                }
+                if ($('#vpwf_chkObjCreate').prop('checked') && vpwf_currentData && vpwf_currentData.objCreateFlag === 1) {
+                    toastr ? toastr.warning(vpwf_msgObjCreateAlreadyExist) : alert(vpwf_msgObjCreateAlreadyExist);
+                    return;
+                }
+                if (($('#vpwf_chkArMonthCal').prop('checked') || $('#vpwf_chkPaCal').prop('checked')) && vpwf_currentData && vpwf_currentData.paConfirmFlag === 1) {
+                    toastr ? toastr.warning(vpwf_msgPayrollConfirmed) : alert(vpwf_msgPayrollConfirmed);
                     return;
                 }
                 $('#vpwf_btnExecute').prop('disabled', true)

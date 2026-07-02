@@ -1,3 +1,10 @@
+<style>
+    .vpf-cell-wrap {
+        white-space: normal !important;
+        word-break: break-word;
+        min-width: 150px;
+    }
+</style>
 <div th:fragment="content">
     <div class="row h-100">
 
@@ -214,7 +221,8 @@
                 columnDefs: [
                     { targets: 0, width: '36px',  className: 'text-center', orderable: false },
                     { targets: 1, width: '40px',  className: 'text-center', orderable: false },
-                    { targets: 2, width: '130px', className: 'text-center', orderable: false }
+                    { targets: 2, width: '130px', className: 'text-center', orderable: false },
+                    { targets: [3, 4, 5], className: 'vpf-cell-wrap' }
                 ],
                 ajax: {
                     url: '/pa/salary/formula/api/list',

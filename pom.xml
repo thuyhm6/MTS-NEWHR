@@ -190,6 +190,17 @@
             <artifactId>wsdl4j</artifactId>
             <version>1.6.3</version>
         </dependency>
+        <!-- SAAJ API + Impl: required by Apache Axis 1.4 on Java 11+ (javax.xml.soap removed from JDK) -->
+        <dependency>
+            <groupId>javax.xml.soap</groupId>
+            <artifactId>javax.xml.soap-api</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+            <version>1.5.3</version>
+        </dependency>
     </dependencies>
 
     <build>

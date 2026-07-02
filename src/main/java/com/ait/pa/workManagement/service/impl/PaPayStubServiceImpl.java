@@ -142,4 +142,28 @@ public class PaPayStubServiceImpl implements PaPayStubService {
             throw e;
         }
     }
+
+    @Override
+    @Transactional
+    public void recalculate(String payScheduleNo, List<String> personIds) {
+        log.info("Bắt đầu tính lại lương payScheduleNo={}, số NV={}", payScheduleNo, personIds.size());
+        try {
+            Integer confirmFlag = mapper.selectConfirmFlag(payScheduleNo);
+            if (Integer.valueOf(1).equals(confirmFlag)) {
+                throw new IllegalStateException("Lương tháng này đã chốt, không thể tính lại!");
+            }
+            for (String personId : personIds) {
+                PaPayStubDto dto = new PaPayStubDto();
+                dto.setPayScheduleNo(payScheduleNo);
+                dto.setPersonId(personId);
+                dto.setType("NONE");
+                mapper.callRecalculateForEmp(dto);
+                log.info("Tính lại lương payScheduleNo={}, personId={}, message={}", payScheduleNo, personId, dto.getMessage());
+            }
+            log.info("Hoàn tất tính lại lương payScheduleNo={}", payScheduleNo);
+        } catch (Exception e) {
+            log.error("Lỗi khi tính lại lương payScheduleNo={}: {}", payScheduleNo, e.getMessage(), e);
+            throw e;
+        }
+    }
 }

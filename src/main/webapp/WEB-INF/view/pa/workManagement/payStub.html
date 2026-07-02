@@ -38,11 +38,17 @@
                         <i class="bi bi-search"></i>
                         <span th:text="#{pa.payStub.search}">Tra cứu</span>
                     </button>
+                    <button type="button" class="btn btn-warning btn-sm" id="vps_btnRecalculate"
+                            onclick="vpsRecalculate()" style="display:none;">
+                        <i class="bi bi-calculator"></i>
+                        <span th:text="#{pa.payStub.recalculate}">Tính lại lương</span>
+                    </button>
                     <button type="button" class="btn btn-secondary btn-sm" id="vps_btnPrint"
                             onclick="vpsPrint()" style="display:none;">
                         <i class="bi bi-printer"></i>
                         <span th:text="#{pa.payStub.print}">In</span>
                     </button>
+
                 </div>
 
             </div>
@@ -87,9 +93,9 @@
         var vps_labelStdItems     = /*[[#{pa.payStub.standardItems}]]*/      'Hạng mục tiêu chuẩn';
         var vps_labelItemName     = /*[[#{pa.payStub.itemName}]]*/           'Hạng mục';
         var vps_labelAmount       = /*[[#{pa.payStub.amount}]]*/             'Số tiền';
-        var vps_labelAttendance   = /*[[#{pa.payStub.attendanceItems}]]*/    'Chấm công chi tiết';
-        var vps_labelSalary       = /*[[#{pa.payStub.salaryItems}]]*/        'Lương chi tiết';
-        var vps_labelDeduction    = /*[[#{pa.payStub.deductionItems}]]*/     'Khoản trừ chi tiết';
+        var vps_labelAttendance   = /*[[#{pa.payStub.attendanceItems}]]*/    'Chi tiết chấm công';
+        var vps_labelSalary       = /*[[#{pa.payStub.salaryItems}]]*/        'Chi tiết lương';
+        var vps_labelDeduction    = /*[[#{pa.payStub.deductionItems}]]*/     'Chi tiết khoản trừ';
         var vps_labelAttItem      = /*[[#{pa.payStub.attendanceItem}]]*/     'Hạng mục chấm công';
         var vps_labelValue        = /*[[#{pa.payStub.value}]]*/              'Giá trị';
         var vps_labelSalaryItem   = /*[[#{pa.payStub.salaryItem}]]*/         'Hạng mục';
@@ -104,6 +110,7 @@
 
         var vps_selectedDeptCodes = [];
         var vps_currentEmpOpinion = '';
+        var vps_currentPersonIds  = [];
 
         /* ── Định dạng số ──────────────────────────────────────────────────── */
         function vpsFormatNumber(val) {
@@ -349,20 +356,58 @@
                     $('#vps_loadingArea').hide();
                     if (!list || list.length === 0) {
                         $('#vps_noData').show();
+                        vps_currentPersonIds = [];
+                        $('#vps_btnRecalculate').hide();
                         return;
                     }
                     vps_currentEmpOpinion = $('#vps_payScheduleNo option:selected').data('emp-opinion') || '';
+                    vps_currentPersonIds  = list.map(function (emp) { return emp.personId; });
                     var html = '';
                     $.each(list, function (i, emp) {
                         html += vpsRenderStub(emp);
                     });
                     $('#vps_printArea').html(html);
                     $('#vps_btnPrint').show();
+                    $('#vps_btnRecalculate').show();
                 },
                 error: function (err) {
                     $('#vps_loadingArea').hide();
                     var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : err.responseText;
                     toastr ? toastr.error(msg) : alert(msg);
+                }
+            });
+        };
+
+        /* ── Tính lại lương ───────────────────────────────────────────────────── */
+        window.vpsRecalculate = function () {
+            var payScheduleNo = $('#vps_payScheduleNo').val();
+            if (!payScheduleNo) {
+                toastr ? toastr.warning(vps_msgSelectSchedule) : alert(vps_msgSelectSchedule);
+                return;
+            }
+            if (!vps_currentPersonIds || vps_currentPersonIds.length === 0) {
+                toastr ? toastr.warning('Không có nhân viên để tính lại lương!') : alert('Không có nhân viên để tính lại lương!');
+                return;
+            }
+            var $btn = $('#vps_btnRecalculate');
+            $btn.prop('disabled', true);
+            $btn.find('i').removeClass('bi-calculator').addClass('bi-hourglass-split');
+            $.ajax({
+                url: '/pa/workManagement/api/payStub/recalculate',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ payScheduleNo: payScheduleNo, personIds: vps_currentPersonIds }),
+                success: function (res) {
+                    toastr ? toastr.success(res.message || 'Tính lại lương thành công!') : alert(res.message);
+                    vpsSearch();
+                },
+                error: function (err) {
+                    var msg = (err.responseJSON && err.responseJSON.error) ? err.responseJSON.error : err.responseText;
+                    toastr ? toastr.error(msg) : alert(msg);
+                },
+                complete: function () {
+                    $btn.prop('disabled', false);
+                    $btn.find('i').removeClass('bi-hourglass-split').addClass('bi-calculator');
                 }
             });
         };

@@ -993,9 +993,9 @@ dựa vào cấu trúc của viewPaResult.html hãy Tạo cho tôi một file pa
  WHERE T.CPNY_ID = #{cpnyId, jdbcType=VARCHAR}
    AND T.PERSON_ID = #{personId, jdbcType=VARCHAR}. 
 sau khi lấy đựo dữ liệu từ bảng PA_EMP_SALARY_PAGE_DATA thì sẽ hiển thị vào phiếu lương, tương ứng với từng ITEM_TYPE sẽ hiển thị ở từng phần khác nhau trong phiếu lương, cụ thể như sau:
-ITEM_TYPE = 1 sẽ hiển thị ở phần Chấm công chi tiết
-ITEM_TYPE = 2 sẽ hiển thị ở phần Lương chi tiết
-ITEM_TYPE = 3 sẽ hiển thị ở phần Khoản trừ chi tiết
+ITEM_TYPE = 1 sẽ hiển thị ở phần Chi tiết chấm công
+ITEM_TYPE = 2 sẽ hiển thị ở phần Chi tiết lương
+ITEM_TYPE = 3 sẽ hiển thị ở phần Chi tiết khoản trừ
 ITEM_TYPE = 4 sẽ hiển thị ở phần Hạng mục tiêu chuẩn
 phần Hạng mục khác sẽ hiển thị dữ liệu từ câu lệnh SQL: SELECT TO_NUMBER(NVL(C.RETURN_VALUE, 0)) RETURN_VALUE, C.REMARK
   FROM PA_PARAM_ITEM_PARAM B, PA_PARAM_DATA C, PA_SUMMARY_HTSV PA
@@ -2452,3 +2452,19 @@ Căn cứ ManageEmpPositionInfoList.html, hãy tạo cho tôi file viewEssApplyI
 Căn cứ ManageEmpPositionInfoList.html, hãy tạo cho tôi file viewEssApplyInfo.html - Chi tiết thay đổi nằm trong module ess/empinfo. Giao diện sẽ hiển thị danh sách các thay đổi thông tin cá nhân của nhân viên đang chờ duyệt, bao gồm các thông tin như Mã nhân viên, Tên nhân viên, Loại thay đổi (thông tin cá nhân, thông tin địa chỉ, thông tin gia đình, người liên hệ khẩn cấp, kinh nghiệm làm việc, trình độ học vấn, thông tin chứng chỉ,...), Trạng thái (đang chờ duyệt - ACTIVITY = 1, đã duyệt - ACTIVITY = 2, đã từ chối - ACTIVITY = 3), Ngày nộp đơn thay đổi,... Khi bấm vào từng thay đổi thì sẽ hiển thị chi tiết về thay đổi đó ở bên phải với các tab tương ứng với từng phần thông tin như Thông tin cá nhân, Thông tin địa chỉ, Thông tin gia đình, Người liên hệ khẩn cấp, Kinh nghiệm làm việc, Trình độ học vấn, Thông tin chứng chỉ,... Dữ liệu sẽ được lấy từ các bảng HR_PERSONAL_INFO_APPLY, hr_address_matters_apply, HR_FAMILY_APPLY, hr_emergency_address_apply, HR_WORK_EXPERIENCE_APPLY, HR_EDUCATION_APPLY, HR_QUALIFICATION_APPLY,... kết hợp với bảng ess_file để lấy ra những file đính kèm của từng thay đổi đó. Giao diện cũng sẽ có các nút để người quản lý có thể duyệt hoặc từ chối từng thay đổi đó một cách dễ dàng. Việc này sẽ giúp cho quá trình quản lý các thay đổi thông tin cá nhân của nhân viên được minh bạch hơn và có đầy đủ căn cứ để đưa ra quyết định duyệt hay không duyệt từng thay đổi đó.
 
 Giống như ess/empinfo/viewEssApplyInfo.html, hãy tạo cho tôi file viewEssApplyInfo.html - Chi tiết thay đổi nằm trong module /hrm/approve. Giao diện sẽ hiển thị danh sách các thay đổi thông tin cá nhân của các nhân viên đang chờ duyệt. Giao diện này dành cho người quản lý nên sẽ có các nút để người quản lý có thể duyệt hoặc từ chối từng thay đổi đó một cách dễ dàng. Việc này sẽ giúp cho quá trình quản lý các thay đổi thông tin cá nhân của nhân viên được minh bạch hơn và có đầy đủ căn cứ để đưa ra quyết định duyệt hay không duyệt từng thay đổi đó. Ở phia bên phải thêm cho tôi cột Dữ liệu ban đầu để hiển thị thông tin về dữ liệu ban đầu của nhân viên trước khi thay đổi, để người quản lý có thể dễ dàng so sánh và đưa ra quyết định duyệt hay không duyệt từng thay đổi đó một cách chính xác hơn. Dữ liệu ban đầu được lấy từ các bảng HR_PERSONAL_INFO, hr_address_matters, HR_FAMILY, hr_emergency_address, HR_WORK_EXPERIENCE, HR_EDUCATION, HR_QUALIFICATION. Khi bấm vào nút Phê duyệt thì sẽ cập nhật trường ACTIVITY của bảng HR_PERSONAL_INFO_APPLY, hr_address_matters_apply, HR_FAMILY_APPLY, hr_emergency_address_apply, HR_WORK_EXPERIENCE_APPLY, HR_EDUCATION_APPLY, HR_QUALIFICATION_APPLY,... tương ứng với từng thay đổi đó thành 2 (đã duyệt), đồng thời cập nhật lại thông tin mới vào các bảng HR_PERSONAL_INFO, hr_address_matters, HR_FAMILY, hr_emergency_address, HR_WORK_EXPERIENCE, HR_EDUCATION, HR_QUALIFICATION,... để thông tin của nhân viên được cập nhật theo những thay đổi đó. Khi bấm vào nút Từ chối thì sẽ cập nhật trường ACTIVITY của bảng HR_PERSONAL_INFO_APPLY, hr_address_matters_apply, HR_FAMILY_APPLY, hr_emergency_address_apply, HR_WORK_EXPERIENCE_APPLY, HR_EDUCATION_APPLY, HR_QUALIFICATION_APPLY,... tương ứng với từng thay đổi đó thành 3 (đã từ chối) để người quản lý có thể dễ dàng theo dõi được những thay đổi nào đã được duyệt và những thay đổi nào đã bị từ chối.
+
+Giống như viewExperienceBatchList.html, hãy tạo cho tôi file viewLoginUser.html - Phân quyền sử dụng nằm trong module sys/syRole/. 
+
+Ở đây hãy thêm cho tôi nút "Tính lại lương" để khi bấm vào sẽ gọi package PA_MONTH_CAL_FOR_EMP_P(
+            #payScheduleNo:VARCHAR#,
+            #adminID:VARCHAR#,
+            #cpnyId:VARCHAR#,
+            #personId:VARCHAR#,
+            '#type:VARCHAR#',
+            #message,jdbcType=VARCHAR,mode=OUT#) với type = 'NONE' để tính lại lương cho nhân viên đang được tìm kiếm ra kết quả. Trước khi tính check giá trị của trường PA_CONFIRM_FLAG trong bảng PA_WORK_FLOW với điều kiện PAY_SCHEDULE_NO = #payScheduleNo# và ACTIVITY = 1, nếu giá trị là '1' thì báo "Lương tháng này đã chốt, không thể tính lại!".
+
+Khi tick vào vpwf_chkObjCreate và bấm thực hiện thì check giá trị của trường OBJ_CREATE_FLAG trong bảng PA_WORK_FLOW với điều kiện PAY_SCHEDULE_NO = #payScheduleNo# và ACTIVITY = 1, nếu giá trị là '1' thì báo "Đã tạo đối tượng nhận lương, không thể tạo lại!".
+Khi tick vào vpwf_chkArMonthCal và bấm thực hiện thì check giá trị của trường PA_CONFIRM_FLAG trong bảng PA_WORK_FLOW với điều kiện PAY_SCHEDULE_NO = #payScheduleNo# và ACTIVITY = 1, nếu giá trị là '1' thì báo "Lương tháng này đã chốt, không thể tính công!".
+Khi tick vào vpwf_chkPaCal và bấm thực hiện thì check giá trị của trường PA_CONFIRM_FLAG trong bảng PA_WORK_FLOW với điều kiện PAY_SCHEDULE_NO = #payScheduleNo# và ACTIVITY = 1, nếu giá trị là '1' thì báo "Lương tháng này đã chốt, không thể tính công!".
+
+Ở đây hãy thêm cho tôi 1 điều kiện tìm kiếm nữa là "Ngày truy vấn" khi người dùng chọn ngày, sau đó bấm vào nút tìm kiếm thì sẽ lấy ra những thông tin tương ứng với ngày truy vấn. mặc định ban đầu sẽ lấy ra những thông tin của ngày hiện tại. với ngày truy vấn này thì sẽ dùng trường DATE_STARTED (Ngày bắt đầu làm việc) và trường DATE_LEFT (Ngày nghỉ việc) của bảng HR_EMPLOYEE để lấy ra những thông tin thống kê bên dưới tương ứng với ngày truy vấn đó.

@@ -47,6 +47,11 @@ public class PaPayStubDto {
     private List<String> deptNoList;
     private String empOfficeCond;
 
+    // Params for recalculate
+    private List<String> personIds;
+    private String type;
+    private String message;
+
     // Dữ liệu phiếu lương (được populate bởi service)
     private List<PaPayStubItemDto> attendanceItems;  // ITEM_TYPE=1
     private List<PaPayStubItemDto> salaryItems;      // ITEM_TYPE=2

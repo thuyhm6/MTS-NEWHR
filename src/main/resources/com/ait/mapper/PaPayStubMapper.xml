@@ -181,4 +181,26 @@
          ORDER BY C.CREATE_DATE
     </select>
 
+
+    <!-- Kiểm tra trạng thái chốt lương của kế hoạch trả lương -->
+    <select id="selectConfirmFlag" resultType="java.lang.Integer">
+        SELECT NVL(PA_CONFIRM_FLAG, 0)
+          FROM PA_WORK_FLOW
+         WHERE PAY_SCHEDULE_NO = #{payScheduleNo, jdbcType=VARCHAR}
+           AND ACTIVITY        = 1
+    </select>
+
+    <!-- Gọi stored procedure tính lại lương cho từng nhân viên -->
+    <select id="callRecalculateForEmp" statementType="CALLABLE"
+            parameterType="com.ait.pa.workManagement.dto.PaPayStubDto">
+        {CALL PA_MONTH_CAL_FOR_EMP_P(
+            #{payScheduleNo, jdbcType=VARCHAR, mode=IN},
+            #{adminID,       jdbcType=VARCHAR, mode=IN},
+            #{cpnyId,        jdbcType=VARCHAR, mode=IN},
+            #{personId,      jdbcType=VARCHAR, mode=IN},
+            #{type,          jdbcType=VARCHAR, mode=IN},
+            #{message,       jdbcType=VARCHAR, mode=OUT}
+        )}
+    </select>
+
 </mapper>

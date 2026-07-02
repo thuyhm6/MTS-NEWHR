@@ -23,4 +23,8 @@ public interface PaPayStubMapper {
 
     List<PaPayStubOtherDto> selectOtherItems(@Param("payScheduleNo") String payScheduleNo,
                                               @Param("personId") String personId);
+
+    Integer selectConfirmFlag(@Param("payScheduleNo") String payScheduleNo);
+
+    void callRecalculateForEmp(PaPayStubDto dto);
 }

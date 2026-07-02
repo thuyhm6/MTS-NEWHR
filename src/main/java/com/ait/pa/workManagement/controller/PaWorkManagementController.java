@@ -70,6 +70,26 @@ public class PaWorkManagementController {
 
     // ── API Phiếu lương ────────────────────────────────────────────────────────
 
+    @PostMapping("/api/payStub/recalculate")
+    @ResponseBody
+    public ResponseEntity<?> recalculatePayStub(@RequestBody PaPayStubDto dto) {
+        try {
+            if (dto.getPayScheduleNo() == null || dto.getPayScheduleNo().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Vui lòng chọn kế hoạch trả lương!"));
+            }
+            if (dto.getPersonIds() == null || dto.getPersonIds().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Không có nhân viên để tính lại lương!"));
+            }
+            paPayStubService.recalculate(dto.getPayScheduleNo(), dto.getPersonIds());
+            return ResponseEntity.ok(Map.of("success", true, "message", "Tính lại lương thành công!"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Lỗi khi tính lại lương payScheduleNo={}: {}", dto.getPayScheduleNo(), e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @GetMapping("/api/payStub/load")
     @ResponseBody
     public ResponseEntity<?> loadPayStubs(

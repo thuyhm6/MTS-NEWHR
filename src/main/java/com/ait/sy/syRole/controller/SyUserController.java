@@ -139,6 +139,6 @@ public class SyUserController {
         }
 
         String userType = user.getSyUser().getUserType();
-        return "ADMIN".equalsIgnoreCase(userType) || "SYS".equalsIgnoreCase(userType);
+        return "ADMIN".equalsIgnoreCase(userType) || "SYS".equalsIgnoreCase(userType) || "HRM".equalsIgnoreCase(userType);
     }
 }

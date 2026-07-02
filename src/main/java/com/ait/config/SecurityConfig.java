@@ -54,15 +54,15 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .authenticated()
                         .requestMatchers("/sy/excel/api/**")
                         .authenticated()
+                        .requestMatchers("/sys/syRole/viewLoginUser", "/sys/api/user/**")
+                        .hasAnyRole("ADMIN", "SYS", "HRM")
                         .requestMatchers(
                                 "/api/admin/**",
                                 "/api/monitoring/**",
                                 "/api/performance/**",
                                 "/api/database/**",
                                 "/multilingual/**",
-                                "/sys/api/**",
-                                "/sys/api/user/**",
-                                "/sys/syRole/viewLoginUser")
+                                "/sys/api/**")
                         .hasAnyRole("ADMIN", "SYS")
                         .requestMatchers(HttpMethod.POST, "/api/multilingual/content", "/api/multilingual/code-param/link")
                         .hasAnyRole("ADMIN", "SYS")

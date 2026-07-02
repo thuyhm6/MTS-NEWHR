@@ -90,7 +90,7 @@
 
     <update id="cancelMyCardApplyList">
         UPDATE ESS_CARD_APPLY_TB
-        SET ACTIVITY    = 0,
+        SET AFFIRM_FLAG = '14014310',
             UPDATE_DATE = SYSDATE,
             UPDATED_BY  = #{adminID, jdbcType=VARCHAR},
             UPDATED_IP  = #{adminIP, jdbcType=VARCHAR}

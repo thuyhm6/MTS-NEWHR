@@ -136,6 +136,8 @@
             submitSuccess        : /*[[#{sa.msg.submitSuccess}]]*/ 'Xin phép thành công!',
             submitError          : /*[[#{sa.msg.submitError}]]*/ 'Lỗi khi gửi đơn!',
             submitConnError      : /*[[#{sa.msg.submitConnError}]]*/ 'Lỗi kết nối khi gửi đơn!',
+            enterReason          : /*[[#{sa.msg.enterReason}]]*/ 'Vui lòng nhập lý do!',
+            confirmSubmit        : /*[[#{sa.msg.confirmSubmit}]]*/ 'Bạn có chắc chắn muốn gửi đơn xin phép này không?',
             selectLeaveTypeFirst : /*[[#{sa.msg.selectLeaveTypeFirst}]]*/ 'Chọn loại nghỉ phép để xem người phê duyệt',
             vacTotalYear         : /*[[#{sa.vac.totalYear}]]*/ 'Tổng phép năm:',
             vacYearVac           : /*[[#{sa.vac.yearVac}]]*/ 'Tạo phép năm:',
@@ -321,6 +323,11 @@
             var toTime   = ($('#sa_toTime').val()   || '');
             if (!fromTime) { toastr && toastr.warning(_sa_i18n.enterStartTime); return; }
             if (!toTime)   { toastr && toastr.warning(_sa_i18n.enterEndTime);   return; }
+
+            var reason = $.trim($('#sa_reason').val());
+            if (!reason) { toastr && toastr.warning(_sa_i18n.enterReason); $('#sa_reason').focus(); return; }
+
+            if (!confirm(_sa_i18n.confirmSubmit)) return;
 
             var payload = {
                 applyNo:       '',

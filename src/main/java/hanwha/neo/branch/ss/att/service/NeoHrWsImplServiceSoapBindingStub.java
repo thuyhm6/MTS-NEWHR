@@ -57,8 +57,6 @@ public class NeoHrWsImplServiceSoapBindingStub extends org.apache.axis.client.St
         } else {
             super.service = service;
         }
-        ((org.apache.axis.client.Service) super.service).registerTypeMappingUrl(
-                "http://service.att.ss.branch.neo.hanwha/");
         java.lang.Class cls;
         javax.xml.namespace.QName qName;
         javax.xml.namespace.QName qName2;
@@ -66,13 +64,6 @@ public class NeoHrWsImplServiceSoapBindingStub extends org.apache.axis.client.St
         Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
         Class sf;
         Class df;
-        java.lang.reflect.Method getFQCNAlias = null;
-        try {
-            getFQCNAlias = java.lang.Class.forName("javax.xml.rpc.encoding.TypeMapping").getMethod("qName", new java.lang.Class[0]);
-        } catch (Exception e) {
-            getFQCNAlias = null;
-        }
-        org.apache.axis.encoding.TypeMapping tm = getTypeMapping();
 
         // Register SyncHrOffDataRequest
         qName = new javax.xml.namespace.QName("http://vo.att.ss.branch.neo.hanwha", "SyncHrOffDataRequest");
@@ -142,21 +133,24 @@ public class NeoHrWsImplServiceSoapBindingStub extends org.apache.axis.client.St
                 _call.setProperty(key, super.cachedProperties.get(key));
             }
             // Register serializers for all cached types
+            // Note: BeanSerializerFactory has no no-arg constructor; use createFactory() instead
             for (int i = 0; i < cachedSerClasses.size(); ++i) {
                 Class cls = (Class) cachedSerClasses.get(i);
                 javax.xml.namespace.QName qName = (javax.xml.namespace.QName) cachedSerQNames.get(i);
                 java.lang.Object x = cachedSerFactories.get(i);
                 if (x instanceof Class) {
+                    Class sfClass = (Class) x;
+                    Class dfClass = (Class) cachedDeserFactories.get(i);
                     _call.registerTypeMapping(cls, qName,
-                            (javax.xml.rpc.encoding.SerializerFactory) ((Class) x).newInstance(),
-                            (javax.xml.rpc.encoding.DeserializerFactory) ((Class) cachedDeserFactories.get(i)).newInstance(),
+                            org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(sfClass, cls, qName),
+                            org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(dfClass, cls, qName),
                             false);
-                } else if (x instanceof javax.xml.rpc.encoding.SerializerFactory) {
-                    Class df = (Class) cachedDeserFactories.get(i);
-                    javax.xml.rpc.encoding.DeserializerFactory dfFactory =
-                            (javax.xml.rpc.encoding.DeserializerFactory) df.newInstance();
+                } else if (x instanceof org.apache.axis.encoding.SerializerFactory) {
+                    Class dfClass = (Class) cachedDeserFactories.get(i);
+                    org.apache.axis.encoding.DeserializerFactory dfFactory =
+                            org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(dfClass, cls, qName);
                     _call.registerTypeMapping(cls, qName,
-                            (javax.xml.rpc.encoding.SerializerFactory) x, dfFactory, false);
+                            (org.apache.axis.encoding.SerializerFactory) x, dfFactory, false);
                 }
             }
             return _call;
