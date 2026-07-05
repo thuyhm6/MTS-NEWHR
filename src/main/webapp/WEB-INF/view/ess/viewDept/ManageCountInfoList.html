@@ -47,6 +47,9 @@
                             <button type="button" class="btn btn-success" onclick="mciExportExcel()">
                                 <i class="bx bx-export"></i> <span th:text="#{essDept.exportExcel}">Xuất excel</span>
                             </button>
+                            <button type="button" class="btn btn-info" onclick="mciExportWeeklyReport()">
+                                <i class="bx bx-calendar-week"></i> <span th:text="#{essDept.weeklyReport}">Báo cáo nhân sự theo tuần</span>
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -400,6 +403,12 @@
                     _mci_table.page.len(origLen).ajax.reload();
                 }, 800);
             }, false);
+        };
+
+        window.mciExportWeeklyReport = function () {
+            var asOfDate = $('#mci_asOfDate').val();
+            var url = '/ess/viewDept/api/manageCountInfo/weeklyReport?asOfDate=' + encodeURIComponent(asOfDate || '');
+            window.location.href = url;
         };
 
         if (document.readyState === 'loading') {

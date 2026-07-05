@@ -21,8 +21,10 @@ import com.ait.ess.viewDept.service.ManageCountInfoService;
 import com.ait.ess.viewDept.service.ManageEvsResultEmpService;
 import com.ait.ess.viewDept.service.ManageEmpPositionInfoService;
 import com.ait.ess.viewDept.service.OtApplyPersonalSelfService;
+import com.ait.ess.viewDept.service.WeeklyHrReportService;
 import com.ait.ess.viewDept.service.YearUseInfoService;
 import com.ait.sy.sys.dto.DataTablesResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +64,9 @@ public class EssViewDeptController {
 
     @Autowired
     private ManageCountInfoService manageCountInfoService;
+
+    @Autowired
+    private WeeklyHrReportService weeklyHrReportService;
 
     @GetMapping("/viewEmpCalendar")
     public String viewEmpCalendar() {
@@ -278,6 +284,13 @@ public class EssViewDeptController {
     @ResponseBody
     public DataTablesResponse<ManageCountInfoEmpDto> getManageCountInfoList(ManageCountInfoEmpDto params) {
         return manageCountInfoService.getPageList(params);
+    }
+
+    @GetMapping("/api/manageCountInfo/weeklyReport")
+    public void exportManageCountInfoWeeklyReport(
+            @RequestParam(required = false) String asOfDate,
+            HttpServletResponse response) throws IOException {
+        weeklyHrReportService.exportWeeklyReport(asOfDate, response);
     }
 
     @GetMapping("/viewEntryInfoList")
