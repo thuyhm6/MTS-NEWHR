@@ -330,7 +330,7 @@
                 A.AFFIRM_CONTENT
             FROM SY_AFFIRM_EMAIL A
             INNER JOIN HR_EMPLOYEE HR ON A.AFFIRM_PERSON_ID = HR.PERSON_ID
-            WHERE A.APPLY_NO = TO_NUMBER(#{applyNo, jdbcType=VARCHAR})
+            WHERE A.APPLY_NO = #{applyNo, jdbcType=VARCHAR}
             <if test="applyType != null and applyType != ''">
                 AND A.APPLY_TYPE = #{applyType, jdbcType=VARCHAR}
             </if>
@@ -360,7 +360,7 @@
                 TO_CHAR(B.CONFIRM_DATE, 'DD/MM/YYYY HH24:MI:SS') AS UPDATE_DATE,
                 '' AS AFFIRM_CONTENT
             FROM ESS_APPLY_OT B
-            WHERE B.APPLY_NO = TO_NUMBER(#{applyNo, jdbcType=VARCHAR})
+            WHERE B.APPLY_NO = #{applyNo, jdbcType=VARCHAR}
         ) T
         ORDER BY TO_NUMBER(T.AFFIRM_LEVEL)
     </select>
@@ -640,7 +640,7 @@
                    AND SY.APPLY_FLAG = SY2.APPLY_FLAG
                    AND SY2.SEQ = (SELECT MAX(SEQ)
                                     FROM SY_AFFIRM_EMAIL
-                                   WHERE APPLY_NO = TO_NUMBER(#{applyNo, jdbcType=VARCHAR})))
+                                   WHERE APPLY_NO = #{applyNo, jdbcType=VARCHAR}))
            AND ROWNUM &lt; 2
     </select>
 
