@@ -289,6 +289,17 @@
         WHERE hc.CONTRACT_NO = #{contractNo}
     </select>
 
+    <!-- Get contracts by personId -->
+    <select id="getContractsByPersonId" resultMap="HrContractResultMap">
+        SELECT
+            <include refid="baseColumns"/>,
+            get_global_name(hc.CONTRACT_TYPE_CODE, #{lang, jdbcType=VARCHAR}) as CONTRACT_TYPE_NAME,
+            <include refid="employeeColumns"/>
+        <include refid="baseFromClause"/>
+        WHERE hc.PERSON_ID = #{personId, jdbcType=VARCHAR}
+        ORDER BY hc.START_CONTRACT_DATE DESC
+    </select>
+
     <!-- DataTables server-side processing - Get contracts with search and sort -->
     <select id="getContractsForDataTables" resultMap="HrContractResultMap">
         SELECT * FROM (
@@ -459,7 +470,7 @@
     <select id="countExpiringContracts" resultType="int">
         SELECT COUNT(*)
         FROM HR_CONTRACT hc
-        WHERE hc.ACTIVITY = 'ACTIVE'
+        WHERE hc.ACTIVITY = '1'
         AND TRUNC(hc.END_CONTRACT_DATE) BETWEEN TRUNC(SYSDATE) AND TRUNC(SYSDATE) + #{days}
     </select>
 

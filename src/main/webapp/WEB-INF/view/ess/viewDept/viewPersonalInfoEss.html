@@ -1,0 +1,1814 @@
+<div th:fragment="content">
+    <div class="row">
+        <div class="col-12">
+
+            <!-- ===== Tìm kiếm nhân viên ===== -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label for="vpi_keyword" class="form-label" th:text="#{common.search.empIdOrName}">Mã nhân viên / Họ tên</label>
+                            <input type="text" class="form-control" id="vpi_keyword" readonly
+                                th:placeholder="#{vpi.msg.selectEmployeeFirst}" placeholder="Vui lòng chọn nhân viên để xem hồ sơ">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-primary w-100" id="vpi_btnSelectEmp">
+                                <i class="bx bx-search-alt me-1"></i><span th:text="#{vpi.btn.selectEmployee}">Chọn nhân viên</span>
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="fw-semibold" id="vpi_identitySummary"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Vùng hiển thị khi chưa chọn nhân viên ===== -->
+            <div id="vpi_emptyState" class="text-center text-muted py-5" style="display:none;">
+                <i class="bx bx-user-circle" style="font-size:48px;"></i>
+                <p class="mt-2" th:text="#{vpi.msg.selectEmployeeFirst}">Vui lòng chọn nhân viên để xem hồ sơ</p>
+            </div>
+
+            <!-- ===== Vùng hồ sơ nhân viên ===== -->
+            <div id="vpi_profileArea">
+
+                <!-- ===== Thông tin cơ bản (thẻ nhân viên) ===== -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-auto">
+                                <div class="d-flex align-items-center justify-content-center bg-light border rounded"
+                                    style="width:120px;height:150px;">
+                                    <i class="bx bx-user" style="font-size:64px;color:#adb5bd;"></i>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <table class="table table-borderless table-sm align-middle mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-muted" style="width:15%;" th:text="#{epi.field.fullName}">Họ tên</th>
+                                            <td style="width:35%;" id="vpi_localName"></td>
+                                            <th class="text-muted" style="width:15%;" th:text="#{epi.field.empId}">Mã nhân viên</th>
+                                            <td style="width:35%;" id="vpi_empId"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted" th:text="#{epi.field.department}">Phòng ban</th>
+                                            <td id="vpi_deptName"></td>
+                                            <th class="text-muted" th:text="#{vpi.field.grade}">Cấp bậc</th>
+                                            <td id="vpi_postGradeName"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted" th:text="#{vpi.field.job}">Công việc</th>
+                                            <td id="vpi_dutyName"></td>
+                                            <th class="text-muted" th:text="#{vpi.field.jobTitle}">Chức danh</th>
+                                            <td id="vpi_positionNoName"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted" th:text="#{vpi.field.empGroup}">Nhóm nhân viên</th>
+                                            <td id="vpi_postFamilyName"></td>
+                                            <th class="text-muted" th:text="#{vpi.field.headDept}">Trưởng phòng</th>
+                                            <td id="vpi_headDepartment"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted" th:text="#{vpi.field.dateStarted}">Ngày vào làm</th>
+                                            <td id="vpi_dateStarted"></td>
+                                            <th class="text-muted"></th>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== Tabs ===== -->
+                <ul class="nav nav-tabs mb-3" id="vpi_tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#vpi_pane_basic" type="button" th:text="#{vpi.tab.basicInfo}">Thông tin cơ bản</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vpi_pane_work" type="button" id="vpi_tabBtn_work" th:text="#{vpi.tab.workInfo}">Thông tin công việc</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vpi_pane_education" type="button" id="vpi_tabBtn_education" th:text="#{vpi.tab.education}">Quá trình học tập</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vpi_pane_rewardPunish" type="button" id="vpi_tabBtn_rewardPunish" th:text="#{vpi.tab.rewardPunishment}">Khen thưởng/Kỷ luật</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vpi_pane_evaluation" type="button" id="vpi_tabBtn_evaluation" th:text="#{vpi.tab.evaluation}">Thông tin đánh giá</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vpi_pane_specialMatter" type="button" id="vpi_tabBtn_specialMatter" th:text="#{vpi.tab.specialMatter}">Ghi chép đặc biệt</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vpi_pane_health" type="button" id="vpi_tabBtn_health" th:text="#{vpi.tab.health}">Thông tin sức khỏe</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <!-- ===================== TAB: Thông tin cơ bản ===================== -->
+                    <div class="tab-pane fade show active" id="vpi_pane_basic" role="tabpanel">
+
+                        <!-- ===== Cá nhân ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <strong><i class="bx bx-user me-1"></i><span th:text="#{epi.section.personal}">Cá nhân</span></strong>
+                               <!-- <button type="button" class="btn btn-sm btn-outline-primary" id="vpi_btnEditPersonal">
+                                    <i class="bx bx-edit me-1"></i><span th:text="#{epi.btn.edit}">Sửa</span>
+                                </button>-->
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-sm align-middle mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="table-light text-center" th:text="#{epi.field.dob}">Ngày sinh</th>
+                                            <td id="vpi_dob"></td>
+                                            <th class="table-light text-center" th:text="#{epi.field.gender}">Giới tính</th>
+                                            <td id="vpi_sexName"></td>
+                                            <th class="table-light text-center" th:text="#{epi.field.maritalStatus}">Trình trạng hôn nhân</th>
+                                            <td id="vpi_maritalStatusName"></td>
+                                            <th class="table-light text-center" th:text="#{epi.field.ethnicity}">Dân tộc</th>
+                                            <td id="vpi_nationName"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="table-light text-center" th:text="#{epi.field.homePhone}">Điện thoại gia đình</th>
+                                            <td id="vpi_homePhone"></td>
+                                            <th class="table-light text-center" th:text="#{epi.field.companyPhone}">Điện thoại công ty</th>
+                                            <td id="vpi_companyPhone"></td>
+                                            <th class="table-light text-center" th:text="#{epi.field.phone}">Điện thoại</th>
+                                            <td id="vpi_cellphone"></td>
+                                            <th class="table-light text-center" th:text="#{epi.field.nationality}">Quốc tịch</th>
+                                            <td id="vpi_nationalityName"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="table-light text-center" th:text="#{epi.field.email}">Email</th>
+                                            <td id="vpi_email"></td>
+                                            <th class="table-light text-center" th:text="#{epi.field.companyEmail}">Email công ty</th>
+                                            <td id="vpi_emailSecond" colspan="5"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Liên hệ khẩn cấp ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <strong><i class="bx bx-phone-call me-1"></i><span th:text="#{epi.section.emergency}">Người liên hệ khẩn cấp</span></strong>
+                                <!-- <button type="button" class="btn btn-sm btn-success" id="vpi_btnAddEmergency">
+                                    <i class="bx bx-plus me-1"></i><span th:text="#{epi.btn.addNew}">Thêm mới</span>
+                                </button>-->
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{epi.field.fullName}">Họ tên</th>
+                                            <th th:text="#{epi.field.relationship}">Quan hệ</th>
+                                            <th th:text="#{epi.field.phone}">Điện thoại</th>
+                                            <th th:text="#{epi.field.email}">Email</th>
+                                            <th th:text="#{epi.field.address}">Địa chỉ</th>
+                                            <th class="text-center" style="width:90px;" th:text="#{epi.field.primaryContact}">Liên hệ chính</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_emergencyBody">
+                                        <tr><td colspan="6" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Loại địa chỉ ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <strong><i class="bx bx-map me-1"></i><span th:text="#{epi.section.address}">Loại địa chỉ</span></strong>
+                                <!-- <button type="button" class="btn btn-sm btn-success" id="vpi_btnAddAddress">
+                                    <i class="bx bx-plus me-1"></i><span th:text="#{epi.btn.addNew}">Thêm mới</span>
+                                </button> -->
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{epi.field.addressType}">Loại địa chỉ</th>
+                                            <th th:text="#{epi.field.effectiveDate}">Ngày hiệu lực</th>
+                                            <th th:text="#{epi.field.address}">Địa chỉ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_addressBody">
+                                        <tr><td colspan="3" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Thông tin gia đình ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <strong><i class="bx bx-group me-1"></i><span th:text="#{epi.section.family}">Thông tin gia đình</span></strong>
+                                <!-- <button type="button" class="btn btn-sm btn-success" id="vpi_btnAddFamily">
+                                    <i class="bx bx-plus me-1"></i><span th:text="#{epi.btn.addNew}">Thêm mới</span>
+                                </button>-->
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{epi.field.relationship}">Quan hệ</th>
+                                            <th th:text="#{epi.field.fullName}">Họ tên</th>
+                                            <th th:text="#{epi.field.gender}">Giới tính</th>
+                                            <th th:text="#{epi.field.dob}">Ngày sinh</th>
+                                            <th th:text="#{epi.field.familyPhone}">Điện thoại gia đình</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_familyBody">
+                                        <tr><td colspan="5" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ===================== TAB: Thông tin công việc ===================== -->
+                    <div class="tab-pane fade" id="vpi_pane_work" role="tabpanel">
+
+                        <!-- ===== Hợp đồng lao động ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-file me-1"></i><span th:text="#{vpi.section.contract}">Hợp đồng lao động</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.contractNo}">Số hợp đồng</th>
+                                            <th th:text="#{vpi.field.contractName}">Tên hợp đồng</th>
+                                            <th th:text="#{common.type}">Loại hợp đồng</th>
+                                            <th th:text="#{common.startDate}">Ngày bắt đầu</th>
+                                            <th th:text="#{common.endDate}">Ngày kết thúc</th>
+                                            <th th:text="#{vpi.field.workPosition}">Vị trí công việc</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_contractBody">
+                                        <tr><td colspan="6" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Kinh nghiệm nội bộ ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-transfer me-1"></i><span th:text="#{vpi.section.insideExperience}">Kinh nghiệm nội bộ</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{common.startDate}">Ngày bắt đầu</th>
+                                            <th th:text="#{epi.field.department}">Phòng ban</th>
+                                            <th th:text="#{vpi.field.mainBusiness}">Công việc chính</th>
+                                            <th th:text="#{vpi.field.grade}">Cấp bậc</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_insideExpBody">
+                                        <tr><td colspan="4" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Kinh nghiệm làm việc (bên ngoài) ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-briefcase me-1"></i><span th:text="#{vpi.section.workExperience}">Kinh nghiệm làm việc</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.cpnyName}">Đơn vị công tác</th>
+                                            <th th:text="#{vpi.field.jobTitle}">Chức danh</th>
+                                            <th th:text="#{common.startDate}">Ngày bắt đầu</th>
+                                            <th th:text="#{common.endDate}">Ngày kết thúc</th>
+                                            <th th:text="#{vpi.field.resignReason}">Lý do nghỉ việc</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_workExpBody">
+                                        <tr><td colspan="5" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ===================== TAB: Quá trình học tập ===================== -->
+                    <div class="tab-pane fade" id="vpi_pane_education" role="tabpanel">
+
+                        <!-- ===== Học vấn ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <strong><i class="bx bx-book me-1"></i><span th:text="#{vpi.section.education}">Học vấn</span></strong>
+                                <!--<button type="button" class="btn btn-sm btn-success" id="vpi_btnAddEducation">
+                                    <i class="bx bx-plus me-1"></i><span th:text="#{epi.btn.addNew}">Thêm mới</span>
+                                </button>-->
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.degreeName}">Bằng cấp</th>
+                                            <th th:text="#{vpi.field.institutionName}">Trường / Cơ sở đào tạo</th>
+                                            <th th:text="#{vpi.field.subject}">Chuyên ngành</th>
+                                            <th th:text="#{common.startDate}">Ngày bắt đầu</th>
+                                            <th th:text="#{common.endDate}">Ngày kết thúc</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_educationBody">
+                                        <tr><td colspan="5" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Chứng chỉ ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-certification me-1"></i><span th:text="#{vpi.section.qualification}">Chứng chỉ</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.qualName}">Tên chứng chỉ</th>
+                                            <th th:text="#{vpi.field.qualInstitute}">Nơi cấp</th>
+                                            <th th:text="#{vpi.field.qualLevel}">Cấp độ</th>
+                                            <th th:text="#{vpi.field.qualGrade}">Xếp loại</th>
+                                            <th th:text="#{vpi.field.dateObtained}">Ngày nhận</th>
+                                            <th th:text="#{vpi.field.validityDate}">Ngày hết hạn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_qualificationBody">
+                                        <tr><td colspan="6" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Ngoại ngữ ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-world me-1"></i><span th:text="#{vpi.section.languageLevel}">Ngoại ngữ</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.languageType}">Loại ngôn ngữ</th>
+                                            <th th:text="#{vpi.field.languageLevel}">Trình độ</th>
+                                            <th th:text="#{vpi.field.listen}">Nghe</th>
+                                            <th th:text="#{vpi.field.say}">Nói</th>
+                                            <th th:text="#{vpi.field.read}">Đọc</th>
+                                            <th th:text="#{vpi.field.write}">Viết</th>
+                                            <th th:text="#{vpi.field.basicLanguage}">Ngôn ngữ cơ bản</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_languageLevelBody">
+                                        <tr><td colspan="7" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ===================== TAB: Khen thưởng/Kỷ luật ===================== -->
+                    <div class="tab-pane fade" id="vpi_pane_rewardPunish" role="tabpanel">
+
+                        <!-- ===== Khen thưởng ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-medal me-1"></i><span th:text="#{vpi.section.reward}">Khen thưởng</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.rewardType}">Loại khen thưởng</th>
+                                            <th th:text="#{vpi.field.rewardDate}">Ngày khen thưởng</th>
+                                            <th th:text="#{vpi.field.rewardCnpy}">Đơn vị khen thưởng</th>
+                                            <th th:text="#{vpi.field.reward}">Hình thức thưởng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_rewardBody">
+                                        <tr><td colspan="4" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== Kỷ luật ===== -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-error me-1"></i><span th:text="#{vpi.section.punishment}">Kỷ luật</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.punishCode}">Loại kỷ luật</th>
+                                            <th th:text="#{vpi.field.punishDate}">Ngày kỷ luật</th>
+                                            <th th:text="#{vpi.field.punishReason}">Lý do</th>
+                                            <th th:text="#{vpi.field.releaseDate}">Ngày hết hạn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_punishmentBody">
+                                        <tr><td colspan="4" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ===================== TAB: Thông tin đánh giá ===================== -->
+                    <div class="tab-pane fade" id="vpi_pane_evaluation" role="tabpanel">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-line-chart me-1"></i><span th:text="#{vpi.section.evaluation}">Thông tin đánh giá</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.evsYear}">Năm đánh giá</th>
+                                            <th th:text="#{vpi.field.evsPeriod}">Kỳ đánh giá</th>
+                                            <th th:text="#{vpi.field.evsType}">Loại đánh giá</th>
+                                            <th th:text="#{vpi.field.evsListType}">Bảng đánh giá</th>
+                                            <th th:text="#{vpi.field.evsGroup}">Nhóm đánh giá</th>
+                                            <th th:text="#{vpi.field.finalGrade}">Xếp loại</th>
+                                            <th th:text="#{vpi.field.finalAffirmContent}">Ý kiến điều chỉnh nhân sự</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_evaluationBody">
+                                        <tr><td colspan="7" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================== TAB: Ghi chép đặc biệt ===================== -->
+                    <div class="tab-pane fade" id="vpi_pane_specialMatter" role="tabpanel">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                <strong><i class="bx bx-star me-1"></i><span th:text="#{vpi.section.specialMatter}">Hạng mục đặc biệt</span></strong>
+                                <!--<button type="button" class="btn btn-sm btn-success" id="vpi_btnAddSpecialMatter">
+                                    <i class="bx bx-plus me-1"></i><span th:text="#{epi.btn.addNew}">Thêm mới</span>
+                                </button>-->
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.classification}">Phân loại</th>
+                                            <th th:text="#{common.startDate}">Ngày bắt đầu</th>
+                                            <th th:text="#{common.endDate}">Ngày kết thúc</th>
+                                            <th th:text="#{vpi.field.content}">Nội dung</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_specialMatterBody">
+                                        <tr><td colspan="4" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================== TAB: Thông tin sức khỏe ===================== -->
+                    <div class="tab-pane fade" id="vpi_pane_health" role="tabpanel">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light py-2">
+                                <strong><i class="bx bx-plus-medical me-1"></i><span th:text="#{vpi.section.health}">Thông tin sức khỏe</span></strong>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-hover table-sm align-middle mb-0 w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th th:text="#{vpi.field.healthType}">Loại khám</th>
+                                            <th th:text="#{vpi.field.dateHealth}">Ngày khám</th>
+                                            <th th:text="#{vpi.field.height}">Chiều cao</th>
+                                            <th th:text="#{vpi.field.weight}">Cân nặng</th>
+                                            <th th:text="#{vpi.field.bloodGroup}">Nhóm máu</th>
+                                            <th th:text="#{vpi.field.historyDisease}">Tiền sử bệnh</th>
+                                            <th th:text="#{vpi.field.healthCnpy}">Nơi khám</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vpi_healthBody">
+                                        <tr><td colspan="7" class="text-center text-muted" th:text="#{common.loading}">Đang tải...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Sửa Cá nhân ===== -->
+    <div class="modal fade" id="vpi_modalPersonal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bx bx-user me-1"></i><span th:text="#{epi.modal.editPersonal}">Chỉnh sửa thông tin cá nhân</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.dob}">Ngày sinh</label>
+                            <input type="date" class="form-control form-control-sm" id="vpi_mp_dob">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.gender}">Giới tính</label>
+                            <select class="form-select form-select-sm" id="vpi_mp_sexCode" data-parent-code="1324"
+                                th:attr="data-default-text=#{epi.select.choose}"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.maritalStatus}">Trình trạng hôn nhân</label>
+                            <select class="form-select form-select-sm" id="vpi_mp_maritalStatusCode" data-parent-code="1709"
+                                th:attr="data-default-text=#{epi.select.choose}"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.ethnicity}">Dân tộc</label>
+                            <select class="form-select form-select-sm" id="vpi_mp_nationCode" data-parent-code="210942"
+                                th:attr="data-default-text=#{epi.select.choose}"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.nationality}">Quốc tịch</label>
+                            <select class="form-select form-select-sm" id="vpi_mp_nationalityCode" data-parent-code="870"
+                                th:attr="data-default-text=#{epi.select.choose}"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.homePhone}">Điện thoại gia đình</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_mp_homePhone">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.companyPhone}">Điện thoại công ty</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_mp_companyPhone">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.phone}">Điện thoại</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_mp_cellphone">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.email}">Email</label>
+                            <input type="email" class="form-control form-control-sm" id="vpi_mp_email">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.companyEmail}">Email công ty</label>
+                            <input type="email" class="form-control form-control-sm" id="vpi_mp_emailSecond">
+                        </div>
+                    </div>
+                    <div class="alert alert-info py-2 mt-3 mb-0 small">
+                        <i class="bx bx-info-circle me-1"></i>
+                        <span th:text="#{epi.msg.applyNote}">Yêu cầu sẽ được gửi đến người quản lý để xét duyệt, không cập nhật trực tiếp hồ sơ.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="vpi_mp_btnSave">
+                        <i class="bx bx-send me-1"></i><span th:text="#{epi.btn.submitRequest}">Gửi yêu cầu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Thêm/Sửa Địa chỉ ===== -->
+    <div class="modal fade" id="vpi_modalAddress" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vpi_modalAddressTitle"><i class="bx bx-map me-1"></i><span th:text="#{epi.modal.address}">Địa chỉ</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="vpi_addr_updateAddressNo">
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold"><span th:text="#{epi.field.addressType}">Loại địa chỉ</span> <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-sm" id="vpi_addr_addressType" data-parent-code="14013840"
+                            th:attr="data-default-text=#{epi.select.chooseAddressType}"></select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold" th:text="#{epi.field.effectiveDate}">Ngày hiệu lực</label>
+                        <input type="date" class="form-control form-control-sm" id="vpi_addr_effectiveStartDate">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold" th:text="#{epi.field.address}">Địa chỉ</label>
+                        <textarea class="form-control form-control-sm" id="vpi_addr_addressContent" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="vpi_addr_btnSave">
+                        <i class="bx bx-save me-1"></i><span th:text="#{common.save}">Lưu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Thêm/Sửa Gia đình ===== -->
+    <div class="modal fade" id="vpi_modalFamily" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vpi_modalFamilyTitle"><i class="bx bx-group me-1"></i><span th:text="#{epi.section.family}">Thông tin gia đình</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="vpi_fam_familyNo">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold"><span th:text="#{epi.field.relationship}">Quan hệ</span> <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" id="vpi_fam_famTypeCode" data-parent-code="950"
+                                th:attr="data-default-text=#{epi.select.chooseRelationship}"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold"><span th:text="#{epi.field.fullName}">Họ tên</span> <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_fam_famName">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.gender}">Giới tính</label>
+                            <select class="form-select form-select-sm" id="vpi_fam_gender" data-parent-code="1324"
+                                th:attr="data-default-text=#{epi.select.choose}"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.dob}">Ngày sinh</label>
+                            <input type="date" class="form-control form-control-sm" id="vpi_fam_famBorndate">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.phone}">Điện thoại</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_fam_famPhone">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="vpi_fam_btnSave">
+                        <i class="bx bx-save me-1"></i><span th:text="#{common.save}">Lưu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Thêm/Sửa Liên hệ khẩn cấp ===== -->
+    <div class="modal fade" id="vpi_modalEmergency" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vpi_modalEmergencyTitle"><i class="bx bx-phone-call me-1"></i><span th:text="#{epi.section.emergency}">Người liên hệ khẩn cấp</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="vpi_emer_emergencyNo">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold"><span th:text="#{epi.field.fullName}">Họ tên</span> <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_emer_emerName">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.relationship}">Quan hệ</label>
+                            <select class="form-select form-select-sm" id="vpi_emer_emerTypeCode" data-parent-code="1693"
+                                th:attr="data-default-text=#{epi.select.chooseRelationship}"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.phone}">Điện thoại</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_emer_emerPhone">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.email}">Email</label>
+                            <input type="email" class="form-control form-control-sm" id="vpi_emer_emerEmail">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" th:text="#{epi.field.address}">Địa chỉ</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_emer_emerAddress">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check mt-1">
+                                <input type="checkbox" class="form-check-input" id="vpi_emer_isEmergencyAddress">
+                                <label class="form-check-label" for="vpi_emer_isEmergencyAddress" th:text="#{epi.field.isPrimaryContact}">Là liên hệ chính</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="vpi_emer_btnSave">
+                        <i class="bx bx-save me-1"></i><span th:text="#{common.save}">Lưu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Thêm/Sửa Học vấn ===== -->
+    <div class="modal fade" id="vpi_modalEducation" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vpi_modalEducationTitle"><i class="bx bx-book me-1"></i><span th:text="#{vpi.section.education}">Học vấn</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="vpi_edu_educNo">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold"><span th:text="#{vpi.field.institutionName}">Trường / Cơ sở đào tạo</span> <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_edu_institutionName">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" th:text="#{vpi.field.subject}">Chuyên ngành</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_edu_subject">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{vpi.field.degreeName}">Bằng cấp</label>
+                            <select class="form-select form-select-sm" id="vpi_edu_degreeCode" data-parent-code="13769"
+                                th:attr="data-default-text=#{epi.select.choose}"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{common.startDate}">Ngày bắt đầu</label>
+                            <input type="date" class="form-control form-control-sm" id="vpi_edu_startDate">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" th:text="#{common.endDate}">Ngày kết thúc</label>
+                            <input type="date" class="form-control form-control-sm" id="vpi_edu_endDate">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="vpi_edu_btnSave">
+                        <i class="bx bx-save me-1"></i><span th:text="#{common.save}">Lưu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Thêm mới Hạng mục đặc biệt ===== -->
+    <div class="modal fade" id="vpi_modalSpecialMatter" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bx bx-star me-1"></i><span th:text="#{vpi.modal.addSpecialMatter}">Thêm mới hạng mục đặc biệt</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2">
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold" th:text="#{vpi.field.classification}">Phân loại</label>
+                            <input type="text" class="form-control form-control-sm" id="vpi_sm_inforDisCode">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" th:text="#{common.startDate}">Ngày bắt đầu</label>
+                            <input type="date" class="form-control form-control-sm" id="vpi_sm_startDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" th:text="#{common.endDate}">Ngày kết thúc</label>
+                            <input type="date" class="form-control form-control-sm" id="vpi_sm_endDate">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold"><span th:text="#{vpi.field.content}">Nội dung</span> <span class="text-danger">*</span></label>
+                            <textarea class="form-control form-control-sm" id="vpi_sm_specialContent" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-dismiss="modal" th:text="#{common.close}">Đóng</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="vpi_sm_btnSave">
+                        <i class="bx bx-save me-1"></i><span th:text="#{common.save}">Lưu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<template id="fragmentScripts">
+    <script th:inline="javascript">
+        (function () {
+            var I18N = {
+                noData:            /*[[#{epi.msg.noData}]]*/ 'Không có dữ liệu',
+                loading:           /*[[#{common.loading}]]*/ 'Đang tải...',
+                saveSuccess:       /*[[#{common.saveSuccess}]]*/ 'Lưu thành công!',
+                addSuccess:        /*[[#{epi.msg.addSuccess}]]*/ 'Thêm mới thành công!',
+                applySuccess:      /*[[#{epi.msg.applySuccess}]]*/ 'Gửi yêu cầu thành công! Chờ người quản lý xét duyệt.',
+                errPersonal:       /*[[#{epi.msg.saveError.personal}]]*/ 'Lỗi khi lưu thông tin cá nhân!',
+                errAddress:        /*[[#{epi.msg.saveError.address}]]*/ 'Lỗi khi lưu địa chỉ!',
+                errFamily:         /*[[#{epi.msg.saveError.family}]]*/ 'Lỗi khi lưu thông tin gia đình!',
+                errEmergency:      /*[[#{epi.msg.saveError.emergency}]]*/ 'Lỗi khi lưu thông tin khẩn cấp!',
+                errEducation:      /*[[#{vpi.msg.saveError.education}]]*/ 'Lỗi khi lưu học vấn!',
+                errSpecialMatter:  /*[[#{vpi.msg.saveError.specialMatter}]]*/ 'Lỗi khi lưu hạng mục đặc biệt!',
+                loadErrAddress:    /*[[#{epi.msg.loadError.address}]]*/ 'Lỗi tải dữ liệu địa chỉ',
+                loadErrFamily:     /*[[#{epi.msg.loadError.family}]]*/ 'Lỗi tải dữ liệu gia đình',
+                loadErrEmergency:  /*[[#{epi.msg.loadError.emergency}]]*/ 'Lỗi tải dữ liệu khẩn cấp',
+                loadErrEducation:  /*[[#{vpi.msg.loadError.education}]]*/ 'Lỗi tải dữ liệu học vấn',
+                loadErrSpecialMatter: /*[[#{vpi.msg.loadError.specialMatter}]]*/ 'Lỗi tải dữ liệu hạng mục đặc biệt',
+                loadErrGeneric:    /*[[#{vpi.msg.loadError.generic}]]*/ 'Lỗi tải dữ liệu',
+                yes:               /*[[#{common.yes}]]*/ 'Có',
+                no:                /*[[#{common.no}]]*/ 'Không',
+                valAddressType:    /*[[#{epi.msg.validate.addressType}]]*/ 'Vui lòng chọn Loại địa chỉ!',
+                valFamilyReq:      /*[[#{epi.msg.validate.familyRequired}]]*/ 'Vui lòng chọn Quan hệ và nhập Họ tên!',
+                valEmerName:       /*[[#{epi.msg.validate.emergencyName}]]*/ 'Vui lòng nhập Họ tên!',
+                valEducation:      /*[[#{vpi.msg.validate.educationRequired}]]*/ 'Vui lòng nhập Trường/Cơ sở đào tạo!',
+                valSpecialMatter:  /*[[#{vpi.msg.validate.specialMatterRequired}]]*/ 'Vui lòng nhập Nội dung!',
+                noEmployeeSelected:/*[[#{vpi.msg.noEmployeeSelected}]]*/ 'Chưa chọn nhân viên',
+                addAddress:        /*[[#{epi.modal.addAddress}]]*/ 'Thêm mới địa chỉ',
+                editAddress:       /*[[#{epi.modal.editAddress}]]*/ 'Cập nhật địa chỉ',
+                addFamily:         /*[[#{epi.modal.addFamily}]]*/ 'Thêm mới thành viên gia đình',
+                editFamily:        /*[[#{epi.modal.editFamily}]]*/ 'Cập nhật thành viên gia đình',
+                addEmergency:      /*[[#{epi.modal.addEmergency}]]*/ 'Thêm mới liên hệ khẩn cấp',
+                editEmergency:     /*[[#{epi.modal.editEmergency}]]*/ 'Cập nhật liên hệ khẩn cấp',
+                addEducation:      /*[[#{vpi.modal.addEducation}]]*/ 'Thêm mới học vấn',
+                editEducation:     /*[[#{vpi.modal.editEducation}]]*/ 'Cập nhật học vấn',
+                iconMap:           '<i class="bx bx-map me-1"></i>',
+                iconGroup:         '<i class="bx bx-group me-1"></i>',
+                iconPhone:         '<i class="bx bx-phone-call me-1"></i>',
+                iconBook:          '<i class="bx bx-book me-1"></i>'
+            };
+
+            var currentPersonId = null;
+            var currentPersonalInfo = {};
+            var currentAddressList = [];
+            var currentFamilyList = [];
+            var currentEmergencyList = [];
+            var currentEducationList = [];
+
+            function activePane() {
+                return document.querySelector('.tab-pane.active') || document;
+            }
+
+            function byId(id) {
+                var pane = activePane();
+                return (pane.querySelector ? pane.querySelector('#' + id) : null) || document.getElementById(id);
+            }
+
+            function setText(id, val) {
+                var el = byId(id);
+                if (el) el.textContent = val || '';
+            }
+
+            function getVal(id) {
+                var el = byId(id);
+                return el ? el.value : '';
+            }
+
+            function setVal(id, val) {
+                var el = byId(id);
+                if (el) el.value = val || '';
+            }
+
+            // Định dạng ngày YYYY/MM/DD theo quy ước hiển thị chung của hệ thống
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                try {
+                    var d = new Date(dateStr);
+                    if (isNaN(d.getTime())) return dateStr;
+                    var day = String(d.getDate()).padStart(2, '0');
+                    var month = String(d.getMonth() + 1).padStart(2, '0');
+                    var year = d.getFullYear();
+                    return year + '/' + month + '/' + day;
+                } catch (e) { return dateStr; }
+            }
+
+            function toInputDate(dateStr) {
+                if (!dateStr) return '';
+                if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) return dateStr.substring(0, 10);
+                try {
+                    var d = new Date(dateStr);
+                    if (!isNaN(d.getTime())) {
+                        return d.getFullYear() + '-' +
+                            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(d.getDate()).padStart(2, '0');
+                    }
+                } catch (e) { }
+                return '';
+            }
+
+            function showToast(msg, type) {
+                var container = document.getElementById('vpi_toast_container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'vpi_toast_container';
+                    container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:250px;';
+                    document.body.appendChild(container);
+                }
+                var toast = document.createElement('div');
+                toast.className = 'alert alert-' + (type || 'info') + ' alert-dismissible fade show shadow-sm py-2';
+                toast.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                container.appendChild(toast);
+                setTimeout(function () { if (toast.parentNode) toast.remove(); }, 3500);
+            }
+
+            function requireEmployee() {
+                if (!currentPersonId) {
+                    showToast(I18N.noEmployeeSelected, 'warning');
+                    return false;
+                }
+                return true;
+            }
+
+            // ===== Thông tin cơ bản + Cá nhân =====
+            function loadProfile(personId) {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/profile',
+                    type: 'GET',
+                    data: personId ? { personId: personId } : {},
+                    success: function (data) {
+                        if (!data) return;
+                        currentPersonId = data.personId;
+                        currentPersonalInfo = data;
+                        setVal('vpi_keyword', (data.empId || '') + ' - ' + (data.localName || ''));
+                        setText('vpi_identitySummary', [data.empId, data.localName, data.postGradeName].filter(Boolean).join(' / '));
+                        setText('vpi_localName', data.localName);
+                        setText('vpi_empId', data.empId);
+                        setText('vpi_deptName', data.deptName);
+                        setText('vpi_postGradeName', data.postGradeName);
+                        setText('vpi_dutyName', data.dutyName);
+                        setText('vpi_positionNoName', data.positionNoName);
+                        setText('vpi_postFamilyName', data.postFamilyName);
+                        setText('vpi_headDepartment', data.headDepartment);
+                        setText('vpi_dateStarted', formatDate(data.dateStarted));
+                        setText('vpi_dob', formatDate(data.dob));
+                        setText('vpi_sexName', data.sexName);
+                        setText('vpi_maritalStatusName', data.maritalStatusName);
+                        setText('vpi_nationName', data.nationName);
+                        setText('vpi_homePhone', data.homePhone);
+                        setText('vpi_companyPhone', data.companyPhone);
+                        setText('vpi_cellphone', data.cellphone);
+                        setText('vpi_nationalityName', data.nationalityName);
+                        setText('vpi_email', data.email);
+                        setText('vpi_emailSecond', data.emailSecond);
+                        loadAll();
+                    },
+                    error: function () {
+                        console.error('Không tải được thông tin hồ sơ');
+                    }
+                });
+            }
+
+            // ===== Loại địa chỉ =====
+            function loadAddress() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/address',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        currentAddressList = list || [];
+                        var tbody = byId('vpi_addressBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item, i) {
+                            html += '<tr style="cursor:pointer;" onclick="window._vpiOpenAddressModal(' + i + ')">' +
+                                '<td>' + (item.addressTypeName || item.addressType || '') + '</td>' +
+                                '<td>' + formatDate(item.effectiveStartDate) + '</td>' +
+                                '<td>' + (item.addressContent || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_addressBody').innerHTML =
+                            '<tr><td colspan="3" class="text-center text-danger">' + I18N.loadErrAddress + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Thông tin gia đình =====
+            function loadFamily() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/family',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        currentFamilyList = list || [];
+                        var tbody = byId('vpi_familyBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item, i) {
+                            html += '<tr style="cursor:pointer;" onclick="window._vpiOpenFamilyModal(' + i + ')">' +
+                                '<td>' + (item.famTypeName || item.famTypeCode || '') + '</td>' +
+                                '<td>' + (item.famName || '') + '</td>' +
+                                '<td>' + (item.genderName || '') + '</td>' +
+                                '<td>' + formatDate(item.famBorndate) + '</td>' +
+                                '<td>' + (item.famPhone || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_familyBody').innerHTML =
+                            '<tr><td colspan="5" class="text-center text-danger">' + I18N.loadErrFamily + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Người liên hệ khẩn cấp =====
+            function loadEmergency() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/emergency',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        currentEmergencyList = list || [];
+                        var tbody = byId('vpi_emergencyBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item, i) {
+                            var checked = (item.isEmergencyAddress === '1' || item.isEmergencyAddress === 'Y') ? 'checked' : '';
+                            html += '<tr style="cursor:pointer;" onclick="window._vpiOpenEmergencyModal(' + i + ')">' +
+                                '<td>' + (item.emerName || '') + '</td>' +
+                                '<td>' + (item.emerTypeName || '') + '</td>' +
+                                '<td>' + (item.emerPhone || '') + '</td>' +
+                                '<td>' + (item.emerEmail || '') + '</td>' +
+                                '<td>' + (item.emerAddress || '') + '</td>' +
+                                '<td class="text-center"><input type="checkbox" ' + checked + ' disabled></td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_emergencyBody').innerHTML =
+                            '<tr><td colspan="6" class="text-center text-danger">' + I18N.loadErrEmergency + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Học vấn =====
+            function loadEducation() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/education',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        currentEducationList = list || [];
+                        var tbody = byId('vpi_educationBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item, i) {
+                            html += '<tr style="cursor:pointer;" onclick="window._vpiOpenEducationModal(' + i + ')">' +
+                                '<td>' + (item.degreeName || '') + '</td>' +
+                                '<td>' + (item.institutionName || '') + '</td>' +
+                                '<td>' + (item.subject || '') + '</td>' +
+                                '<td>' + formatDate(item.startDate) + '</td>' +
+                                '<td>' + formatDate(item.endDate) + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_educationBody').innerHTML =
+                            '<tr><td colspan="5" class="text-center text-danger">' + I18N.loadErrEducation + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Hạng mục đặc biệt =====
+            function loadSpecialMatter() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/specialMatter',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_specialMatterBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.inforDisCode || '') + '</td>' +
+                                '<td>' + formatDate(item.startDate) + '</td>' +
+                                '<td>' + formatDate(item.endDate) + '</td>' +
+                                '<td>' + (item.specialContent || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_specialMatterBody').innerHTML =
+                            '<tr><td colspan="4" class="text-center text-danger">' + I18N.loadErrSpecialMatter + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Hợp đồng lao động (chỉ xem) =====
+            function loadContract() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/contract',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_contractBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.contractNo || '') + '</td>' +
+                                '<td>' + (item.contractName || '') + '</td>' +
+                                '<td>' + (item.contractTypeName || item.contractType || '') + '</td>' +
+                                '<td>' + formatDate(item.startContractDate) + '</td>' +
+                                '<td>' + formatDate(item.endContractDate) + '</td>' +
+                                '<td>' + (item.workPosition || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_contractBody').innerHTML =
+                            '<tr><td colspan="6" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Kinh nghiệm nội bộ (chỉ xem) =====
+            function loadInsideExperience() {
+                $.ajax({
+                    url: '/ess/viewDept/api/manageEmpPositionInfo/insideExperience',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_insideExpBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + formatDate(item.startDate) + '</td>' +
+                                '<td>' + (item.deptName || '') + '</td>' +
+                                '<td>' + (item.mainBusiness || '') + '</td>' +
+                                '<td>' + (item.postGrade || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_insideExpBody').innerHTML =
+                            '<tr><td colspan="4" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Kinh nghiệm làm việc bên ngoài (chỉ xem) =====
+            function loadWorkExperience() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/workExperience',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_workExpBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.cpnyName || '') + '</td>' +
+                                '<td>' + (item.position || '') + '</td>' +
+                                '<td>' + (item.startDate || '') + '</td>' +
+                                '<td>' + (item.endDate || '') + '</td>' +
+                                '<td>' + (item.resignReason || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_workExpBody').innerHTML =
+                            '<tr><td colspan="5" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Chứng chỉ (chỉ xem) =====
+            function loadQualification() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/qualification',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_qualificationBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.qualName || '') + '</td>' +
+                                '<td>' + (item.qualInstitute || '') + '</td>' +
+                                '<td>' + (item.qualLevel || '') + '</td>' +
+                                '<td>' + (item.qualGrade || '') + '</td>' +
+                                '<td>' + formatDate(item.dateObtained) + '</td>' +
+                                '<td>' + formatDate(item.validityDate) + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_qualificationBody').innerHTML =
+                            '<tr><td colspan="6" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Ngoại ngữ (chỉ xem) =====
+            function loadLanguageLevel() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/languageLevel',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_languageLevelBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.languageTypeName || item.languageType || '') + '</td>' +
+                                '<td>' + (item.languageLevelName || item.languageLevel || '') + '</td>' +
+                                '<td>' + (item.listenName || item.listen || '') + '</td>' +
+                                '<td>' + (item.sayName || item.say || '') + '</td>' +
+                                '<td>' + (item.readName || item.read || '') + '</td>' +
+                                '<td>' + (item.writeName || item.write || '') + '</td>' +
+                                '<td>' + (item.basicLanguage === 'Y' ? I18N.yes : I18N.no) + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_languageLevelBody').innerHTML =
+                            '<tr><td colspan="7" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Khen thưởng (chỉ xem) =====
+            function loadReward() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/reward',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_rewardBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.rewardType || '') + '</td>' +
+                                '<td>' + formatDate(item.rewardDate) + '</td>' +
+                                '<td>' + (item.rewardCnpy || '') + '</td>' +
+                                '<td>' + (item.reward || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_rewardBody').innerHTML =
+                            '<tr><td colspan="4" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Kỷ luật (chỉ xem) =====
+            function loadPunishment() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/punishment',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_punishmentBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.punishCode || '') + '</td>' +
+                                '<td>' + formatDate(item.punishDate) + '</td>' +
+                                '<td>' + (item.punishReason || '') + '</td>' +
+                                '<td>' + formatDate(item.releaseDate) + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_punishmentBody').innerHTML =
+                            '<tr><td colspan="4" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Thông tin đánh giá (chỉ xem) =====
+            function loadEvaluation() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/evsObject',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_evaluationBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.evsYear || '') + '</td>' +
+                                '<td>' + (item.evsMonthName || item.evsCycleName || '') + '</td>' +
+                                '<td>' + (item.evsTypeName || item.evsType || '') + '</td>' +
+                                '<td>' + (item.listTypeName || '') + '</td>' +
+                                '<td>' + (item.evsGroupName || '') + '</td>' +
+                                '<td>' + (item.finalGrade || '') + '</td>' +
+                                '<td>' + (item.finalAffirmContent || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_evaluationBody').innerHTML =
+                            '<tr><td colspan="7" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            // ===== Thông tin sức khỏe (chỉ xem) =====
+            function loadHealth() {
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/healthInfo',
+                    type: 'GET',
+                    data: { personId: currentPersonId },
+                    success: function (list) {
+                        var tbody = byId('vpi_healthBody');
+                        if (!list || list.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">' + I18N.noData + '</td></tr>';
+                            return;
+                        }
+                        var html = '';
+                        list.forEach(function (item) {
+                            html += '<tr>' +
+                                '<td>' + (item.healthType || '') + '</td>' +
+                                '<td>' + formatDate(item.dateHealth) + '</td>' +
+                                '<td>' + (item.height || '') + '</td>' +
+                                '<td>' + (item.weight || '') + '</td>' +
+                                '<td>' + (item.bloodGroup || '') + '</td>' +
+                                '<td>' + (item.historyDisease || '') + '</td>' +
+                                '<td>' + (item.healthCnpy || '') + '</td>' +
+                                '</tr>';
+                        });
+                        tbody.innerHTML = html;
+                    },
+                    error: function () {
+                        byId('vpi_healthBody').innerHTML =
+                            '<tr><td colspan="7" class="text-center text-danger">' + I18N.loadErrGeneric + '</td></tr>';
+                    }
+                });
+            }
+
+            function loadAll() {
+                loadAddress();
+                loadFamily();
+                loadEmergency();
+                loadEducation();
+                loadSpecialMatter();
+                loadContract();
+                loadInsideExperience();
+                loadWorkExperience();
+                loadQualification();
+                loadLanguageLevel();
+                loadReward();
+                loadPunishment();
+                loadEvaluation();
+                loadHealth();
+            }
+
+            // ===== Chọn nhân viên =====
+            function selectEmployee(emp) {
+                loadProfile(emp.personId);
+            }
+            window._vpiSelectEmployee = selectEmployee;
+
+            // ===== Modal: Cá nhân =====
+            window._vpiOpenPersonalModal = function () {
+                if (!requireEmployee()) return;
+                var d = currentPersonalInfo;
+                setVal('vpi_mp_dob', toInputDate(d.dob));
+                setVal('vpi_mp_homePhone', d.homePhone);
+                setVal('vpi_mp_companyPhone', d.companyPhone);
+                setVal('vpi_mp_cellphone', d.cellphone);
+                setVal('vpi_mp_email', d.email);
+                setVal('vpi_mp_emailSecond', d.emailSecond);
+
+                $.when(
+                    initCodeSelects('#vpi_mp_sexCode'),
+                    initCodeSelects('#vpi_mp_maritalStatusCode'),
+                    initCodeSelects('#vpi_mp_nationCode'),
+                    initCodeSelects('#vpi_mp_nationalityCode')
+                ).done(function () {
+                    $('#vpi_mp_sexCode').val(d.sexCode || '');
+                    $('#vpi_mp_maritalStatusCode').val(d.maritalStatusCode || '');
+                    $('#vpi_mp_nationCode').val(d.nationCode || '');
+                    $('#vpi_mp_nationalityCode').val(d.nationalityCode || '');
+                });
+
+                new bootstrap.Modal(document.getElementById('vpi_modalPersonal')).show();
+            };
+
+            function savePersonal() {
+                if (!requireEmployee()) return;
+                var payload = {
+                    personId: currentPersonId,
+                    dob: getVal('vpi_mp_dob') || null,
+                    sexCode: getVal('vpi_mp_sexCode') || null,
+                    maritalStatusCode: getVal('vpi_mp_maritalStatusCode') || null,
+                    nationCode: getVal('vpi_mp_nationCode') || null,
+                    nationalityCode: getVal('vpi_mp_nationalityCode') || null,
+                    homePhone: getVal('vpi_mp_homePhone') || null,
+                    companyPhone: getVal('vpi_mp_companyPhone') || null,
+                    cellphone: getVal('vpi_mp_cellphone') || null,
+                    email: getVal('vpi_mp_email') || null,
+                    emailSecond: getVal('vpi_mp_emailSecond') || null
+                };
+                var btn = byId('vpi_mp_btnSave');
+                btn.disabled = true;
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/savePersonal',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        bootstrap.Modal.getInstance(document.getElementById('vpi_modalPersonal')).hide();
+                        showToast(I18N.applySuccess, 'success');
+                        loadProfile(currentPersonId);
+                    },
+                    error: function () {
+                        showToast(I18N.errPersonal, 'danger');
+                    },
+                    complete: function () { btn.disabled = false; }
+                });
+            }
+
+            // ===== Modal: Địa chỉ =====
+            window._vpiOpenAddressModal = function (indexOrNull) {
+                if (!requireEmployee()) return;
+                var isNew = (indexOrNull === null || indexOrNull === undefined);
+                byId('vpi_modalAddressTitle').innerHTML = I18N.iconMap + (isNew ? I18N.addAddress : I18N.editAddress);
+                var addressType = '';
+                if (isNew) {
+                    setVal('vpi_addr_updateAddressNo', '');
+                    setVal('vpi_addr_effectiveStartDate', '');
+                    setVal('vpi_addr_addressContent', '');
+                } else {
+                    var item = currentAddressList[indexOrNull];
+                    addressType = item.addressType || '';
+                    setVal('vpi_addr_updateAddressNo', item.addressNo || '');
+                    setVal('vpi_addr_effectiveStartDate', toInputDate(item.effectiveStartDate));
+                    setVal('vpi_addr_addressContent', item.addressContent || '');
+                }
+                $.when(initCodeSelects('#vpi_addr_addressType')).done(function () {
+                    $('#vpi_addr_addressType').val(addressType);
+                });
+                new bootstrap.Modal(document.getElementById('vpi_modalAddress')).show();
+            };
+
+            function saveAddress() {
+                if (!requireEmployee()) return;
+                var updateAddressNo = getVal('vpi_addr_updateAddressNo');
+                var payload = {
+                    personId: currentPersonId,
+                    updateAddressNo: updateAddressNo ? parseInt(updateAddressNo, 10) : null,
+                    addressType: getVal('vpi_addr_addressType') || null,
+                    effectiveStartDate: getVal('vpi_addr_effectiveStartDate') || null,
+                    addressContent: getVal('vpi_addr_addressContent') || null
+                };
+                if (!payload.addressType) {
+                    showToast(I18N.valAddressType, 'danger');
+                    return;
+                }
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/saveAddress',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        bootstrap.Modal.getInstance(document.getElementById('vpi_modalAddress')).hide();
+                        showToast(updateAddressNo ? I18N.saveSuccess : I18N.addSuccess, 'success');
+                        loadAddress();
+                    },
+                    error: function () { showToast(I18N.errAddress, 'danger'); }
+                });
+            }
+
+            // ===== Modal: Gia đình =====
+            window._vpiOpenFamilyModal = function (indexOrNull) {
+                if (!requireEmployee()) return;
+                var isNew = (indexOrNull === null || indexOrNull === undefined);
+                byId('vpi_modalFamilyTitle').innerHTML = I18N.iconGroup + (isNew ? I18N.addFamily : I18N.editFamily);
+                var famTypeCode = '', gender = '';
+                if (isNew) {
+                    setVal('vpi_fam_familyNo', '');
+                    setVal('vpi_fam_famName', '');
+                    setVal('vpi_fam_famBorndate', '');
+                    setVal('vpi_fam_famPhone', '');
+                } else {
+                    var item = currentFamilyList[indexOrNull];
+                    famTypeCode = item.famTypeCode || '';
+                    gender = item.gender || '';
+                    setVal('vpi_fam_familyNo', item.familyNo || '');
+                    setVal('vpi_fam_famName', item.famName || '');
+                    setVal('vpi_fam_famBorndate', toInputDate(item.famBorndate));
+                    setVal('vpi_fam_famPhone', item.famPhone || '');
+                }
+                $.when(
+                    initCodeSelects('#vpi_fam_famTypeCode'),
+                    initCodeSelects('#vpi_fam_gender')
+                ).done(function () {
+                    $('#vpi_fam_famTypeCode').val(famTypeCode);
+                    $('#vpi_fam_gender').val(gender);
+                });
+                new bootstrap.Modal(document.getElementById('vpi_modalFamily')).show();
+            };
+
+            function saveFamily() {
+                if (!requireEmployee()) return;
+                var familyNo = getVal('vpi_fam_familyNo');
+                var famTypeCode = getVal('vpi_fam_famTypeCode');
+                var famName = getVal('vpi_fam_famName');
+                if (!famTypeCode || !famName) {
+                    showToast(I18N.valFamilyReq, 'danger');
+                    return;
+                }
+                var payload = {
+                    personId: currentPersonId,
+                    famTypeCode: famTypeCode,
+                    famName: famName,
+                    gender: getVal('vpi_fam_gender') || null,
+                    famBorndate: getVal('vpi_fam_famBorndate') || null,
+                    famPhone: getVal('vpi_fam_famPhone') || null,
+                    updateFamilyNo: familyNo ? parseInt(familyNo, 10) : null
+                };
+                var btn = byId('vpi_fam_btnSave');
+                btn.disabled = true;
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/saveFamily',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        bootstrap.Modal.getInstance(document.getElementById('vpi_modalFamily')).hide();
+                        showToast(I18N.applySuccess, 'success');
+                        loadFamily();
+                    },
+                    error: function () { showToast(I18N.errFamily, 'danger'); },
+                    complete: function () { btn.disabled = false; }
+                });
+            }
+
+            // ===== Modal: Khẩn cấp =====
+            window._vpiOpenEmergencyModal = function (indexOrNull) {
+                if (!requireEmployee()) return;
+                var isNew = (indexOrNull === null || indexOrNull === undefined);
+                byId('vpi_modalEmergencyTitle').innerHTML = I18N.iconPhone + (isNew ? I18N.addEmergency : I18N.editEmergency);
+                var emerTypeCode = '';
+                if (isNew) {
+                    setVal('vpi_emer_emergencyNo', '');
+                    setVal('vpi_emer_emerName', '');
+                    setVal('vpi_emer_emerPhone', '');
+                    setVal('vpi_emer_emerEmail', '');
+                    setVal('vpi_emer_emerAddress', '');
+                    byId('vpi_emer_isEmergencyAddress').checked = false;
+                } else {
+                    var item = currentEmergencyList[indexOrNull];
+                    emerTypeCode = item.emerTypeCode || '';
+                    setVal('vpi_emer_emergencyNo', item.emergencyNo || '');
+                    setVal('vpi_emer_emerName', item.emerName || '');
+                    setVal('vpi_emer_emerPhone', item.emerPhone || '');
+                    setVal('vpi_emer_emerEmail', item.emerEmail || '');
+                    setVal('vpi_emer_emerAddress', item.emerAddress || '');
+                    byId('vpi_emer_isEmergencyAddress').checked = (item.isEmergencyAddress === '1' || item.isEmergencyAddress === 'Y');
+                }
+                $.when(initCodeSelects('#vpi_emer_emerTypeCode')).done(function () {
+                    $('#vpi_emer_emerTypeCode').val(emerTypeCode);
+                });
+                new bootstrap.Modal(document.getElementById('vpi_modalEmergency')).show();
+            };
+
+            function saveEmergency() {
+                if (!requireEmployee()) return;
+                var emergencyNo = getVal('vpi_emer_emergencyNo');
+                var emerName = getVal('vpi_emer_emerName');
+                if (!emerName) {
+                    showToast(I18N.valEmerName, 'danger');
+                    return;
+                }
+                var payload = {
+                    personId: currentPersonId,
+                    emerName: emerName,
+                    emerTypeCode: getVal('vpi_emer_emerTypeCode') || null,
+                    emerPhone: getVal('vpi_emer_emerPhone') || null,
+                    emerEmail: getVal('vpi_emer_emerEmail') || null,
+                    emerAddress: getVal('vpi_emer_emerAddress') || null,
+                    isEmergencyAddress: byId('vpi_emer_isEmergencyAddress').checked ? '1' : '0',
+                    updateEmergencyNo: emergencyNo ? parseInt(emergencyNo, 10) : null
+                };
+                var btn = byId('vpi_emer_btnSave');
+                btn.disabled = true;
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/saveEmergency',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        bootstrap.Modal.getInstance(document.getElementById('vpi_modalEmergency')).hide();
+                        showToast(I18N.applySuccess, 'success');
+                        loadEmergency();
+                    },
+                    error: function () { showToast(I18N.errEmergency, 'danger'); },
+                    complete: function () { btn.disabled = false; }
+                });
+            }
+
+            // ===== Modal: Học vấn =====
+            window._vpiOpenEducationModal = function (indexOrNull) {
+                if (!requireEmployee()) return;
+                var isNew = (indexOrNull === null || indexOrNull === undefined);
+                byId('vpi_modalEducationTitle').innerHTML = I18N.iconBook + (isNew ? I18N.addEducation : I18N.editEducation);
+                var degreeCode = '';
+                if (isNew) {
+                    setVal('vpi_edu_educNo', '');
+                    setVal('vpi_edu_institutionName', '');
+                    setVal('vpi_edu_subject', '');
+                    setVal('vpi_edu_startDate', '');
+                    setVal('vpi_edu_endDate', '');
+                } else {
+                    var item = currentEducationList[indexOrNull];
+                    degreeCode = item.degreeCode || '';
+                    setVal('vpi_edu_educNo', item.educNo || '');
+                    setVal('vpi_edu_institutionName', item.institutionName || '');
+                    setVal('vpi_edu_subject', item.subject || '');
+                    setVal('vpi_edu_startDate', toInputDate(item.startDate));
+                    setVal('vpi_edu_endDate', toInputDate(item.endDate));
+                }
+                $.when(initCodeSelects('#vpi_edu_degreeCode')).done(function () {
+                    $('#vpi_edu_degreeCode').val(degreeCode);
+                });
+                new bootstrap.Modal(document.getElementById('vpi_modalEducation')).show();
+            };
+
+            function saveEducation() {
+                if (!requireEmployee()) return;
+                var educNo = getVal('vpi_edu_educNo');
+                var institutionName = getVal('vpi_edu_institutionName');
+                if (!institutionName) {
+                    showToast(I18N.valEducation, 'danger');
+                    return;
+                }
+                var payload = {
+                    personId: currentPersonId,
+                    institutionName: institutionName,
+                    subject: getVal('vpi_edu_subject') || null,
+                    degreeCode: getVal('vpi_edu_degreeCode') || null,
+                    startDate: getVal('vpi_edu_startDate') || null,
+                    endDate: getVal('vpi_edu_endDate') || null,
+                    updateEducNo: educNo ? parseInt(educNo, 10) : null
+                };
+                var btn = byId('vpi_edu_btnSave');
+                btn.disabled = true;
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/saveEducation',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        bootstrap.Modal.getInstance(document.getElementById('vpi_modalEducation')).hide();
+                        showToast(I18N.applySuccess, 'success');
+                        loadEducation();
+                    },
+                    error: function () { showToast(I18N.errEducation, 'danger'); },
+                    complete: function () { btn.disabled = false; }
+                });
+            }
+
+            // ===== Modal: Hạng mục đặc biệt (chỉ thêm mới) =====
+            window._vpiOpenSpecialMatterModal = function () {
+                if (!requireEmployee()) return;
+                setVal('vpi_sm_inforDisCode', '');
+                setVal('vpi_sm_startDate', '');
+                setVal('vpi_sm_endDate', '');
+                setVal('vpi_sm_specialContent', '');
+                new bootstrap.Modal(document.getElementById('vpi_modalSpecialMatter')).show();
+            };
+
+            function saveSpecialMatter() {
+                if (!requireEmployee()) return;
+                var specialContent = getVal('vpi_sm_specialContent');
+                if (!specialContent) {
+                    showToast(I18N.valSpecialMatter, 'danger');
+                    return;
+                }
+                var payload = {
+                    personId: currentPersonId,
+                    inforDisCode: getVal('vpi_sm_inforDisCode') || null,
+                    startDate: getVal('vpi_sm_startDate') || null,
+                    endDate: getVal('vpi_sm_endDate') || null,
+                    specialContent: specialContent
+                };
+                var btn = byId('vpi_sm_btnSave');
+                btn.disabled = true;
+                $.ajax({
+                    url: '/ess/viewDept/api/personalInfoEss/saveSpecialMatter',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        bootstrap.Modal.getInstance(document.getElementById('vpi_modalSpecialMatter')).hide();
+                        showToast(I18N.addSuccess, 'success');
+                        loadSpecialMatter();
+                    },
+                    error: function () { showToast(I18N.errSpecialMatter, 'danger'); },
+                    complete: function () { btn.disabled = false; }
+                });
+            }
+
+            function bindEvents() {
+                var btnSelectEmp = byId('vpi_btnSelectEmp');
+                if (btnSelectEmp) {
+                    btnSelectEmp.onclick = function () {
+                        if (typeof EmployeeSearchModal !== 'undefined') {
+                            EmployeeSearchModal.open(function (emp) { selectEmployee(emp); });
+                        }
+                    };
+                }
+
+                var map = {
+                    vpi_btnEditPersonal: window._vpiOpenPersonalModal,
+                    vpi_btnAddAddress: function () { window._vpiOpenAddressModal(null); },
+                    vpi_btnAddFamily: function () { window._vpiOpenFamilyModal(null); },
+                    vpi_btnAddEmergency: function () { window._vpiOpenEmergencyModal(null); },
+                    vpi_btnAddEducation: function () { window._vpiOpenEducationModal(null); },
+                    vpi_btnAddSpecialMatter: window._vpiOpenSpecialMatterModal,
+                    vpi_mp_btnSave: savePersonal,
+                    vpi_addr_btnSave: saveAddress,
+                    vpi_fam_btnSave: saveFamily,
+                    vpi_emer_btnSave: saveEmergency,
+                    vpi_edu_btnSave: saveEducation,
+                    vpi_sm_btnSave: saveSpecialMatter
+                };
+                Object.keys(map).forEach(function (id) {
+                    var el = byId(id);
+                    if (el) el.onclick = map[id];
+                });
+            }
+
+            bindEvents();
+            // Mặc định tải hồ sơ của nhân viên đang đăng nhập (PERSON_ID lấy từ SY_USER qua session)
+            loadProfile(null);
+        })();
+    </script>
+</template>

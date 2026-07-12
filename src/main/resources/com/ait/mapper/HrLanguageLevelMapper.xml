@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ait.hrm.empinfo.mapper.HrLanguageLevelMapper">
+
+    <resultMap id="HrLanguageLevelResultMap" type="com.ait.hrm.empinfo.model.HrLanguageLevel">
+        <id property="languageNo" column="LANGUAGE_NO" jdbcType="DECIMAL"/>
+        <result property="personId" column="PERSON_ID" jdbcType="VARCHAR"/>
+        <result property="languageType" column="LANGUAGE_TYPE" jdbcType="VARCHAR"/>
+        <result property="languageTypeName" column="LANGUAGE_TYPE_NAME" jdbcType="VARCHAR"/>
+        <result property="combined" column="COMBINED" jdbcType="VARCHAR"/>
+        <result property="combinedName" column="COMBINED_NAME" jdbcType="VARCHAR"/>
+        <result property="say" column="SAY" jdbcType="VARCHAR"/>
+        <result property="sayName" column="SAY_NAME" jdbcType="VARCHAR"/>
+        <result property="read" column="READ" jdbcType="VARCHAR"/>
+        <result property="readName" column="READ_NAME" jdbcType="VARCHAR"/>
+        <result property="write" column="WRITE" jdbcType="VARCHAR"/>
+        <result property="writeName" column="WRITE_NAME" jdbcType="VARCHAR"/>
+        <result property="listen" column="LISTEN" jdbcType="VARCHAR"/>
+        <result property="listenName" column="LISTEN_NAME" jdbcType="VARCHAR"/>
+        <result property="languageLevel" column="LANGUAGE_LEVEL" jdbcType="VARCHAR"/>
+        <result property="languageLevelName" column="LANGUAGE_LEVEL_NAME" jdbcType="VARCHAR"/>
+        <result property="basicLanguage" column="BASIC_LANGUAGE" jdbcType="VARCHAR"/>
+        <result property="remark" column="REMARK" jdbcType="VARCHAR"/>
+        <result property="activity" column="ACTIVITY" jdbcType="DECIMAL"/>
+        <result property="createDate" column="CREATE_DATE" jdbcType="TIMESTAMP"/>
+        <result property="createdBy" column="CREATED_BY" jdbcType="VARCHAR"/>
+        <result property="updateDate" column="UPDATE_DATE" jdbcType="TIMESTAMP"/>
+        <result property="updatedBy" column="UPDATED_BY" jdbcType="VARCHAR"/>
+        <result property="createdIp" column="CREATED_IP" jdbcType="VARCHAR"/>
+        <result property="updatedIp" column="UPDATED_IP" jdbcType="VARCHAR"/>
+        <result property="empId" column="EMPID" jdbcType="VARCHAR"/>
+        <result property="localName" column="LOCAL_NAME" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getByPersonId" resultMap="HrLanguageLevelResultMap">
+        SELECT
+            t1.LANGUAGE_NO,
+            t1.PERSON_ID,
+            t1.LANGUAGE_TYPE,
+            get_global_name(t1.LANGUAGE_TYPE, #{lang, jdbcType=VARCHAR}) AS LANGUAGE_TYPE_NAME,
+            t1.COMBINED,
+            get_global_name(t1.COMBINED, #{lang, jdbcType=VARCHAR}) AS COMBINED_NAME,
+            t1.SAY,
+            get_global_name(t1.SAY, #{lang, jdbcType=VARCHAR}) AS SAY_NAME,
+            t1.READ,
+            get_global_name(t1.READ, #{lang, jdbcType=VARCHAR}) AS READ_NAME,
+            t1.WRITE,
+            get_global_name(t1.WRITE, #{lang, jdbcType=VARCHAR}) AS WRITE_NAME,
+            t1.LISTEN,
+            get_global_name(t1.LISTEN, #{lang, jdbcType=VARCHAR}) AS LISTEN_NAME,
+            t1.LANGUAGE_LEVEL,
+            get_global_name(t1.LANGUAGE_LEVEL, #{lang, jdbcType=VARCHAR}) AS LANGUAGE_LEVEL_NAME,
+            t1.BASIC_LANGUAGE,
+            t1.REMARK,
+            t1.ACTIVITY,
+            t1.CREATE_DATE,
+            t1.CREATED_BY,
+            t1.UPDATE_DATE,
+            t1.UPDATED_BY,
+            t1.CREATED_IP,
+            t1.UPDATED_IP,
+            t2.EMPID,
+            t2.LOCAL_NAME
+        FROM HR_LANGUAGE_LEVEL t1
+        LEFT JOIN HR_EMPLOYEE t2 ON t1.PERSON_ID = t2.PERSON_ID
+        WHERE t1.PERSON_ID = #{personId, jdbcType=VARCHAR}
+          AND (t1.ACTIVITY = 1 OR t1.ACTIVITY IS NULL)
+        ORDER BY t1.LANGUAGE_NO DESC
+    </select>
+
+</mapper>

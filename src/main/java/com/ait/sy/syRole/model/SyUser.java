@@ -105,41 +105,6 @@ public class SyUser {
     private String personalDataFlag;
 
     /**
-     * Ngày cập nhật dữ liệu cá nhân
-     */
-    private LocalDateTime personalDataUpdateDate;
-
-    /**
-     * IP cập nhật dữ liệu cá nhân
-     */
-    private String personalDataUpdatedIp;
-
-    /**
-     * Người cập nhật dữ liệu cá nhân
-     */
-    private String personalDataUpdatedBy;
-
-    /**
-     * Cờ gửi dữ liệu cá nhân
-     */
-    private String personalSendDataFlag;
-
-    /**
-     * Ngày cập nhật gửi dữ liệu cá nhân
-     */
-    private LocalDateTime personalSendDataUpdateDate;
-
-    /**
-     * IP cập nhật gửi dữ liệu cá nhân
-     */
-    private String personalSendDataUpdatedIp;
-
-    /**
-     * Người cập nhật gửi dữ liệu cá nhân
-     */
-    private String personalSendDataUpdatedBy;
-
-    /**
      * Tên nhân viên (Virtual)
      */
     private String empName;

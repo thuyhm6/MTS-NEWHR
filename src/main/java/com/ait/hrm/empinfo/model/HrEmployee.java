@@ -309,16 +309,7 @@ public class HrEmployee {
      */
     private String otLimit100;
 
-    /**
-     * Người cập nhật giới hạn OT
-     */
-    private String updatedOtLimitBy;
-
-    /**
-     * Ngày cập nhật giới hạn OT
-     */
-    private LocalDateTime updateOtLimitDate;
-
+   
     /**
      * Kiểm tra nhân viên có hoạt động không
      */

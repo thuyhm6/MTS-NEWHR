@@ -45,7 +45,6 @@
         <result column="RECRUIT_TYPE" property="recruitType"/>
         <result column="INSURANCE_TYPE" property="insuranceType"/>
         <result column="INSURANCE_AREA" property="insuranceArea"/>
-        <result column="FILENUMBER" property="filenumber"/>
         <result column="EMPLOYEE_OWNED" property="employeeOwned"/>
         <result column="WAGE_TYPE" property="wageType"/>
         <result column="POSITION" property="position"/>
@@ -63,8 +62,6 @@
         <result column="PERSON_SUPPLIER_COMPANY" property="personSupplierCompany"/>
         <result column="OT_LIMIT" property="otLimit"/>
         <result column="OT_LIMIT_100" property="otLimit100"/>
-        <result column="UPDATED_OT_LIMIT_BY" property="updatedOtLimitBy"/>
-        <result column="UPDATE_OT_LIMIT_DATE" property="updateOtLimitDate"/>
     </resultMap>
 
     <!-- ============================================ -->
@@ -114,7 +111,6 @@
         he.RECRUIT_TYPE,
         he.INSURANCE_TYPE,
         he.INSURANCE_AREA,
-        he.FILENUMBER,
         he.EMPLOYEE_OWNED,
         he.WAGE_TYPE,
         he.POSITION,
@@ -131,9 +127,7 @@
         he.IS_PROBATION,
         he.PERSON_SUPPLIER_COMPANY,
         he.OT_LIMIT,
-        he.OT_LIMIT_100,
-        he.UPDATED_OT_LIMIT_BY,
-        he.UPDATE_OT_LIMIT_DATE
+        he.OT_LIMIT_100
     </sql>
 
     <!-- Fragment 2: Base FROM clause -->
@@ -535,11 +529,10 @@
             STATUS_CODE, DATE_LEFT, ID_CARD_NO, SHIFT_NO, EMP_OFFICE, INCUMBENCY,
             PROMOTION_DAY, POST_FAMILY, AFFIRM_WORK_AGE, WORK_HOUR_TYPE,
             DIRECT_INDIRECT_DISTINCTION, RECRUIT_TYPE, INSURANCE_TYPE, INSURANCE_AREA,
-            FILENUMBER, EMPLOYEE_OWNED, WAGE_TYPE, POSITION, DATE_LAST_UP, RECOMMEND,
+            EMPLOYEE_OWNED, WAGE_TYPE, POSITION, DATE_LAST_UP, RECOMMEND,
             DATE_GROUP_ENTRY, LAST_HAOFENG_DATE, ASSIGNMENT_INFORMATION, COST_CENTER,
             PAY_STEP_NO, PHONE_CARD_NO, LIZHIREASON, SOCIAL_DIFFERENTIATION,
-            IS_PROBATION, PERSON_SUPPLIER_COMPANY, OT_LIMIT, OT_LIMIT_100,
-            UPDATED_OT_LIMIT_BY, UPDATE_OT_LIMIT_DATE
+            IS_PROBATION, PERSON_SUPPLIER_COMPANY, OT_LIMIT, OT_LIMIT_100
         ) VALUES (
             #{empId}, #{chinesePinyin}, #{englishName}, #{positionNo}, #{postGradeNo},
             #{dateStarted}, #{endProbationDate}, #{empTypeCode}, #{cpnyId, jdbcType=VARCHAR}, #{personId},
@@ -549,11 +542,10 @@
             #{statusCode}, #{dateLeft}, #{idCardNo}, #{shiftNo}, #{empOffice}, #{incumbency},
             #{promotionDay}, #{postFamily}, #{affirmWorkAge}, #{workHourType},
             #{directIndirectDistinction}, #{recruitType}, #{insuranceType}, #{insuranceArea},
-            #{filenumber}, #{employeeOwned}, #{wageType}, #{position}, #{dateLastUp}, #{recommend},
+            #{employeeOwned}, #{wageType}, #{position}, #{dateLastUp}, #{recommend},
             #{dateGroupEntry}, #{lastHaofengDate}, #{assignmentInformation}, #{costCenter},
             #{payStepNo}, #{phoneCardNo}, #{lizhireason}, #{socialDifferentiation},
-            #{isProbation}, #{personSupplierCompany}, #{otLimit}, #{otLimit100},
-            #{updatedOtLimitBy}, #{updateOtLimitDate}
+            #{isProbation}, #{personSupplierCompany}, #{otLimit}, #{otLimit100}
         )
     </insert>
 
@@ -651,9 +643,6 @@
             <if test="insuranceArea != null">
                 INSURANCE_AREA = #{insuranceArea},
             </if>
-            <if test="filenumber != null">
-                FILENUMBER = #{filenumber},
-            </if>
             <if test="employeeOwned != null">
                 EMPLOYEE_OWNED = #{employeeOwned},
             </if>
@@ -704,12 +693,6 @@
             </if>
             <if test="otLimit100 != null">
                 OT_LIMIT_100 = #{otLimit100},
-            </if>
-            <if test="updatedOtLimitBy != null">
-                UPDATED_OT_LIMIT_BY = #{updatedOtLimitBy},
-            </if>
-            <if test="updateOtLimitDate != null">
-                UPDATE_OT_LIMIT_DATE = #{updateOtLimitDate},
             </if>
             <if test="mainBusiness != null">
                 MAIN_BUSINESS = #{mainBusiness},

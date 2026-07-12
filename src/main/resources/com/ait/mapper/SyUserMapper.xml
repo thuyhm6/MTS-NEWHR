@@ -24,13 +24,6 @@
         <result column="ORDERNO" property="orderNo"/>
         <result column="ACTIVITY" property="activity"/>
         <result column="PERSONAL_DATA_FLAG" property="personalDataFlag"/>
-        <result column="PERSONAL_DATA_UPDATE_DATE" property="personalDataUpdateDate"/>
-        <result column="PERSONAL_DATA_UPDATED_IP" property="personalDataUpdatedIp"/>
-        <result column="PERSONAL_DATA_UPDATED_BY" property="personalDataUpdatedBy"/>
-        <result column="PERSONAL_SEND_DATA_FLAG" property="personalSendDataFlag"/>
-        <result column="PERSONAL_SEND_DATA_UPDATE_DATE" property="personalSendDataUpdateDate"/>
-        <result column="PERSONAL_SEND_DATA_UPDATED_IP" property="personalSendDataUpdatedIp"/>
-        <result column="PERSONAL_SEND_DATA_UPDATED_BY" property="personalSendDataUpdatedBy"/>
         <result column="EMP_NAME" property="empName"/>
         <result column="DEPT_NAME" property="deptName"/>
     </resultMap>
@@ -55,14 +48,7 @@
             UPDATED_BY,
             ORDERNO,
             ACTIVITY,
-            PERSONAL_DATA_FLAG,
-            PERSONAL_DATA_UPDATE_DATE,
-            PERSONAL_DATA_UPDATED_IP,
-            PERSONAL_DATA_UPDATED_BY,
-            PERSONAL_SEND_DATA_FLAG,
-            PERSONAL_SEND_DATA_UPDATE_DATE,
-            PERSONAL_SEND_DATA_UPDATED_IP,
-            PERSONAL_SEND_DATA_UPDATED_BY
+            PERSONAL_DATA_FLAG
         FROM sy_user 
         WHERE USER_NAME = #{userName}
     </select>
@@ -87,14 +73,7 @@
             UPDATED_BY,
             ORDERNO,
             ACTIVITY,
-            PERSONAL_DATA_FLAG,
-            PERSONAL_DATA_UPDATE_DATE,
-            PERSONAL_DATA_UPDATED_IP,
-            PERSONAL_DATA_UPDATED_BY,
-            PERSONAL_SEND_DATA_FLAG,
-            PERSONAL_SEND_DATA_UPDATE_DATE,
-            PERSONAL_SEND_DATA_UPDATED_IP,
-            PERSONAL_SEND_DATA_UPDATED_BY
+            PERSONAL_DATA_FLAG
         FROM sy_user 
         WHERE USER_NO = #{userNo}
     </select>
@@ -119,14 +98,7 @@
             UPDATED_BY,
             ORDERNO,
             ACTIVITY,
-            PERSONAL_DATA_FLAG,
-            PERSONAL_DATA_UPDATE_DATE,
-            PERSONAL_DATA_UPDATED_IP,
-            PERSONAL_DATA_UPDATED_BY,
-            PERSONAL_SEND_DATA_FLAG,
-            PERSONAL_SEND_DATA_UPDATE_DATE,
-            PERSONAL_SEND_DATA_UPDATED_IP,
-            PERSONAL_SEND_DATA_UPDATED_BY
+            PERSONAL_DATA_FLAG
         FROM sy_user 
         WHERE PERSON_ID = #{personId}
     </select>
@@ -152,14 +124,7 @@
             UPDATED_BY,
             ORDERNO,
             ACTIVITY,
-            PERSONAL_DATA_FLAG,
-            PERSONAL_DATA_UPDATE_DATE,
-            PERSONAL_DATA_UPDATED_IP,
-            PERSONAL_DATA_UPDATED_BY,
-            PERSONAL_SEND_DATA_FLAG,
-            PERSONAL_SEND_DATA_UPDATE_DATE,
-            PERSONAL_SEND_DATA_UPDATED_IP,
-            PERSONAL_SEND_DATA_UPDATED_BY
+            PERSONAL_DATA_FLAG
         FROM sy_user 
         WHERE USER_NAME = #{userName} 
           AND PASSWORD = #{password}
@@ -188,14 +153,7 @@
             u.UPDATED_BY,
             u.ORDERNO,
             u.ACTIVITY,
-            u.PERSONAL_DATA_FLAG,
-            u.PERSONAL_DATA_UPDATE_DATE,
-            u.PERSONAL_DATA_UPDATED_IP,
-            u.PERSONAL_DATA_UPDATED_BY,
-            u.PERSONAL_SEND_DATA_FLAG,
-            u.PERSONAL_SEND_DATA_UPDATE_DATE,
-            u.PERSONAL_SEND_DATA_UPDATED_IP,
-            u.PERSONAL_SEND_DATA_UPDATED_BY
+            u.PERSONAL_DATA_FLAG
         FROM sy_user u
         INNER JOIN hr_employee e ON u.PERSON_ID = e.PERSON_ID
         INNER JOIN hr_department d ON e.DEPTNO = d.DEPTNO
@@ -249,14 +207,7 @@
             UPDATED_BY,
             ORDERNO,
             ACTIVITY,
-            PERSONAL_DATA_FLAG,
-            PERSONAL_DATA_UPDATE_DATE,
-            PERSONAL_DATA_UPDATED_IP,
-            PERSONAL_DATA_UPDATED_BY,
-            PERSONAL_SEND_DATA_FLAG,
-            PERSONAL_SEND_DATA_UPDATE_DATE,
-            PERSONAL_SEND_DATA_UPDATED_IP,
-            PERSONAL_SEND_DATA_UPDATED_BY
+            PERSONAL_DATA_FLAG
         FROM sy_user 
         WHERE ACTIVITY = 1
         ORDER BY USER_NO

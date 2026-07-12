@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ait.hrm.empinfo.mapper.HrHealthInfoMapper">
+
+    <resultMap id="HrHealthInfoResultMap" type="com.ait.hrm.empinfo.model.HrHealthInfo">
+        <id property="healthNo" column="HEALTH_NO" jdbcType="VARCHAR"/>
+        <result property="personId" column="PERSON_ID" jdbcType="VARCHAR"/>
+        <result property="healthType" column="HEALTH_TYPE" jdbcType="VARCHAR"/>
+        <result property="height" column="HEIGHT" jdbcType="VARCHAR"/>
+        <result property="weight" column="WEIGHT" jdbcType="VARCHAR"/>
+        <result property="historyDisease" column="HISTORY_DISEASE" jdbcType="VARCHAR"/>
+        <result property="bloodGroup" column="BLOOD_GROUP" jdbcType="VARCHAR"/>
+        <result property="vacxinNo1" column="VACXIN_NO1" jdbcType="VARCHAR"/>
+        <result property="vacxinNo2" column="VACXIN_NO2" jdbcType="VARCHAR"/>
+        <result property="placeVacxinNo1" column="PLACE_VACXIN_NO1" jdbcType="VARCHAR"/>
+        <result property="placeVacxinNo2" column="PLACE_VACXIN_NO2" jdbcType="VARCHAR"/>
+        <result property="dateHealth" column="DATE_HEALTH" jdbcType="DATE"/>
+        <result property="healthCnpy" column="HEALTH_CNPY" jdbcType="VARCHAR"/>
+        <result property="activity" column="ACTIVITY" jdbcType="DECIMAL"/>
+        <result property="createDate" column="CREATE_DATE" jdbcType="TIMESTAMP"/>
+        <result property="createdBy" column="CREATED_BY" jdbcType="VARCHAR"/>
+        <result property="updateDate" column="UPDATE_DATE" jdbcType="TIMESTAMP"/>
+        <result property="updatedBy" column="UPDATED_BY" jdbcType="VARCHAR"/>
+        <result property="createdIp" column="CREATED_IP" jdbcType="VARCHAR"/>
+        <result property="updatedIp" column="UPDATED_IP" jdbcType="VARCHAR"/>
+        <result property="empId" column="EMPID" jdbcType="VARCHAR"/>
+        <result property="localName" column="LOCAL_NAME" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getByPersonId" resultMap="HrHealthInfoResultMap">
+        SELECT
+            t1.HEALTH_NO,
+            t1.PERSON_ID,
+            t1.HEALTH_TYPE,
+            t1.HEIGHT,
+            t1.WEIGHT,
+            t1.HISTORY_DISEASE,
+            t1.BLOOD_GROUP,
+            t1.VACXIN_NO1,
+            t1.VACXIN_NO2,
+            t1.PLACE_VACXIN_NO1,
+            t1.PLACE_VACXIN_NO2,
+            t1.DATE_HEALTH,
+            t1.HEALTH_CNPY,
+            t1.ACTIVITY,
+            t1.CREATE_DATE,
+            t1.CREATED_BY,
+            t1.UPDATE_DATE,
+            t1.UPDATED_BY,
+            t1.CREATED_IP,
+            t1.UPDATED_IP,
+            t2.EMPID,
+            t2.LOCAL_NAME
+        FROM HR_HEALTH_INFO t1
+        LEFT JOIN HR_EMPLOYEE t2 ON t1.PERSON_ID = t2.PERSON_ID
+        WHERE t1.PERSON_ID = #{personId, jdbcType=VARCHAR}
+          AND (t1.ACTIVITY = 1 OR t1.ACTIVITY IS NULL)
+        ORDER BY t1.DATE_HEALTH DESC
+    </select>
+
+</mapper>
