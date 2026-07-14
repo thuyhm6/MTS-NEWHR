@@ -240,7 +240,7 @@
 
             // Tải danh sách loại nghỉ phép thông qua parentCodeNo 21
             $.ajax({
-                url: '/sys/api/code/list?parentCodeNo=21',
+                url: '/sys/api/getCode/list?parentCodeNo=21',
                 success: function (data) {
                     _lv_typeList = data || [];
                     lvPopulateLeaveTypeFilter();

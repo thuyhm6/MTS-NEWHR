@@ -1029,7 +1029,7 @@
 
                 // Load grade options (14015161) rồi mới load dữ liệu lần đầu
                 $.ajax({
-                    url: '/sys/api/code/list?parentCodeNo=14015161',
+                    url: '/sys/api/getCode/list?parentCodeNo=14015161',
                     type: 'GET',
                     success: function (data) {
                         inst.gradeOptions = (data || []).map(function (code) {

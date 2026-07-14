@@ -235,7 +235,7 @@
             abInitDate();
 
             $.ajax({
-                url: '/sys/api/code/list?parentCodeNo=21',
+                url: '/sys/api/getCode/list?parentCodeNo=21',
                 success: function (data) {
                     _ab_typeList = data || [];
                     abPopulateLeaveTypeFilter();
